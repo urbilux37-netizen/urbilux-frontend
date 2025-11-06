@@ -1,7 +1,10 @@
 <template>
   <div class="blog-page">
-    <!-- Navbar -->
+    <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
+
 
     <!-- Hero Section -->
     <section class="hero">

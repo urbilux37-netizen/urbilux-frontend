@@ -1,7 +1,9 @@
 <template>
   <div>
+    <div >
     <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <!-- 🟣 All Products Section -->
     <h2 class="page-title">🛒 All Products</h2>

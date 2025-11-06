@@ -1,7 +1,10 @@
 <template>
   <div class="coming-soon-page">
-    <!-- Navbar -->
+   <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
+
 
     <div class="coming-soon-content">
       <h1>Coming Soon</h1>

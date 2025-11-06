@@ -1,7 +1,11 @@
 <template>
   <div class="terms-page">
     <!-- Navbar -->
+
+   <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <!-- Hero Section -->
     <header class="hero">

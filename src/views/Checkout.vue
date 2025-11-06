@@ -1,6 +1,9 @@
 <template>
   <div>
+ <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <div class="checkout-page">
       <h1 class="checkout-title">Checkout</h1>

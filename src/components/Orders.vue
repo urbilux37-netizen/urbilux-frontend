@@ -1,6 +1,9 @@
 <template>
   <div class="orders-page">
+     <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <section class="header">
       <h1>My Orders</h1>

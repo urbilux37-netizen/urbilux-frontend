@@ -1,7 +1,9 @@
 <template>
   <div>
-    <!-- Navbar -->
+  <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <!-- Categories Section -->
     <div class="categories-section" v-if="categories.length">

@@ -1,7 +1,10 @@
 <template>
   <div>
-    <!-- Navbar -->
+     <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
+
 
     <!-- Main Search Content -->
     <div class="search-page-wrapper">

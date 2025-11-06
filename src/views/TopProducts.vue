@@ -1,8 +1,9 @@
 <template>
   <div>
+    <div >
     <!-- 🟣 Navbar -->
     <Navbar />
-
+     </div>
     <!-- 🟣 Top Products Section -->
     <h2 class="page-title">⭐ Top Products</h2>
 

@@ -1,6 +1,10 @@
 <template>
   <div>
+    <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
+
     <div class="login-container">
       <h2 class="login-title">Login</h2>
       <form @submit.prevent="handleLogin" class="login-form">

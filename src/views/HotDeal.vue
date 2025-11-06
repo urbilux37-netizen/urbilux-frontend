@@ -1,7 +1,9 @@
 <template>
   <div>
+     <div >
     <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <!-- 🟣 Hot Deals Section -->
     <div class="products-page">

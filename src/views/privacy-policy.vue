@@ -1,7 +1,9 @@
 <template>
   <div class="privacy-page">
-    <!-- Navbar -->
+ <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <!-- Hero / Header -->
     <header class="hero">

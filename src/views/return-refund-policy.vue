@@ -1,7 +1,9 @@
 <template>
   <div class="return-refund-page">
-    <!-- 🔹 Navbar -->
+    <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <!-- 🔹 Header Section -->
     <header class="header">

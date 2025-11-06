@@ -1,6 +1,9 @@
 <template>
   <div>
+     <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <div class="home-wrapper category-page">
       <h1 class="category-title">{{ slug }} Products</h1>

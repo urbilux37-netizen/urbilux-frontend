@@ -1,7 +1,9 @@
 <template>
   <div class="delivery-policy-page">
-    <!-- 🔹 Navbar -->
+    <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <!-- 🔹 Page Header -->
     <header class="header">

@@ -1,7 +1,10 @@
 <template>
   <div>
-    <!-- ================= Navbar ================= -->
+    <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
+
 
     <!-- ================= Main Product Details ================= -->
     <div class="product-page">
