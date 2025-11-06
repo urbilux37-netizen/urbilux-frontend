@@ -1,12 +1,12 @@
 <template>
   <div>
     <Navbar />
-
-    <div class="home-content">
-      <!-- Banner Slider -->
-      <div>
+     <div>
     <WelcomeBanner />
   </div>
+    <div class="home-content">
+      <!-- Banner Slider -->
+
 
       <!-- Top Categories -->
       <div class="categories-section" v-if="categories.length">
