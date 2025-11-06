@@ -20,7 +20,7 @@
 /* === Base Section === */
 .welcome-banner {
   width: 100%;
-  min-height: 60vh; /* 🟣 Reduced from full-screen to 60% height */
+  min-height: 70vh; /* 🟣 Reduced from full-screen to 60% height */
   background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
   display: flex;
   justify-content: center;
