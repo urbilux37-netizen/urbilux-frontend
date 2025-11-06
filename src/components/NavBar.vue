@@ -17,6 +17,7 @@
           <!-- Keep your logo image optionally -->
 <img src="@/assets/logo.png" alt="URBILUX Logo" class="brand-logo" />
           <h3 class="brand-text">URBILUX</h3>
+
         </div>
 
         <!-- ✅ Search (center, desktop only) -->
@@ -283,7 +284,7 @@ watch(itemCount, () => {
 
 /* ---------- Brand ---------- */
 .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
-.brand-logo { width: 36px; height: 36px; border-radius: 9px; object-fit: contain; }
+.brand-logo { width: 36px; height: 36px; border-radius: 9px; object-fit: contain;  mix-blend-mode: screen; /* blends logo over dark bg */}
 .brand-text {
   font-size: 28px; letter-spacing: .6px; font-weight: 800;
   color: #7a00ff;
