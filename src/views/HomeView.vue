@@ -105,7 +105,7 @@ const placeholder = new URL('@/assets/no-image.png', import.meta.url).href;
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : "https://avado-backend.onrender.com";
+    : "https://urbilux-backend.onrender.com";
 
 // ------------------ Banners ------------------
 const banners = ref([]);
