@@ -81,7 +81,7 @@ import axios from "axios";
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : "https://avado-backend.onrender.com";
+    : "https://urbilux-backend.onrender.com";
 
 console.log("🔗 Using API base:", API_BASE);
 

@@ -46,7 +46,7 @@ import ProductCard from "@/components/ProductCard.vue";
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : "https://avado-backend.onrender.com";
+    : "https://urbilux-backend.onrender.com";
 
 // ✅ Use axios instance (no /api prefix issues)
 const api = axios.create({

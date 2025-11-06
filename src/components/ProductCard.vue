@@ -40,7 +40,7 @@ const cartStore = useCartStore();
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
-    : "https://avado-backend.onrender.com";
+    : "https://urbilux-backend.onrender.com";
 
 // ✅ Navigate to product page
 const goToProductPage = () => {

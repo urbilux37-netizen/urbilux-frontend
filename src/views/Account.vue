@@ -28,7 +28,7 @@ const router = useRouter();
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
-    : "https://avado-backend.onrender.com/api";
+    : "https://urbilux-backend.onrender.com/api";
 
 // ✅ Axios setup for cookies & base URL
 axios.defaults.withCredentials = true;

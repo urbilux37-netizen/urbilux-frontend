@@ -13,7 +13,7 @@ const isProduction = import.meta.env.PROD;
 
 // 🟢 Set baseURL automatically
 axios.defaults.baseURL = isProduction
-  ? "https://avado-backend.onrender.com/api" // 🌍 Live (Render backend)
+  ? "https://urbilux-backend.onrender.com/api" // 🌍 Live (Render backend)
   : "http://localhost:5000/api";              // 💻 Local backend
 
 axios.defaults.withCredentials = true;

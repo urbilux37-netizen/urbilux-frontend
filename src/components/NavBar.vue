@@ -161,7 +161,7 @@ const { itemCount } = storeToRefs(cartStore);
 axios.defaults.baseURL =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
-    : "https://avado-backend.onrender.com/api";
+    : "https://urbilux-backend.onrender.com/api";
 
 axios.defaults.withCredentials = true; // ✅ Cookie পাঠানোর জন্য
 
@@ -203,7 +203,7 @@ const fetchSuggestions = async () => {
     const base =
       window.location.hostname === "localhost"
         ? "http://localhost:5000"
-        : "https://avado-backend.onrender.com";
+        : "https://urbilux-backend.onrender.com";
     const res = await axios.get(
       `${base}/products/search?q=${encodeURIComponent(query)}`
     );

@@ -141,7 +141,7 @@ router.beforeEach(async (to, from, next) => {
     try {
       // 🔹 Backend থেকে current user তথ্য যাচাই (Render backend)
       const res = await axios.get(
-        "https://avado-backend.onrender.com/api/auth/current-user",
+        "https://urbilux-backend.onrender.com/api/auth/current-user",
         { withCredentials: true }
       );
 

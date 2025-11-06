@@ -130,7 +130,7 @@ export default {
       API_BASE:
         window.location.hostname === "localhost"
           ? "http://localhost:5000"
-          : "https://avado-backend.onrender.com",
+          : "https://urbilux-backend.onrender.com",
       categories: [],
       products: [],
       loading: false,
