@@ -87,6 +87,7 @@
 }
 
 /* Section Titles */
+/* Section Titles */
 .section-title {
   font-family: "Alice", serif;
   font-weight: 400;
@@ -97,11 +98,13 @@
   -webkit-text-fill-color: transparent;
   font-size: 24px;
   font-weight: bold;
- margin: 8px auto;
-
+  margin: 8px auto; /* centers the element horizontally */
+  text-align: center; /* centers text content */
   position: relative;
-  display: inline-block;
+  display: inline-block; /* allows underline to fit text width */
   padding-bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .section-title::after {
