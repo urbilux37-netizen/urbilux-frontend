@@ -1,72 +1,169 @@
 <template>
-  <section class="welcome-banner">
-    <div class="content">
-      <h1 class="title">Welcome to <span class="brand">URBILUX</span></h1>
-      <p class="subtitle">
-        Discover elegance and style across our exclusive collections, tailored for your sophisticated taste.
-      </p>
-      <a href="https://urbilux.pages.dev/all-products" class="shop-btn">
-        Shop Now
-      </a>
+  <div>
+    <Navbar />
+
+    <div class="home-content">
+      <!-- Banner Slider -->
+      <div>
+    <WelcomeBanner />
+  </div>
+
+      <!-- Top Categories -->
+      <div class="categories-section" v-if="categories.length">
+        <h2 class="section-title">Top Categories</h2>
+        <div class="categories-grid">
+          <div
+            v-for="category in categories"
+            :key="category.id"
+            class="category-card"
+          >
+            <router-link :to="`/category/${category.slug}`">
+              <img
+                :src="category.image_url || placeholder"
+                :alt="category.slug"
+                class="category-image"
+              />
+              <p>{{ category.slug }}</p>
+            </router-link>
+          </div>
+        </div>
+        <span class="section-link" @click="router.push('/categories')">See All Categories</span>
+      </div>
+
+      <!-- Hot Deals Section -->
+      <div class="products-section" v-if="hotDeals.length">
+        <h2 class="section-title">Hot Deals</h2>
+        <div class="products-grid">
+          <ProductCard
+            v-for="product in hotDeals"
+            :key="product.id"
+            :product="product"
+          />
+        </div>
+        <span class="section-link" @click="router.push('/hot-deal')">View All Hot Deals</span>
+      </div>
+
+      <!-- Top Products Section -->
+      <div class="products-section" v-if="topProducts.length">
+        <h2 class="section-title">Top Products</h2>
+        <div class="products-grid">
+          <ProductCard
+            v-for="product in topProducts"
+            :key="product.id"
+            :product="product"
+          />
+        </div>
+        <span class="section-link" @click="router.push('/top-products')">See All Top Products</span>
+      </div>
+
+      <!-- All Products Section -->
+      <div class="products-section" v-if="allProducts.length">
+        <h2 class="section-title">All Products</h2>
+        <div class="products-grid">
+          <ProductCard
+            v-for="product in allProducts"
+            :key="product.id"
+            :product="product"
+          />
+        </div>
+        <span class="section-link" @click="router.push('/all-products')">View All Products</span>
+      </div>
     </div>
-  </section>
+
+    <Footer />
+  </div>
+
+  <head>
+    <meta charset="utf-8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alice&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>AVADO</title>
+  </head>
 </template>
 
 <script setup>
-// No JS needed — purely static section
+import Navbar from "../components/NavBar.vue";
+import ProductCard from "../components/ProductCard.vue";
+import Footer from "../components/Footer.vue";
+import { ref, onMounted, onUnmounted } from "vue";
+import axios from "axios";
+import { useRouter } from "vue-router";
+import WelcomeBanner from "../components/WelcomeBanner.vue";
+const router = useRouter();
+const placeholder = new URL('@/assets/no-image.png', import.meta.url).href;
+
+// 🔗 Detect environment and auto baseURL
+const API_BASE =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "https://urbilux-backend.onrender.com";
+
+// ------------------ Banners ------------------
+const banners = ref([]);
+const currentIndex = ref(0);
+let intervalId = null;
+
+const fetchBanners = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/banners`);
+    banners.value = res.data;
+  } catch (err) {
+    console.error("❌ Banners fetch error:", err);
+  }
+};
+
+const startSlider = () => {
+  intervalId = setInterval(() => {
+    if (banners.value.length) {
+      currentIndex.value = (currentIndex.value + 1) % banners.value.length;
+    }
+  }, 4000);
+};
+
+onMounted(async () => {
+  await fetchBanners();
+  startSlider();
+});
+
+onUnmounted(() => clearInterval(intervalId));
+
+// ------------------ Categories ------------------
+const categories = ref([]);
+const fetchCategories = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/categories`);
+    categories.value = res.data;
+  } catch (err) {
+    console.error("❌ Categories fetch error:", err);
+  }
+};
+onMounted(fetchCategories);
+
+// ------------------ Products ------------------
+const topProducts = ref([]);
+const hotDeals = ref([]);
+const allProducts = ref([]);
+
+const fetchProducts = async () => {
+  try {
+    const res = await axios.get(`${API_BASE}/products`);
+    const data = res.data || [];
+    topProducts.value = data.filter(p => p.is_top_product);
+    hotDeals.value = data.filter(p => p.is_hot_deal);
+    allProducts.value = data;
+  } catch (err) {
+    console.error("❌ Products fetch error:", err);
+  }
+};
+onMounted(fetchProducts);
 </script>
 
 <style scoped>
-.welcome-banner {
-  width: 100%;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  color: black;
-  font-family: "Georgia", serif;
-  padding: 2rem;
-}
 
-.content {
-  max-width: 800px;
-}
 
-.title {
-  font-size: 3rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-}
+@import "../views/home.css";
 
-.brand {
-  background: linear-gradient(90deg, #4a00e0, #8e2de2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
 
-.subtitle {
-  font-size: 1.1rem;
-  color: #2d2d2d;
-  line-height: 1.6;
-  margin-bottom: 2.5rem;
-}
-
-.shop-btn {
-  display: inline-block;
-  background: linear-gradient(90deg, #a24eff, #c977ff);
-  color: white;
-  font-weight: 600;
-  padding: 0.8rem 2rem;
-  border-radius: 12px;
-  text-decoration: none;
-  transition: 0.3s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.shop-btn:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
-}
-</style>
+</style> home view er style part ta daw jeno import o thake kaj o hoy
