@@ -77,7 +77,6 @@ onMounted(fetchHotDeals);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  margin-top: 70px;
   font-family: "Zalando Sans", sans-serif;
 }
 
