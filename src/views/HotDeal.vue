@@ -72,6 +72,7 @@ onMounted(fetchHotDeals);
 
 <style scoped>
 .products-page {
+  padding-top: 90px; /* default for other pages */
   width: 80%;
   margin: 0 auto;
   display: flex;

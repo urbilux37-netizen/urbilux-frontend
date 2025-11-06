@@ -79,7 +79,7 @@ onMounted(fetchAllProducts);
 
 /* Page title gradient & underline */
 .page-title {
-  margin-top: 90px;
+
   margin-left: 10%;
   font-size: 2rem;
   font-weight: 700;
@@ -88,6 +88,7 @@ onMounted(fetchAllProducts);
   -webkit-text-fill-color: transparent;
   position: relative;
   display: inline-block;
+  padding-top: 90px; /* default for other pages */
 }
 
 .page-title::after {

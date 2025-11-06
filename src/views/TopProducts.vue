@@ -1,9 +1,10 @@
 <template>
-  <div>
-    <div >
+
+    <div class="products-page" >
     <!-- 🟣 Navbar -->
     <Navbar />
      </div>
+      <div>
     <!-- 🟣 Top Products Section -->
     <h2 class="page-title">⭐ Top Products</h2>
 
@@ -69,6 +70,8 @@ onMounted(fetchTopProducts);
 
 
 <style scoped>
+.products-page {
+padding-top: 90px; /* default for other pages */}
 /* Two side 10% margin */
 .products-grid {
   display: grid;
