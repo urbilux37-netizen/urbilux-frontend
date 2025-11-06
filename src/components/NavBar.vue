@@ -285,7 +285,7 @@ watch(itemCount, () => {
 .brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .brand-logo { width: 36px; height: 36px; border-radius: 9px; object-fit: contain; }
 .brand-text {
-  font-size: 22px; letter-spacing: .6px; font-weight: 800;
+  font-size: 28px; letter-spacing: .6px; font-weight: 800;
   color: #7a00ff;
   font-family: var(--brand-font);
 }
@@ -341,7 +341,7 @@ watch(itemCount, () => {
   font-family: var(--brand-font);
 }
 .menu-link {
-  color: #000; font-size: 14px; font-weight: 600; cursor: pointer;
+  color: #000; font-size: 20px; font-weight: 600; cursor: pointer;
 }
 .menu-link:hover { color: var(--purple); }
 

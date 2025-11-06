@@ -50,7 +50,7 @@
       >
 
       </a>
-      <span> | </span>
+      <span>  </span>
       <a
         href="https://www.flaticon.com/free-icons/return"
         title="return icons"
@@ -58,7 +58,7 @@
       >
 
       </a>
-      <span> | </span>
+      <span>  </span>
       <a
         href="https://www.flaticon.com/free-icons/profit"
         title="profit icons"
