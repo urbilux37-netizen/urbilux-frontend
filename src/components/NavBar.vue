@@ -341,7 +341,7 @@ watch(itemCount, () => {
   font-family: var(--brand-font);
 }
 .menu-link {
-  color: #000; font-size: 20px; font-weight: 600; cursor: pointer;
+  color: #000; font-size: 17px; font-weight: 600; cursor: pointer;
 }
 .menu-link:hover { color: var(--purple); }
 
