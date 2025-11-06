@@ -48,7 +48,7 @@
         title="delivery icons"
         target="_blank"
       >
-        Delivery icons created by Freepik
+
       </a>
       <span> | </span>
       <a
@@ -56,7 +56,7 @@
         title="return icons"
         target="_blank"
       >
-        Return icons created by BomSymbols
+
       </a>
       <span> | </span>
       <a
@@ -64,7 +64,7 @@
         title="profit icons"
         target="_blank"
       >
-        Profit icons created by monkik
+
       </a>
     </div>
   </section>
