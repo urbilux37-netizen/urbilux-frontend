@@ -32,6 +32,22 @@
         <span class="section-link" @click="router.push('/categories')">See All Categories</span>
       </div>
 
+
+   <!-- Top Products Section -->
+      <div class="products-section" v-if="topProducts.length">
+        <h2 class="section-title">Top Products</h2>
+        <div class="products-grid">
+          <ProductCard
+            v-for="product in topProducts"
+            :key="product.id"
+            :product="product"
+          />
+        </div>
+        <span class="section-link" @click="router.push('/top-products')">See All Top Products</span>
+      </div>
+
+
+
       <!-- Hot Deals Section -->
       <div class="products-section" v-if="hotDeals.length">
         <h2 class="section-title">Hot Deals</h2>
@@ -45,18 +61,7 @@
         <span class="section-link" @click="router.push('/hot-deal')">View All Hot Deals</span>
       </div>
 
-      <!-- Top Products Section -->
-      <div class="products-section" v-if="topProducts.length">
-        <h2 class="section-title">Top Products</h2>
-        <div class="products-grid">
-          <ProductCard
-            v-for="product in topProducts"
-            :key="product.id"
-            :product="product"
-          />
-        </div>
-        <span class="section-link" @click="router.push('/top-products')">See All Top Products</span>
-      </div>
+
 
       <!-- All Products Section -->
       <div class="products-section" v-if="allProducts.length">
