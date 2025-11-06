@@ -1,8 +1,9 @@
 <template>
   <div>
     <Navbar />
-     <div>
     <WelcomeBanner />
+     <div>
+
 
   </div>
     <div class="home-content">
