@@ -15,7 +15,7 @@
         <!-- ✅ Brand (left) -->
         <div class="brand" @click="goHome">
           <!-- Keep your logo image optionally -->
-          <img class="brand-logo" src="@/assets/logo.png" alt="URBILUX" />
+
           <h3 class="brand-text">URBILUX</h3>
         </div>
 
@@ -286,7 +286,7 @@ watch(itemCount, () => {
 .brand-logo { width: 36px; height: 36px; border-radius: 9px; object-fit: contain; }
 .brand-text {
   font-size: 22px; letter-spacing: .6px; font-weight: 800;
-  color: var(--purple);
+  color: #7a00ff;
   font-family: var(--brand-font);
 }
 
@@ -360,12 +360,20 @@ watch(itemCount, () => {
 
 /* Sign up pill (when logged out) */
 .signup-btn {
-  background: var(--purple); color: #fff;
-  border: 1px solid rgba(142, 45, 226, .2);
-  border-radius: 12px; padding: 10px 16px; font-weight: 700; cursor: pointer;
-  box-shadow: 0 10px 20px rgba(142, 45, 226, 0.18);
+  background: linear-gradient(90deg, #7a00ff, #b38dff); /* bright purple gradient */
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(122, 0, 255, 0.25);
 }
-.signup-btn:hover { box-shadow: 0 14px 26px rgba(142, 45, 226, 0.24); }
+.signup-btn:hover {
+  box-shadow: 0 8px 22px rgba(122, 0, 255, 0.35);
+  transform: translateY(-1px);
+  transition: 0.2s ease;
+}
 
 /* ---------- Mobile bottom bar ---------- */
 .mobile-bottom-bar { display: none; }
