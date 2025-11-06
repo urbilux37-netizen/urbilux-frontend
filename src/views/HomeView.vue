@@ -3,12 +3,13 @@
     <Navbar />
      <div>
     <WelcomeBanner />
-     <ServiceFeatures />
+
   </div>
     <div class="home-content">
       <!-- Banner Slider -->
-
-
+       <div class="div">
+<ServiceFeatures />
+</div>
       <!-- Top Categories -->
       <div class="categories-section" v-if="categories.length">
         <h2 class="section-title">Top Categories</h2>
@@ -167,4 +168,4 @@ onMounted(fetchProducts);
 @import "../views/home.css";
 
 
-</style> home view er style part ta daw jeno import o thake kaj o hoy
+</style>
