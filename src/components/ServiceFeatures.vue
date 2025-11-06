@@ -51,7 +51,7 @@
 /* ===== Section Wrapper ===== */
 .service-section {
   width: 100%;
-  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
+  background: white;
   padding: 4rem 2rem;
   text-align: center;
 }
