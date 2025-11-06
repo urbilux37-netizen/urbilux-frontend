@@ -1,16 +1,17 @@
 <template>
   <div>
+    <!-- 🟣 Navbar -->
     <Navbar />
+
+    <!-- 🟣 Banner -->
     <WelcomeBanner />
-     <div>
 
-
-  </div>
+    <!-- 🟣 Home Page Content -->
     <div class="home-content">
-      <!-- Banner Slider -->
-       <div class="div">
-<ServiceFeatures />
-</div>
+
+      <!-- Service Features Section -->
+      <ServiceFeatures />
+
       <!-- Top Categories -->
       <div class="categories-section" v-if="categories.length">
         <h2 class="section-title">Top Categories</h2>
@@ -30,11 +31,12 @@
             </router-link>
           </div>
         </div>
-        <span class="section-link" @click="router.push('/categories')">See All Categories</span>
+        <span class="section-link" @click="router.push('/categories')">
+          See All Categories
+        </span>
       </div>
 
-
-   <!-- Top Products Section -->
+      <!-- Top Products -->
       <div class="products-section" v-if="topProducts.length">
         <h2 class="section-title">Top Products</h2>
         <div class="products-grid">
@@ -44,12 +46,12 @@
             :product="product"
           />
         </div>
-        <span class="section-link" @click="router.push('/top-products')">See All Top Products</span>
+        <span class="section-link" @click="router.push('/top-products')">
+          See All Top Products
+        </span>
       </div>
 
-
-
-      <!-- Hot Deals Section -->
+      <!-- Hot Deals -->
       <div class="products-section" v-if="hotDeals.length">
         <h2 class="section-title">Hot Deals</h2>
         <div class="products-grid">
@@ -59,12 +61,12 @@
             :product="product"
           />
         </div>
-        <span class="section-link" @click="router.push('/hot-deal')">View All Hot Deals</span>
+        <span class="section-link" @click="router.push('/hot-deal')">
+          View All Hot Deals
+        </span>
       </div>
 
-
-
-      <!-- All Products Section -->
+      <!-- All Products -->
       <div class="products-section" v-if="allProducts.length">
         <h2 class="section-title">All Products</h2>
         <div class="products-grid">
@@ -74,20 +76,16 @@
             :product="product"
           />
         </div>
-        <span class="section-link" @click="router.push('/all-products')">View All Products</span>
+        <span class="section-link" @click="router.push('/all-products')">
+          View All Products
+        </span>
       </div>
-    </div>
 
+    </div> <!-- ✅ Properly closed home-content -->
+
+    <!-- 🟣 Footer -->
+    <Footer />
   </div>
-
-  <head>
-    <meta charset="utf-8" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alice&display=swap" rel="stylesheet">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-    <title>AVADO</title>
-  </head>
 </template>
 
 <script setup>
