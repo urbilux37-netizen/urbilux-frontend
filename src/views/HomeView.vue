@@ -168,5 +168,13 @@ onMounted(fetchProducts);
 </script>
 
 <style scoped>
+
+:deep(body) {
+  background: linear-gradient(135deg, #B38DFF, #D3B8FF);
+  min-height: 100vh;
+  background-attachment: fixed;
+}
 @import "../views/home.css";
+
+
 </style>
