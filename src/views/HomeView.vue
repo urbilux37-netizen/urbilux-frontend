@@ -172,9 +172,5 @@ onMounted(fetchProducts);
 @import "../views/home.css";
 
 /* ✅ body gradient যেন কাজ করে scoped অবস্থায়ও */
-:deep(body) {
-  background: linear-gradient(135deg, #B38DFF, #D3B8FF);
-  background-attachment: fixed;
-  min-height: 100vh;
-}
+
 </style>
