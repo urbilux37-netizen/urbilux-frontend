@@ -133,6 +133,13 @@
 
 /* Mobile (🟣 3 cards per row) */
 @media (max-width: 768px) {
+  .service-section {
+  width: 100%;
+  max-width: 1200px; /* match your home-content max width */
+  margin: 0 auto;
+  border-radius: 16px;
+}
+
   .cards-container {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
