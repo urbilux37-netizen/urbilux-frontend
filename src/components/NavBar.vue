@@ -15,7 +15,7 @@
         <!-- ✅ Brand (left) -->
         <div class="brand" @click="goHome">
           <!-- Keep your logo image optionally -->
-
+<img src="@/assets/logo.png" alt="URBILUX Logo" class="brand-logo" />
           <h3 class="brand-text">URBILUX</h3>
         </div>
 
