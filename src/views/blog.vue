@@ -30,7 +30,6 @@
     </section>
 
     <!-- Footer -->
-    <Footer />
   </div>
 </template>
 

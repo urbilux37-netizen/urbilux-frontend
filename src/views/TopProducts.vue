@@ -26,7 +26,6 @@
     </div>
 
     <!-- 🟣 Footer -->
-    <Footer />
   </div>
 </template>
 

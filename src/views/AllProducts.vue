@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div >
+    <div class="">
     <!-- 🟣 Navbar -->
     <Navbar />
      </div>
@@ -27,7 +27,6 @@
     </div>
 
     <!-- 🟣 Footer -->
-    <Footer />
   </div>
 </template>
 

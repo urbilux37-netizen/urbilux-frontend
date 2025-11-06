@@ -116,7 +116,6 @@
       </article>
     </section>
 
-    <Footer />
   </div>
 </template>
 

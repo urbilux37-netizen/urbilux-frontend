@@ -78,7 +78,6 @@
       </div>
     </div>
 
-    <Footer />
   </div>
 
   <head>

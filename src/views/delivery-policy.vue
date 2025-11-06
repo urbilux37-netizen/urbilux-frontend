@@ -62,7 +62,6 @@
     </main>
 
     <!-- 🔹 Footer -->
-    <Footer />
   </div>
 </template>
 
