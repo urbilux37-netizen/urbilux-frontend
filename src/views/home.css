@@ -2,6 +2,11 @@
    🌟 AVADO Home Page CSS
    Desktop unchanged, Mobile updated
 =================================*/
+body {
+  background: linear-gradient(135deg, #B38DFF, #D3B8FF);
+  min-height: 100vh;
+  background-attachment: fixed;
+}
 
 /* Main wrapper */
 .home-content {
