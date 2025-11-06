@@ -1,0 +1,238 @@
+/* ===============================
+   🌟 AVADO Home Page CSS
+   Desktop unchanged, Mobile updated
+=================================*/
+
+/* Main wrapper */
+.home-content {
+  width: 80%; /* desktop width */
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  margin-top: 60px;
+}
+
+/* Banner */
+.banner-slider {
+  width: 100%;
+  height: 600px;
+  margin: 50px auto;
+  position: relative;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+    object-position: center;
+}
+
+.banner-title {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  color: white;
+  font-size: 2rem;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(0,0,0,0.7);
+}
+
+/* Categories */
+.categories-section {
+  margin-top: 50px;
+}
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  justify-content: space-between;
+}
+
+.category-card {
+  text-align: center;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+  width: 200px;
+  height: 150px;
+  margin-top: 10px;
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+}
+
+.category-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.category-card p {
+  font-size: 14px;
+}
+
+/* Section Titles */
+.section-title {
+  font-family: "Alice", serif;
+  font-weight: 400;
+  font-style: normal;
+  background: linear-gradient(to right, #a100ff, #ff00ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  position: relative;
+  display: inline-block;
+  padding-bottom: 8px;
+}
+
+.section-title::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 4px;
+  width: 100%;
+  border-radius: 2px;
+  background: linear-gradient(to right, #a100ff, #ff00ff);
+}
+
+/* Section link */
+.section-link {
+  font-family: "Zalando Sans", sans-serif;
+  display: block;
+  font-size: 0.95rem;
+  margin-top: 4px;
+  color: #8E2DE2;
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
+  margin-left: 88%;
+}
+
+.section-link:hover {
+  color: #4A00E0;
+}
+
+/* Products */
+.products-section {
+  margin: 30px 0;
+}
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 15px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Desktop/Tablets unchanged */
+@media (max-width: 1024px) {
+  .products-grid, .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  /* Banner margin 5% both sides */
+  .banner-slider {
+    width: 90%; /* 5% margin each side */
+    height: 300px;
+
+    margin-top: 80px;
+    margin-right: 5%;
+    margin-left: 5%;
+    margin-bottom: 0;
+  }
+  .banner-title {
+    font-size: 1.2rem;
+  }
+  /* Categories */
+.categories-section {
+  margin-top: 0px;
+}
+
+.home-content{
+margin-top: 0px;
+}
+  /* Categories grid 1 row 3-4 card */
+  .categories-grid {
+
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .category-card {
+  text-align: center;
+  border-radius: 8px;
+height: 100px;
+width: 100px;
+
+}
+
+.category-card:hover {
+  transform: scale(1.05);
+}
+
+.category-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+  /* Products grid 2 card per row */
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .section-title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .section-link {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-left: 0;
+  }
+
+  .home-content {
+    width: 90%;
+    padding: 0 5%;
+  }
+}
+
+/* Extra small phones <=480px */
+@media (max-width: 480px) {
+  .banner-slider {
+    height: 230px;
+    width: 90%;
+  }
+  .categories-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .category-card {
+    max-width: 90px;
+    height: 90px;
+  }
+  .category-image {
+    height: 100%;
+  }
+  .section-title {
+    font-size: 18px;
+  }
+}
