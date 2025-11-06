@@ -71,17 +71,16 @@
 </template>
 
 <script setup>
-// No JS needed
+// no JS logic needed
 </script>
 
 <style scoped>
-/* ===== Section Wrapper ===== */
+/* ===== Base Section ===== */
 .service-section {
   width: 100%;
-  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
+  background: #fff;
   padding: 4rem 2rem;
   text-align: center;
-  color: #000;
 }
 
 /* ===== Cards Layout ===== */
@@ -92,20 +91,20 @@
   flex-wrap: wrap;
 }
 
-/* ===== Card ===== */
+/* ===== Each Card ===== */
 .card {
-  background: #ffffff;
-  border: none;
-  border-radius: 18px;
-  box-shadow: 0 3px 10px rgba(74, 0, 224, 0.1);
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(74, 0, 224, 0.08);
   padding: 2rem 1.5rem;
   width: 320px;
-  transition: all 0.3s ease;
+  transition: 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 6px 25px rgba(142, 45, 226, 0.35);
+  box-shadow: 0 6px 20px rgba(142, 45, 226, 0.25);
 }
 
 /* ===== Icon ===== */
@@ -118,7 +117,7 @@
 }
 
 .card:hover .icon {
-  transform: scale(1.08);
+  transform: scale(1.05);
 }
 
 /* ===== Text ===== */
@@ -132,36 +131,46 @@
 
 .card-text {
   font-size: 1rem;
-  color: #333;
+  color: #444;
   line-height: 1.5;
 }
 
 /* ===== Credits ===== */
 .credits {
-  margin-top: 2.5rem;
+  margin-top: 2rem;
   font-size: 0.8rem;
-  color: #fff;
+  color: #888;
   text-align: center;
 }
 
 .credits a {
-  color: #fff;
-  opacity: 0.9;
+  color: #8e2de2;
   text-decoration: none;
 }
 
 .credits a:hover {
   text-decoration: underline;
-  opacity: 1;
 }
 
-/* ===== Responsive Design ===== */
+/* ===== RESPONSIVE DESIGN ===== */
 
 /* Tablet */
 @media (max-width: 1024px) {
+  .cards-container {
+    gap: 1.5rem;
+  }
+
   .card {
     width: 280px;
     padding: 1.8rem 1.2rem;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
   }
 }
 
@@ -204,7 +213,7 @@
 
   .card {
     padding: 1.5rem 1rem;
-    border-radius: 14px;
+    border-radius: 12px;
   }
 
   .icon {
