@@ -32,7 +32,6 @@ body,
 
 /* ✅ Keep pages below fixed navbar */
 .page-container {
-  padding-top: 90px; /* space equal to navbar height */
   min-height: calc(100vh - 160px); /* adjust if footer is ~70px high */
   background-color: #fff;
 }
