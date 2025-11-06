@@ -73,6 +73,7 @@ onMounted(fetchCategories);
   margin-left: 10%;
   margin-right: 10%;
   margin-bottom: 40px;
+  padding-top: 90px;
 }
 
 .categories-grid {

@@ -66,74 +66,94 @@ onMounted(fetchAllProducts);
 </script>
 
 <style scoped>
-/* Two side 10% margin */
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 15px;
-  margin-left: 10%;
-  margin-right: 10%;
-  margin-top: 10px;
-  margin-bottom: 40px;
-}
-
-/* Page title gradient & underline */
-.page-title {
-
-  margin-left: 10%;
-  font-size: 2rem;
-  font-weight: 700;
-  background: linear-gradient(90deg, #4A00E0, #8E2DE2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-  display: inline-block;
-  padding-top: 90px; /* default for other pages */
-}
-
-.page-title::after {
-  content: "";
-  display: block;
-  width: 60px;
-  height: 4px;
-  margin-top: 6px;
-  background: linear-gradient(90deg, #4A00E0, #8E2DE2);
-  border-radius: 2px;
-}
-
-/* Empty State */
-.empty {
+/* ===== Section Wrapper ===== */
+.service-section {
+  width: 100%;
+  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
+  padding: 3rem 1rem;
   text-align: center;
-  margin-top: 60px;
-  color: #777;
-}
-.empty img {
-  width: 120px;
-  opacity: 0.8;
-  margin-bottom: 10px;
+  overflow-x: hidden; /* ✅ Prevent side scroll on mobile */
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
-  .products-grid {
+/* ===== Cards Layout ===== */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); /* ✅ responsive grid */
+  justify-items: center;
+  align-items: stretch;
+  gap: 0.8rem;
+  max-width: 100%;
+}
+
+/* ===== Each Card ===== */
+.card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(74, 0, 224, 0.08);
+  padding: 1rem;
+  transition: 0.3s ease;
+  width: 100%;
+  max-width: 115px; /* ✅ ensures 3 fit in a row */
+  text-align: center;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 6px 20px rgba(142, 45, 226, 0.25);
+}
+
+/* ===== Icon ===== */
+.icon {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 0.6rem;
+  filter: drop-shadow(0 0 6px rgba(142, 45, 226, 0.4));
+  transition: 0.3s;
+}
+
+.card:hover .icon {
+  transform: scale(1.05);
+}
+
+/* ===== Text ===== */
+.card-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #000;
+  margin-bottom: 0.4rem;
+  font-family: "Georgia", serif;
+}
+
+.card-text {
+  font-size: 0.75rem;
+  color: #444;
+  line-height: 1.3;
+}
+
+/* ===== Responsive ===== */
+@media (min-width: 768px) {
+  .cards-container {
     grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+
+  .card {
+    max-width: 280px;
+    padding: 1.8rem 1.2rem;
+  }
+
+  .icon {
+    width: 60px;
+    height: 60px;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
   }
 }
 
-/* ✅ Mobile - Always 2 cards per row */
-@media (max-width: 768px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .page-title {
-    margin: 20px 5%;
-  }
-}
-
-/* Very small screens - keep 2 per row */
-@media (max-width: 480px) {
-  .products-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
 </style>

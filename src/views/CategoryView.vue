@@ -94,6 +94,8 @@ onMounted(fetchProducts);
   margin-bottom: 20px;
   color: #4A00E0;
   text-align: center;
+    padding-top: 90px;
+
 }
 
 /* Products grid: default (desktop) */
