@@ -1,10 +1,10 @@
 <template>
-  <div>
+
      <div >
     <!-- 🟣 Navbar -->
     <Navbar />
      </div>
-
+<div>
     <!-- 🟣 Hot Deals Section -->
     <div class="products-page">
       <h2 class="page-title">🔥 Hot Deals</h2>
