@@ -40,45 +40,18 @@
         </p>
       </div>
     </div>
-
-    <!-- 📝 Icon Credits -->
-    <div class="credits">
-      <a
-        href="https://www.flaticon.com/free-icons/delivery"
-        title="delivery icons"
-        target="_blank"
-      >
-
-      </a>
-      <span>  </span>
-      <a
-        href="https://www.flaticon.com/free-icons/return"
-        title="return icons"
-        target="_blank"
-      >
-
-      </a>
-      <span>  </span>
-      <a
-        href="https://www.flaticon.com/free-icons/profit"
-        title="profit icons"
-        target="_blank"
-      >
-
-      </a>
-    </div>
   </section>
 </template>
 
 <script setup>
-// no JS logic needed
+// no JS needed
 </script>
 
 <style scoped>
-/* ===== Base Section ===== */
+/* ===== Section Wrapper ===== */
 .service-section {
   width: 100%;
-  background: #fff;
+  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
   padding: 4rem 2rem;
   text-align: center;
 }
@@ -87,6 +60,7 @@
 .cards-container {
   display: flex;
   justify-content: center;
+  align-items: stretch;
   gap: 2rem;
   flex-wrap: wrap;
 }
@@ -94,10 +68,9 @@
 /* ===== Each Card ===== */
 .card {
   background: #fff;
-  border: 1px solid #eee;
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(74, 0, 224, 0.08);
-  padding: 2rem 1.5rem;
+  padding: 2rem 1rem;
   width: 320px;
   transition: 0.3s ease;
 }
@@ -135,65 +108,18 @@
   line-height: 1.5;
 }
 
-/* ===== Credits ===== */
-.credits {
-  margin-top: 2rem;
-  font-size: 0.8rem;
-  color: #888;
-  text-align: center;
-}
-
-.credits a {
-  color: #8e2de2;
-  text-decoration: none;
-}
-
-.credits a:hover {
-  text-decoration: underline;
-}
-
-/* ===== RESPONSIVE DESIGN ===== */
+/* ===== Responsive ===== */
 
 /* Tablet */
 @media (max-width: 1024px) {
   .cards-container {
-    gap: 1.5rem;
+    gap: 1.2rem;
+    flex-wrap: wrap;
   }
 
   .card {
-    width: 280px;
-    padding: 1.8rem 1.2rem;
-  }
-
-  .card-title {
-    font-size: 1.2rem;
-  }
-
-  .card-text {
-    font-size: 0.95rem;
-  }
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .service-section {
-    padding: 3rem 1.5rem;
-  }
-
-  .cards-container {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .card {
-    width: 100%;
-    max-width: 350px;
-    margin-bottom: 1.5rem;
-  }
-
-  .icon {
-    width: 50px;
-    height: 50px;
+    width: 260px;
+    padding: 1.8rem 1rem;
   }
 
   .card-title {
@@ -201,35 +127,60 @@
   }
 
   .card-text {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
   }
 }
 
-/* Small Phones */
-@media (max-width: 480px) {
-  .service-section {
-    padding: 2.5rem 1rem;
+/* Mobile (🟣 3 cards per row) */
+@media (max-width: 768px) {
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
   }
 
   .card {
-    padding: 1.5rem 1rem;
-    border-radius: 12px;
+    width: 100%;
+    padding: 1.2rem 0.8rem;
   }
 
   .icon {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
   }
 
   .card-title {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
   }
 
   .card-text {
-    font-size: 0.88rem;
+    font-size: 0.75rem;
+    line-height: 1.3;
+  }
+}
+
+/* Small Phones (🟣 still 3 per row but tighter) */
+@media (max-width: 480px) {
+  .cards-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.6rem;
   }
 
-  .credits {
+  .card {
+    padding: 1rem 0.5rem;
+  }
+
+  .icon {
+    width: 35px;
+    height: 35px;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-title {
+    font-size: 0.85rem;
+  }
+
+  .card-text {
     font-size: 0.7rem;
   }
 }
