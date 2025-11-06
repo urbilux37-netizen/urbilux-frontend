@@ -8,10 +8,7 @@
 
     <!-- 🟣 Home Page Content -->
     <div class="home-content">
-<div class="service-wrapper">
-      <!-- Service Features Section -->
-      <ServiceFeatures />
-</div>
+
       <!-- Top Categories -->
       <div class="categories-section" v-if="categories.length">
         <h2 class="section-title">Top Categories</h2>
