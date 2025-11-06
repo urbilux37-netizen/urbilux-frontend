@@ -1,7 +1,7 @@
 <template>
   <div>
     <Navbar />
-
+<div class="body">
     <div class="home-content">
       <!-- Banner Slider -->
       <div class="banner-slider" v-if="banners.length">
@@ -76,7 +76,7 @@
         <span class="section-link" @click="router.push('/all-products')">View All Products</span>
       </div>
     </div>
-
+</div>
     <Footer />
   </div>
 
