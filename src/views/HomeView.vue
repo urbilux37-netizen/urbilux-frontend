@@ -8,6 +8,8 @@
 
     <!-- 🟣 Home Page Content -->
     <div class="home-content">
+<!-- Service Features Section -->
+      <ServiceFeatures />
 
       <!-- Top Categories -->
       <div class="categories-section" v-if="categories.length">
