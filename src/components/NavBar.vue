@@ -386,7 +386,7 @@ watch(itemCount, () => {
 
   .nav-inner { padding: 0 16px; }
   .brand-text { font-size: 18px; }
-  .brand-logo { width: 30px; height: 30px; }
+  .brand-logo { width: 50px; height: 50px; }
   .mobile-search-btn {
     border: none; background: none; font-size: 22px; color: var(--purple); cursor: pointer;
   }
