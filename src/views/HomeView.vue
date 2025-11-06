@@ -3,6 +3,7 @@
     <Navbar />
      <div>
     <WelcomeBanner />
+     <ServiceFeatures />
   </div>
     <div class="home-content">
       <!-- Banner Slider -->
@@ -93,7 +94,7 @@ import { useRouter } from "vue-router";
 import WelcomeBanner from "../components/WelcomeBanner.vue";
 const router = useRouter();
 const placeholder = new URL('@/assets/no-image.png', import.meta.url).href;
-
+import ServiceFeatures from "@/components/ServiceFeatures.vue";
 // 🔗 Detect environment and auto baseURL
 const API_BASE =
   window.location.hostname === "localhost"
