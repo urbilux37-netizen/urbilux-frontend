@@ -9,82 +9,76 @@
     tabindex="0"
   >
     <!-- Slides -->
-<div class="slides" v-if="banners.length">
-  <transition name="fade" mode="out-in">
-    <div class="slide" :key="currentKey">
-      <img
-        :src="banners[current]?.image_url"
-        :alt="banners[current]?.title || 'Banner'"
-        class="img"
-        loading="eager"
-        @load="onLoaded"
-      />
+    <div class="slides" v-if="banners.length">
+      <transition name="fade" mode="out-in">
+        <div class="slide" :key="currentKey">
+          <img
+            :src="banners[current]?.image_url"
+            :alt="banners[current]?.title || 'Banner'"
+            class="img"
+            loading="eager"
+            @load="onLoaded"
+          />
 
-      <!-- ✅ Smart CTA (same logic as before) -->
-      <div v-if="banners[current]?.button_text" class="cta">
-        <a
-          v-if="banners[current]?.button_link?.startsWith('http')"
-          class="cta-btn"
-          :href="banners[current]?.button_link"
-          target="_blank"
-          rel="noopener"
-        >
-          {{ banners[current]?.button_text }}
-        </a>
-        <router-link
-          v-else
-          class="cta-btn"
-          :to="banners[current]?.button_link || '#'"
-        >
-          {{ banners[current]?.button_text }}
-        </router-link>
-      </div>
+          <!-- ✅ Smart CTA -->
+          <div v-if="banners[current]?.button_text" class="cta">
+            <!-- 🌐 External link -->
+            <a
+              v-if="banners[current]?.button_link?.startsWith('http')"
+              class="cta-btn"
+              :href="banners[current]?.button_link"
+              target="_blank"
+              rel="noopener"
+            >
+              {{ banners[current]?.button_text }}
+            </a>
+
+            <!-- 🔗 Internal route -->
+            <router-link
+              v-else
+              class="cta-btn"
+              :to="banners[current]?.button_link || '#'"
+            >
+              {{ banners[current]?.button_text }}
+            </router-link>
+          </div>
+        </div>
+      </transition>
     </div>
-  </transition>
-</div>
 
-<!-- 🟣 Optional loader if you want -->
-<div v-else class="banner-loading"></div>
+    <!-- 🟣 Empty space (no placeholder) -->
+    <div v-else class="banner-loading"></div>
 
-
-
-  <!-- 🔗 If internal route -->
-  <router-link
-    v-else
-    class="cta-btn"
-    :to="banners[current]?.button_link || '#'"
-  >
-    {{ banners[current]?.button_text }}
-  </router-link>
-</div>
-
-
-    <!-- Dots (PC top overlay; mobile bottom) -->
-    <div class="dots" :class="{ top: isDesktop }">
+    <!-- ⚪ Dots (PC only) -->
+    <div class="dots" :class="{ top: isDesktop }" v-if="isDesktop">
       <button
         v-for="(b, i) in banners"
         :key="b.id ?? i"
         class="dot"
         :class="{ active: i === current }"
         @click="go(i)"
-        :aria-label="`Go to slide ${i+1}`"
+        :aria-label="`Go to slide ${i + 1}`"
       />
     </div>
 
-    <!-- Arrows (show on hover on desktop) -->
+    <!-- ⬅️➡️ Arrows -->
     <button
       v-if="isDesktop && banners.length > 1"
       class="arrow left"
       @click="prev"
       aria-label="Previous"
-    >‹</button>
+    >
+      ‹
+    </button>
 
     <button
       v-if="isDesktop && banners.length > 1"
       class="arrow right"
       @click="next"
       aria-label="Next"
-    >›</button>
+    >
+      ›
+    </button>
   </div>
 </template>
 
@@ -103,13 +97,15 @@ const timer = ref(null);
 const isDesktop = ref(false);
 const sliderRef = ref(null);
 
-const currentKey = computed(() => (banners.value[current.value]?.id ?? current.value) + ":" + current.value);
+const currentKey = computed(
+  () =>
+    (banners.value[current.value]?.id ?? current.value) + ":" + current.value
+);
 
 async function fetchBanners() {
   try {
-const res = await axios.get(`${API_BASE}/api/banners`);
+    const res = await axios.get(`${API_BASE}/banners`);
     banners.value = res.data;
-    // if no banners, keep placeholder flow
   } catch (e) {
     console.error("Banner load error:", e);
   }
@@ -122,7 +118,8 @@ function next() {
 }
 function prev() {
   if (!banners.value.length) return;
-  current.value = (current.value - 1 + banners.value.length) % banners.value.length;
+  current.value =
+    (current.value - 1 + banners.value.length) % banners.value.length;
   softPreload(current.value - 1);
 }
 function go(i) {
@@ -131,7 +128,6 @@ function go(i) {
   softPreload(i + 1);
 }
 
-// autoplay
 function start() {
   stop();
   timer.value = setInterval(next, 4500);
@@ -140,10 +136,13 @@ function stop() {
   if (timer.value) clearInterval(timer.value);
   timer.value = null;
 }
-function pause() { stop(); }
-function resume() { start(); }
+function pause() {
+  stop();
+}
+function resume() {
+  start();
+}
 
-// image preloading (soft)
 function softPreload(idx) {
   if (!banners.value.length) return;
   const nextIndex = (idx + banners.value.length) % banners.value.length;
@@ -153,20 +152,14 @@ function softPreload(idx) {
     img.src = url;
   }
 }
-// accessibility focus show arrows
-function onLoaded() {
-  // no-op hook for now
-}
 
-// swipe (mobile)
+function onLoaded() {}
+
 let startX = 0;
 let touchActive = false;
 function onTouchStart(e) {
   touchActive = true;
   startX = e.touches[0].clientX;
-}
-function onTouchMove(e) {
-  if (!touchActive) return;
 }
 function onTouchEnd(e) {
   if (!touchActive) return;
@@ -175,7 +168,6 @@ function onTouchEnd(e) {
   else if (dx < -50) next();
   touchActive = false;
 }
-
 function updateDesktopFlag() {
   isDesktop.value = window.matchMedia("(min-width: 1024px)").matches;
 }
@@ -183,26 +175,21 @@ function updateDesktopFlag() {
 onMounted(async () => {
   updateDesktopFlag();
   window.addEventListener("resize", updateDesktopFlag);
-
   await fetchBanners();
   if (banners.value.length > 1) start();
 
-  // swipe listeners on container only
   const el = sliderRef.value;
   if (el) {
     el.addEventListener("touchstart", onTouchStart, { passive: true });
-    el.addEventListener("touchmove", onTouchMove, { passive: true });
     el.addEventListener("touchend", onTouchEnd, { passive: true });
   }
 });
-
 onUnmounted(() => {
   stop();
   window.removeEventListener("resize", updateDesktopFlag);
   const el = sliderRef.value;
   if (el) {
     el.removeEventListener("touchstart", onTouchStart);
-    el.removeEventListener("touchmove", onTouchMove);
     el.removeEventListener("touchend", onTouchEnd);
   }
 });
