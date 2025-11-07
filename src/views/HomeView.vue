@@ -3,12 +3,13 @@
     <!-- 🟣 Navbar -->
     <Navbar />
 
-    <!-- 🟣 Banner -->
-    <WelcomeBanner />
+    <!-- 🟣 Dynamic Banner (Full Width Slider) -->
+    <section class="banner-wrapper">
+      <WelcomeBanner />
+    </section>
 
     <!-- 🟣 Home Page Content -->
     <div class="home-content">
-
       <!-- 🟣 Service Features Section -->
       <section class="service-section">
         <div class="cards-container">
@@ -121,57 +122,26 @@
           View All Products
         </span>
       </div>
-
-    </div> <!-- ✅ end .home-content -->
-
+    </div>
   </div>
 </template>
 
 <script setup>
 import Navbar from "../components/NavBar.vue";
 import ProductCard from "../components/ProductCard.vue";
-import Footer from "../components/Footer.vue";
-import { ref, onMounted, onUnmounted } from "vue";
+import WelcomeBanner from "../components/WelcomeBanner.vue";
+import { ref, onMounted } from "vue";
 import axios from "axios";
 import { useRouter } from "vue-router";
-import WelcomeBanner from "../components/WelcomeBanner.vue";
+
 const router = useRouter();
-const placeholder = new URL('@/assets/no-image.png', import.meta.url).href;
-import ServiceFeatures from "@/components/ServiceFeatures.vue";
-// 🔗 Detect environment and auto baseURL
+const placeholder = new URL("@/assets/no-image.png", import.meta.url).href;
+
+// ✅ Base URL auto-detect
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
     : "https://urbilux-backend.onrender.com";
-
-// ------------------ Banners ------------------
-const banners = ref([]);
-const currentIndex = ref(0);
-let intervalId = null;
-
-const fetchBanners = async () => {
-  try {
-    const res = await axios.get(`${API_BASE}/banners`);
-    banners.value = res.data;
-  } catch (err) {
-    console.error("❌ Banners fetch error:", err);
-  }
-};
-
-const startSlider = () => {
-  intervalId = setInterval(() => {
-    if (banners.value.length) {
-      currentIndex.value = (currentIndex.value + 1) % banners.value.length;
-    }
-  }, 4000);
-};
-
-onMounted(async () => {
-  await fetchBanners();
-  startSlider();
-});
-
-onUnmounted(() => clearInterval(intervalId));
 
 // ------------------ Categories ------------------
 const categories = ref([]);
@@ -179,7 +149,6 @@ const fetchCategories = async () => {
   try {
     const res = await axios.get(`${API_BASE}/categories`);
     const data = res.data || [];
-    // ✅ Show only last 10 categories (latest first)
     categories.value = data.slice(-12).reverse();
   } catch (err) {
     console.error("❌ Categories fetch error:", err);
@@ -196,13 +165,12 @@ const fetchProducts = async () => {
   try {
     const res = await axios.get(`${API_BASE}/products`);
     const data = res.data || [];
-    // ✅ Only show last 10 in each section
     topProducts.value = data
-      .filter(p => p.is_top_product)
+      .filter((p) => p.is_top_product)
       .slice(-10)
       .reverse();
     hotDeals.value = data
-      .filter(p => p.is_hot_deal)
+      .filter((p) => p.is_hot_deal)
       .slice(-10)
       .reverse();
     allProducts.value = data.slice(-10).reverse();
@@ -214,8 +182,126 @@ onMounted(fetchProducts);
 </script>
 
 <style scoped>
-@import "../views/home.css";
 
+</style>
+
+
+<style scoped>
+@import "../views/home.css";
+.banner-wrapper {
+  width: 100%;
+  margin-bottom: 30px;
+}
+.home-content {
+  padding: 0 16px 60px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* 🟣 Service Section */
+.service-section {
+  margin: 40px 0;
+}
+.cards-container {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.card {
+  background: #fff;
+  border-radius: 20px;
+  padding: 20px;
+  flex: 1 1 30%;
+  text-align: center;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+}
+.icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+.card-title {
+  font-weight: 700;
+  color: #4a00e0;
+}
+.card-text {
+  font-size: 14px;
+  color: #555;
+}
+
+/* 🟣 Category & Product Sections */
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 20px;
+  background: linear-gradient(90deg, #4a00e0, #8e2de2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.section-link {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: 600;
+  color: #8e2de2;
+  cursor: pointer;
+}
+.categories-grid,
+.products-grid {
+  display: grid;
+  gap: 16px;
+}
+.categories-grid {
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+}
+.products-grid {
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+}
+.category-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.category-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.07);
+}
+.category-image {
+  width: 100%;
+  height: 100px;
+  object-fit: cover;
+}
+.category-card p {
+  padding: 10px 0;
+  font-weight: 600;
+  color: #4a00e0;
+}
+
+@media (max-width: 768px) {
+  .cards-container {
+    flex-direction: column;
+  }
+  .card {
+    width: 100%;
+  }
+  .categories-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  }
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+}
 /* ===== Base Section ===== */
 /* ===== Section Wrapper ===== */
 .service-section {
