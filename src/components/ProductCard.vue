@@ -85,7 +85,7 @@ const handleBuyNow = async () => {
   font-family: "Zalando Sans", sans-serif;
   width: 260px;
   height: 380px;
-  background: #fff;
+  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
   border-radius: 16px;
   overflow: hidden;
   display: flex;
