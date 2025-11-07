@@ -209,136 +209,93 @@ onMounted(fetchProducts);
 <style scoped>
 @import "../views/home.css";
 
-/* 🟣 Service Features Section Styles */
+/* ===== Section Wrapper ===== */
 .service-section {
   width: 100%;
   background: #fff;
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-/* ===== Cards Layout (Desktop Default) ===== */
-.cards-container {
+  padding: 2rem 1rem;
   display: flex;
   justify-content: center;
-  align-items: stretch;
-  gap: 2rem;
-  flex-wrap: wrap;
+  align-items: center;
 }
 
-/* ===== Individual Card ===== */
+/* ===== Cards Wrapper ===== */
+.cards-container {
+  display: flex;
+  justify-content: center; /* ✅ centers all cards evenly */
+  align-items: stretch;
+  gap: 0.8rem; /* equal space between cards */
+  flex-wrap: wrap;
+  max-width: 360px; /* ✅ ensures perfect width for 3 cards on phone */
+}
+
+/* ===== Each Card ===== */
 .card {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(74, 0, 224, 0.08);
-  padding: 2rem 1.5rem;
-  width: 320px;
-  transition: 0.3s ease;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  padding: 1rem 0.6rem;
+  width: 100%;
+  max-width: 105px; /* ✅ small and consistent */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 6px 20px rgba(142, 45, 226, 0.25);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(160, 112, 255, 0.25);
 }
 
 /* ===== Icon ===== */
 .icon {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 1rem;
-  filter: drop-shadow(0 0 6px rgba(122, 0, 255, 0.3));
-  transition: 0.3s;
-}
-
-.card:hover .icon {
-  transform: scale(1.05);
+  width: 36px;
+  height: 36px;
+  margin-bottom: 0.6rem;
+  filter: drop-shadow(0 0 4px rgba(122, 0, 255, 0.3));
 }
 
 /* ===== Text ===== */
 .card-title {
-  font-size: 1.3rem;
+  font-size: 0.9rem;
   font-weight: 600;
   color: #000;
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.3rem;
   font-family: "Georgia", serif;
 }
 
 .card-text {
-  font-size: 1rem;
+  font-size: 0.7rem;
   color: #444;
-  line-height: 1.5;
+  line-height: 1.3;
 }
 
-/* ===== Responsive ===== */
+/* ===== Responsive Adjustments ===== */
 
 /* Tablet */
 @media (max-width: 1024px) {
   .cards-container {
-    gap: 1.5rem;
+    gap: 0.7rem;
   }
-
   .card {
-    width: 260px;
-    padding: 1.8rem 1.2rem;
-  }
-
-  .card-title {
-    font-size: 1.15rem;
-  }
-
-  .card-text {
-    font-size: 0.95rem;
+    max-width: 100px;
+    padding: 0.9rem 0.5rem;
   }
 }
 
-/* ===== Mobile ===== */
+/* Mobile */
 @media (max-width: 768px) {
   .service-section {
-    padding: 3rem 1rem;
+    padding: 1.8rem 0;
   }
 
   .cards-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.8rem;
-    margin: 0 10px;
-  }
-
-  .card {
-    width: 100%;
-    max-width: 110px;
-    padding: 1rem 0.6rem;
-    border-radius: 14px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  }
-
-  .icon {
-    width: 35px;
-    height: 35px;
-    margin-bottom: 0.4rem;
-  }
-
-  .card-title {
-    font-size: 0.85rem;
-  }
-
-  .card-text {
-    font-size: 0.7rem;
-    line-height: 1.2;
-  }
-}
-
-/* ===== Small Phones ===== */
-@media (max-width: 480px) {
-  .cards-container {
-    gap: 0.7rem;
-    margin: 0 12px;
+    gap: 0.6rem;
+    max-width: 340px; /* ✅ balances edge spacing */
   }
 
   .card {
     max-width: 95px;
     padding: 0.8rem 0.4rem;
-    border-radius: 12px;
   }
 
   .icon {
@@ -354,5 +311,32 @@ onMounted(fetchProducts);
     font-size: 0.65rem;
   }
 }
+
+/* Very small phones */
+@media (max-width: 480px) {
+  .cards-container {
+    gap: 0.5rem;
+    max-width: 310px; /* ✅ keeps perfect equal margin on both sides */
+  }
+
+  .card {
+    max-width: 90px;
+    padding: 0.7rem 0.4rem;
+  }
+
+  .icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .card-title {
+    font-size: 0.75rem;
+  }
+
+  .card-text {
+    font-size: 0.6rem;
+  }
+}
+
 
 </style>
