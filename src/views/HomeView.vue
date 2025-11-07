@@ -196,7 +196,10 @@ const fetchProducts = async () => {
   try {
     const res = await axios.get(`${API_BASE}/products`);
     const data = res.data || [];
-    topProducts.value = data.filter(p => p.is_top_product);
+  topProducts.value = data
+  .filter(p => p.is_top_product)
+  .slice(-10)
+  .reverse();
     hotDeals.value = data.filter(p => p.is_hot_deal);
     allProducts.value = data;
   } catch (err) {
