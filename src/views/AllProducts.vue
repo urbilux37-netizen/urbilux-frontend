@@ -66,6 +66,39 @@ onMounted(fetchAllProducts);
 </script>
 
 <style scoped>
+/* ===== Products Grid ===== */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* ✅ 5 per row on desktop */
+  gap: 20px;
+  width: 85%;
+  margin: 30px auto;
+  justify-items: center;
+}
+
+/* ===== Responsive Layout ===== */
+@media (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr); /* tablet */
+    gap: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr); /* mobile */
+    width: 90%;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr); /* small phones */
+    gap: 10px;
+  }
+}
+
 /* ===== Section Wrapper ===== */
 .service-section {
   width: 100%;
