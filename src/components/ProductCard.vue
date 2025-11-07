@@ -85,7 +85,7 @@ const handleBuyNow = async () => {
   font-family: "Zalando Sans", sans-serif;
   width: 260px;
   height: 380px;
-  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
+  background: #fff;
   border-radius: 16px;
   overflow: hidden;
   display: flex;
@@ -124,7 +124,7 @@ const handleBuyNow = async () => {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: linear-gradient(135deg, #ff4d4d, #ff9900);
+  background: linear-gradient(90deg, #a24eff, #c977ff);
   color: white;
   font-size: 12px;
   font-weight: bold;
@@ -134,7 +134,7 @@ const handleBuyNow = async () => {
 .product-name {
   font-size: 16px;
   font-weight: 600;
-  color: #4a00e0;
+  color: #000000;
   text-align: center;
   margin: 10px 0 4px;
 }
@@ -173,7 +173,7 @@ const handleBuyNow = async () => {
   border: none;
   border-radius: 8px;
   color: #fff;
-  background: linear-gradient(to right, #a100ff, #ff00ff);
+  background: linear-gradient(90deg, #a24eff, #c977ff);
   cursor: pointer;
   transition: all 0.25s ease;
 }
