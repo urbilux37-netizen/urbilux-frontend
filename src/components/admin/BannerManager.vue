@@ -3,39 +3,38 @@
     <h1 class="page-title">🖼️ Banner Manager</h1>
 
     <!-- ===== Add Banner Form ===== -->
-    <form @submit.prevent="handleCreate" class="card form-card">
+    <form @submit.prevent="addBanner" class="card form-card">
       <h2 class="card-title">Add New Banner</h2>
 
       <div class="grid">
         <div class="field">
           <label>Title (optional)</label>
-          <input v-model.trim="form.title" placeholder="Summer Sale" />
+          <input v-model.trim="newBanner.title" placeholder="Summer Sale" />
         </div>
 
         <div class="field col-span-2">
           <label>Banner Image <span class="req">*</span></label>
-          <input type="file" @change="handleFileUpload" accept="image/*" />
-          <p class="hint">
-            Upload a wide image (1500–2400px recommended)
-          </p>
-
-          <div v-if="uploading" class="uploading">Uploading...</div>
-          <img
-            v-if="form.image_url"
-            :src="form.image_url"
-            alt="Preview"
-            class="preview"
+          <input
+            type="file"
+            @change="onBannerFileChange"
+            accept="image/*"
+            required
           />
+          <p class="hint">Upload a wide image (1500–2400px recommended)</p>
+
+          <div v-if="newBannerFilePreview" class="image-preview">
+            <img :src="newBannerFilePreview" alt="Preview" />
+          </div>
         </div>
 
         <div class="field">
           <label>Button Text (optional)</label>
-          <input v-model.trim="form.button_text" placeholder="Shop Now" />
+          <input v-model.trim="newBanner.button_text" placeholder="Shop Now" />
         </div>
 
         <div class="field">
           <label>Button Link (optional)</label>
-          <input v-model.trim="form.button_link" placeholder="/category/new" />
+          <input v-model.trim="newBanner.button_link" placeholder="/category/new" />
         </div>
       </div>
 
@@ -49,7 +48,7 @@
     <div class="card list-card">
       <div class="list-header">
         <h2 class="card-title">All Banners</h2>
-        <button class="btn-ghost" @click="loadBanners" :disabled="loading">
+        <button class="btn-ghost" @click="fetchBanners" :disabled="loading">
           {{ loading ? "Refreshing…" : "Refresh" }}
         </button>
       </div>
@@ -58,33 +57,24 @@
         <div class="skeleton" v-for="n in 3" :key="n"></div>
       </div>
 
-      <div v-else-if="!banners.length" class="empty">
-        No banners yet. Add one above.
-      </div>
+      <div v-else-if="!banners.length" class="empty">No banners found.</div>
 
       <div v-else class="items">
         <div v-for="b in banners" :key="b.id" class="item">
           <img :src="b.image_url" class="thumb" alt="Banner" />
           <div class="meta">
-            <div class="title-row">
-              <p class="title">{{ b.title || "Untitled banner" }}</p>
-              <span class="id">#{{ b.id }}</span>
-            </div>
+            <p class="title">{{ b.title || "Untitled banner" }}</p>
             <p class="sub">
               <strong>Button:</strong>
               <span v-if="b.button_text">{{ b.button_text }}</span>
               <span v-else class="muted">—</span>
-              <span v-if="b.button_link" class="link">
-                → {{ b.button_link }}
-              </span>
+              <span v-if="b.button_link" class="link">→ {{ b.button_link }}</span>
             </p>
           </div>
 
           <div class="row-actions">
             <button class="btn-small" @click="openEdit(b)">Edit</button>
-            <button class="btn-danger" @click="confirmDelete(b.id)">
-              Delete
-            </button>
+            <button class="btn-danger" @click="deleteBanner(b.id)">Delete</button>
           </div>
         </div>
       </div>
@@ -98,7 +88,7 @@
           <button class="x" @click="closeEdit">✕</button>
         </div>
 
-        <form @submit.prevent="handleUpdate" class="modal-body">
+        <form @submit.prevent="updateBanner" class="modal-body">
           <div class="grid">
             <div class="field">
               <label>Title</label>
@@ -107,13 +97,15 @@
 
             <div class="field col-span-2">
               <label>Banner Image</label>
-              <input type="file" @change="handleEditFileUpload" accept="image/*" />
-              <div v-if="uploadingEdit" class="uploading">Uploading...</div>
+              <input type="file" @change="onEditBannerFileChange" accept="image/*" />
+              <div v-if="editFilePreview" class="image-preview">
+                <img :src="editFilePreview" alt="Preview" />
+              </div>
               <img
-                v-if="editModel.image_url"
+                v-else-if="editModel.image_url"
                 :src="editModel.image_url"
                 class="preview"
-                alt="Preview"
+                alt="Current"
               />
             </div>
 
@@ -130,9 +122,7 @@
 
           <div class="actions">
             <button type="submit" class="btn-primary">Save</button>
-            <button type="button" class="btn-ghost" @click="closeEdit">
-              Cancel
-            </button>
+            <button type="button" class="btn-ghost" @click="closeEdit">Cancel</button>
           </div>
         </form>
       </div>
@@ -144,144 +134,119 @@
 import axios from "axios";
 import { ref, onMounted } from "vue";
 
-// 🔗 API Base URL
 const API_BASE =
   window.location.hostname === "localhost"
-    ? "http://localhost:5000/api"
-    : "https://urbilux-backend.onrender.com/api";
+    ? "http://localhost:5000"
+    : "https://urbilux-backend.onrender.com";
 
 const banners = ref([]);
 const loading = ref(false);
-const uploading = ref(false);
-const uploadingEdit = ref(false);
 
-// ====== Add Banner ======
-const form = ref({
+const newBanner = ref({
   title: "",
-  image_url: "",
   button_text: "",
   button_link: "",
 });
+const newBannerFile = ref(null);
+const newBannerFilePreview = ref(null);
 
-function resetForm() {
-  form.value = { title: "", image_url: "", button_text: "", button_link: "" };
+function onBannerFileChange(e) {
+  newBannerFile.value = e.target.files[0];
+  newBannerFilePreview.value = newBannerFile.value
+    ? URL.createObjectURL(newBannerFile.value)
+    : null;
 }
 
-// ====== Load Banners ======
-async function loadBanners() {
+function resetForm() {
+  newBanner.value = { title: "", button_text: "", button_link: "" };
+  newBannerFile.value = null;
+  newBannerFilePreview.value = null;
+}
+
+async function fetchBanners() {
   loading.value = true;
   try {
-    const res = await axios.get(`${API_BASE}/banners`);
+    const res = await axios.get(`${API_BASE}/api/banners`);
     banners.value = res.data;
-  } catch (e) {
-    console.error("Banner fetch error:", e);
+  } catch (err) {
+    console.error("❌ Fetch banners error:", err);
   } finally {
     loading.value = false;
   }
 }
 
-// ====== File Upload (Add) ======
-async function handleFileUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  uploading.value = true;
-
+async function addBanner() {
+  if (!newBannerFile.value) return alert("Please select an image");
   const formData = new FormData();
-  formData.append("image", file);
+  formData.append("image", newBannerFile.value);
+  formData.append("title", newBanner.value.title);
+  formData.append("button_text", newBanner.value.button_text);
+  formData.append("button_link", newBanner.value.button_link);
 
   try {
-    const res = await axios.post(`${API_BASE}/banners/upload`, formData, {
+    await axios.post(`${API_BASE}/api/banners`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
-    form.value.image_url = res.data.url;
-  } catch (err) {
-    alert("❌ Image upload failed");
-    console.error(err);
-  } finally {
-    uploading.value = false;
-  }
-}
-
-// ====== File Upload (Edit) ======
-async function handleEditFileUpload(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  uploadingEdit.value = true;
-
-  const formData = new FormData();
-  formData.append("image", file);
-
-  try {
-    const res = await axios.post(`${API_BASE}/banners/upload`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    editModel.value.image_url = res.data.url;
-  } catch (err) {
-    alert("❌ Upload failed");
-    console.error(err);
-  } finally {
-    uploadingEdit.value = false;
-  }
-}
-
-// ====== Create ======
-async function handleCreate() {
-  if (!form.value.image_url) return alert("Please upload an image first!");
-  try {
-    const res = await axios.post(`${API_BASE}/banners`, form.value);
-    banners.value.unshift(res.data);
     resetForm();
-  } catch (e) {
-    console.error("Create error:", e);
+    fetchBanners();
+  } catch (err) {
+    console.error("❌ Add banner error:", err);
   }
 }
 
-// ====== Delete ======
-function confirmDelete(id) {
-  if (confirm("Delete this banner?")) handleDelete(id);
-}
-
-async function handleDelete(id) {
+async function deleteBanner(id) {
+  if (!confirm("Delete this banner?")) return;
   try {
-    await axios.delete(`${API_BASE}/banners/${id}`);
-    banners.value = banners.value.filter((b) => b.id !== id);
-  } catch (e) {
-    console.error("Delete error:", e);
+    await axios.delete(`${API_BASE}/api/banners/${id}`);
+    fetchBanners();
+  } catch (err) {
+    console.error("❌ Delete banner error:", err);
   }
 }
 
-// ====== Edit ======
+/* ========= Edit Modal ========= */
 const editing = ref(false);
 const editModel = ref({});
+const editFile = ref(null);
+const editFilePreview = ref(null);
 
 function openEdit(b) {
   editModel.value = { ...b };
   editing.value = true;
 }
-
 function closeEdit() {
   editing.value = false;
+  editFile.value = null;
+  editFilePreview.value = null;
+}
+function onEditBannerFileChange(e) {
+  editFile.value = e.target.files[0];
+  editFilePreview.value = editFile.value
+    ? URL.createObjectURL(editFile.value)
+    : null;
 }
 
-async function handleUpdate() {
+async function updateBanner() {
+  const formData = new FormData();
+  if (editFile.value) formData.append("image", editFile.value);
+  formData.append("title", editModel.value.title);
+  formData.append("button_text", editModel.value.button_text);
+  formData.append("button_link", editModel.value.button_link);
+
   try {
-    const { id, title, image_url, button_text, button_link } = editModel.value;
-    const res = await axios.put(`${API_BASE}/banners/${id}`, {
-      title,
-      image_url,
-      button_text,
-      button_link,
+    await axios.put(`${API_BASE}/api/banners/${editModel.value.id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
     });
-    const idx = banners.value.findIndex((x) => x.id === id);
-    if (idx !== -1) banners.value[idx] = res.data;
     closeEdit();
-  } catch (e) {
-    console.error("Update error:", e);
+    fetchBanners();
+  } catch (err) {
+    console.error("❌ Update banner error:", err);
   }
 }
 
-onMounted(loadBanners);
+onMounted(fetchBanners);
 </script>
+
 
 <style scoped>
 .banner-manager {
