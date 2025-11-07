@@ -210,34 +210,32 @@ onMounted(fetchProducts);
 @import "../views/home.css";
 
 /* ===== Section Wrapper ===== */
+
+/* ===== Section Wrapper ===== */
 .service-section {
   width: 100%;
   background: #fff;
   padding: 2rem 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  text-align: center;
 }
 
-/* ===== Cards Wrapper ===== */
+/* ===== Cards Grid ===== */
 .cards-container {
-  display: flex;
-  justify-content: center; /* ✅ centers all cards evenly */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem; /* equal spacing */
+  justify-items: center;
   align-items: stretch;
-  gap: 0.8rem; /* equal space between cards */
-  flex-wrap: wrap;
-  max-width: 360px; /* ✅ ensures perfect width for 3 cards on phone */
 }
 
-/* ===== Each Card ===== */
+/* ===== Individual Card ===== */
 .card {
   background: #ffffff;
   border-radius: 16px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  padding: 1rem 0.6rem;
+  padding: 1rem;
   width: 100%;
-  max-width: 105px; /* ✅ small and consistent */
-  text-align: center;
+  max-width: 120px; /* 🟣 small & equal cards */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -268,6 +266,7 @@ onMounted(fetchProducts);
   color: #444;
   line-height: 1.3;
 }
+
 
 /* ===== Responsive Adjustments ===== */
 
