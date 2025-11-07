@@ -48,78 +48,113 @@
 </script>
 
 <style scoped>
-/* ===== Section Wrapper ===== */
+/* ===== Base Section ===== */
 .service-section {
   width: 100%;
   background: #fff;
-  padding: 2rem 1rem;
+  padding: 4rem 2rem;
   text-align: center;
 }
 
-/* ===== Cards Grid ===== */
+/* ===== Cards Layout (Desktop Default) ===== */
 .cards-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem; /* equal spacing */
-  justify-items: center;
+  display: flex;
+  justify-content: center;
   align-items: stretch;
+  gap: 2rem;
+  flex-wrap: wrap;
 }
 
 /* ===== Individual Card ===== */
 .card {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  padding: 1rem;
-  width: 100%;
-  max-width: 120px; /* 🟣 small & equal cards */
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 2px 8px rgba(74, 0, 224, 0.08);
+  padding: 2rem 1.5rem;
+  width: 320px;
+  transition: 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(160, 112, 255, 0.25);
+  transform: translateY(-6px);
+  box-shadow: 0 6px 20px rgba(142, 45, 226, 0.25);
 }
 
 /* ===== Icon ===== */
 .icon {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 0.6rem;
-  filter: drop-shadow(0 0 4px rgba(122, 0, 255, 0.3));
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 6px rgba(122, 0, 255, 0.3));
+  transition: 0.3s;
+}
+
+.card:hover .icon {
+  transform: scale(1.05);
 }
 
 /* ===== Text ===== */
 .card-title {
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #000;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.6rem;
   font-family: "Georgia", serif;
 }
 
 .card-text {
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: #444;
-  line-height: 1.3;
+  line-height: 1.5;
 }
 
-/* ===== Responsive ===== */
+/* ===== Responsive Design ===== */
 
-/* Tablet (medium) */
+/* Tablet */
 @media (max-width: 1024px) {
   .cards-container {
-    gap: 0.8rem;
+    gap: 1.5rem;
   }
 
   .card {
+    width: 260px;
+    padding: 1.8rem 1.2rem;
+  }
+
+  .card-title {
+    font-size: 1.15rem;
+  }
+
+  .card-text {
+    font-size: 0.95rem;
+  }
+}
+
+/* ===== Mobile View ===== */
+@media (max-width: 768px) {
+  .service-section {
+    padding: 3rem 1rem;
+  }
+
+  .cards-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    margin: 0 10px; /* ✅ equal side margin */
+  }
+
+  .card {
+    width: 100%;
     max-width: 110px;
-    padding: 0.9rem;
+    padding: 1rem 0.6rem;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
   }
 
   .icon {
-    width: 32px;
-    height: 32px;
+    width: 35px;
+    height: 35px;
+    margin-bottom: 0.4rem;
   }
 
   .card-title {
@@ -127,20 +162,21 @@
   }
 
   .card-text {
-    font-size: 0.68rem;
+    font-size: 0.7rem;
+    line-height: 1.2;
   }
 }
 
-/* Mobile (small screens) */
-@media (max-width: 768px) {
+/* ===== Small Phones ===== */
+@media (max-width: 480px) {
   .cards-container {
-    grid-template-columns: repeat(3, 1fr);
     gap: 0.7rem;
+    margin: 0 12px; /* ✅ balanced margin on both sides */
   }
 
   .card {
-    max-width: 100px;
-    padding: 0.8rem 0.5rem;
+    max-width: 95px;
+    padding: 0.8rem 0.4rem;
     border-radius: 12px;
   }
 
@@ -155,32 +191,6 @@
 
   .card-text {
     font-size: 0.65rem;
-    line-height: 1.2;
-  }
-}
-
-/* Very small phones */
-@media (max-width: 480px) {
-  .cards-container {
-    gap: 0.5rem;
-  }
-
-  .card {
-    max-width: 90px;
-    padding: 0.7rem 0.4rem;
-  }
-
-  .icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .card-title {
-    font-size: 0.75rem;
-  }
-
-  .card-text {
-    font-size: 0.6rem;
   }
 }
 </style>
