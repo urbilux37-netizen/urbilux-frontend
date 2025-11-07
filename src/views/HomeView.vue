@@ -180,7 +180,9 @@ const categories = ref([]);
 const fetchCategories = async () => {
   try {
     const res = await axios.get(`${API_BASE}/categories`);
-    categories.value = res.data;
+    const data = res.data || [];
+    // ✅ Show only last 10 categories (latest first)
+    categories.value = data.slice(-12).reverse();
   } catch (err) {
     console.error("❌ Categories fetch error:", err);
   }
@@ -196,12 +198,16 @@ const fetchProducts = async () => {
   try {
     const res = await axios.get(`${API_BASE}/products`);
     const data = res.data || [];
-  topProducts.value = data
-  .filter(p => p.is_top_product)
-  .slice(-10)
-  .reverse();
-    hotDeals.value = data.filter(p => p.is_hot_deal);
-    allProducts.value = data;
+    // ✅ Only show last 10 in each section
+    topProducts.value = data
+      .filter(p => p.is_top_product)
+      .slice(-10)
+      .reverse();
+    hotDeals.value = data
+      .filter(p => p.is_hot_deal)
+      .slice(-10)
+      .reverse();
+    allProducts.value = data.slice(-10).reverse();
   } catch (err) {
     console.error("❌ Products fetch error:", err);
   }
