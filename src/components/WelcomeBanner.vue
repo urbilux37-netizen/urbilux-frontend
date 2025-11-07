@@ -192,7 +192,7 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   height: 46vw;           /* responsive height */
-  max-height: 520px;      /* desktop cap */
+  max-height: 700px;      /* desktop cap */
   min-height: 180px;      /* mobile floor */
   border-radius: 16px;
   overflow: hidden;
