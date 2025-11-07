@@ -2,10 +2,10 @@
   <div>
     <!-- 🟣 Navbar -->
     <Navbar />
-
+<div class="wlcbanner">
     <!-- 🟣 Banner -->
     <WelcomeBanner />
-
+</div>
     <!-- 🟣 Home Page Content -->
     <div class="home-content">
 
@@ -220,7 +220,9 @@ onMounted(fetchProducts);
   width: 100%;
   margin-bottom: 30px;
 }
-
+.wlcbanner{
+  padding-top: 90px;
+}
 
 /* ===== Base Section ===== */
 /* ===== Section Wrapper ===== */
