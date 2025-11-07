@@ -124,13 +124,30 @@ const handleBuyNow = async () => {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: linear-gradient(90deg, #a24eff, #c977ff);
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  padding: 4px 8px;
-  border-radius: 6px;
+  background: #ff0033;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 8px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  transform: rotate(-5deg);
 }
+
+.discount-badge::after {
+  content: "OFF";
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+}
+
 .product-name {
   font-size: 16px;
   font-weight: 600;
