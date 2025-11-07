@@ -217,11 +217,12 @@ onUnmounted(() => {
 .img {
   width: 100%;
   height: 100%;
-  object-fit: contain;       /* show full image */
-  object-position: center;   /* center both axes */
+  object-fit: cover;        /* fills fully — no white gaps */
+  object-position: center;  /* keeps product centered */
   display: block;
-  background-color: #fff;    /* optional neutral fill behind transparent parts */
+  transition: transform 0.4s ease; /* optional smooth adjust */
 }
+
 
 /* 🎯 CTA Button */
 .cta {
