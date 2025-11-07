@@ -131,6 +131,7 @@ onMounted(fetchFooterData);
 </script>
 <style scoped>
 .footer {
+  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff) ;
   background-color: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
   color: linear-gradient(135deg, #a070ff, #b682ff, #c394ff) ;
   padding: 40px 80px;
