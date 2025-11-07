@@ -192,49 +192,6 @@ onMounted(fetchProducts);
   width: 100%;
   margin-bottom: 30px;
 }
-.home-content {
-  padding: 0 16px 60px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-/* 🟣 Service Section */
-.service-section {
-  margin: 40px 0;
-}
-.cards-container {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-.card {
-  background: #fff;
-  border-radius: 20px;
-  padding: 20px;
-  flex: 1 1 30%;
-  text-align: center;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
-}
-.icon {
-  width: 60px;
-  height: 60px;
-  object-fit: contain;
-  margin-bottom: 10px;
-}
-.card-title {
-  font-weight: 700;
-  color: #4a00e0;
-}
-.card-text {
-  font-size: 14px;
-  color: #555;
-}
 
 /* 🟣 Category & Product Sections */
 .section-title {
