@@ -187,46 +187,56 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-/* Container */
+/* 🌟 Container */
 .banner-slider {
   position: relative;
   width: 100%;
-  height: 600px;           /* responsive height */
-  max-height: 700px;      /* desktop cap */
-  min-height: 180px;      /* mobile floor */
+  height: 700px;           /* desktop height */
+  min-height: 180px;       /* safety for very small screens */
   border-radius: 16px;
   overflow: hidden;
   outline: none;
   box-shadow: 0 14px 35px rgba(0,0,0,.12);
-  background: #f8f8fb;
+  background: transparent; /* no background fill */
 }
+
+@media (max-width: 1024px) {
+  .banner-slider {
+    height: 400px;         /* mobile height */
+  }
+}
+
+/* 🌄 Slides */
+.slides,
+.slide {
+  position: absolute;
+  inset: 0;
+}
+
+/* 🖼️ Image (full visible, no crop or zoom) */
 .img {
-  width: 100%; height: 100%; object-fit: cover;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;       /* show full image */
+  object-position: center;   /* center both axes */
   display: block;
+  background-color: #fff;    /* optional neutral fill behind transparent parts */
 }
 
-@media (min-width: 1024px) {
-  .banner-slider { height: 400px; }
-}
-
-/* Slides */
-.slides, .slide {
-  position: absolute; inset: 0;
-}
-.img {
-  width: 100%; height: 100%; object-fit: cover;
-  display: block;
-}
-
-/* CTA Button */
+/* 🎯 CTA Button */
 .cta {
   position: absolute;
-  left: 50%; transform: translateX(-50%);
+  left: 50%;
+  transform: translateX(-50%);
   bottom: 10%;
 }
+
 @media (max-width: 480px) {
-  .cta { bottom: 8%; }
+  .cta {
+    bottom: 8%;
+  }
 }
+
 .cta-btn {
   text-decoration: none;
   padding: 12px 28px;
@@ -237,24 +247,33 @@ onUnmounted(() => {
   box-shadow: 0 12px 24px rgba(142,45,226,.25);
 }
 
-/* Dots */
+/* ⚪ Dots */
 .dots {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   bottom: 12px;
-  display: flex; gap: 10px;
+  display: flex;
+  gap: 10px;
 }
-.dots.top { top: 14px; bottom: auto; }
+
+.dots.top {
+  top: 14px;
+  bottom: auto;
+}
+
 .dot {
-  width: 12px; height: 12px; border-radius: 999px;
-  background: rgba(255,255,255,.75);
-  border: 2px solid rgba(0,0,0,.12);
-  box-shadow: 0 2px 6px rgba(0,0,0,.12);
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.75);
+  border: 2px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
   cursor: pointer;
-  transition: transform .15s, opacity .15s, background .15s;
-  opacity: .7;
+  transition: transform 0.15s, opacity 0.15s, background 0.15s;
+  opacity: 0.7;
 }
+
 .dot.active {
   background: #fff;
   opacity: 1;
@@ -262,23 +281,47 @@ onUnmounted(() => {
   border-color: transparent;
 }
 
-/* Arrows (desktop hover) */
+/* ⬅️➡️ Arrows (desktop hover only) */
 .arrow {
-  position: absolute; top: 50%; transform: translateY(-50%);
-  width: 44px; height: 44px; border-radius: 999px;
-  background: rgba(255,255,255,.78);
-  border: none; font-size: 26px; font-weight: 700;
-  display: none; align-items: center; justify-content: center;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.78);
+  border: none;
+  font-size: 26px;
+  font-weight: 700;
+  display: none;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 22px rgba(0,0,0,.18);
-}
-.arrow.left { left: 12px; }
-.arrow.right { right: 12px; }
-@media (hover: hover) and (pointer: fine) {
-  .banner-slider:hover .arrow { display: inline-flex; }
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
 
-/* Fade transition */
-.fade-enter-active, .fade-leave-active { transition: opacity .55s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
+.arrow.left {
+  left: 12px;
+}
+
+.arrow.right {
+  right: 12px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .banner-slider:hover .arrow {
+    display: inline-flex;
+  }
+}
+
+/* ✨ Fade Transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.55s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
