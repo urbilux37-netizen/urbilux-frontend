@@ -38,6 +38,10 @@ const fetchOrders = async () => {
         typeof o.customer === "string"
           ? JSON.parse(o.customer)
           : o.customer || {},
+      online_payment:
+        typeof o.online_payment === "string"
+          ? JSON.parse(o.online_payment)
+          : o.online_payment || null,
     }));
   } catch (err) {
     console.error("❌ Failed to fetch orders:", err);
@@ -67,9 +71,7 @@ const updateStatus = async (order) => {
 
 const filteredOrders = computed(() =>
   orders.value
-    .filter(
-      (o) => o.status?.toLowerCase() === activeTab.value.toLowerCase()
-    )
+    .filter((o) => o.status?.toLowerCase() === activeTab.value.toLowerCase())
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 );
 
@@ -116,12 +118,36 @@ onMounted(fetchOrders);
           <div class="details">
             <p><b>Payment:</b> {{ o.payment_method }}</p>
             <p class="total"><b>Total:</b> ৳{{ o.total }}</p>
+
+            <!-- 🟣 New Manual Payment Info -->
+            <div
+              v-if="o.payment_method === 'Online Payment' && o.online_payment"
+              class="payment-info"
+            >
+              <p>
+                <b>Method:</b> {{ o.online_payment.method }}
+              </p>
+              <p>
+                <b>Paid:</b> ৳{{ o.online_payment.amount || 0 }}
+              </p>
+              <p>
+                <b>Due:</b>
+                ৳{{ (o.total - (o.online_payment.amount || 0)).toFixed(2) }}
+              </p>
+              <p>
+                <b>Last 2 digit:</b> {{ o.online_payment.last2 }}
+              </p>
+              <p class="note">
+                🕓 {{ o.online_payment.note || "Verification pending" }}
+              </p>
+            </div>
           </div>
         </div>
 
         <div class="order-actions">
           <select v-model="o.newStatus" class="status-select">
             <option value="pending">Pending</option>
+            <option value="pending_payment">Pending Payment</option>
             <option value="processing">Processing</option>
             <option value="delivered">Delivered</option>
           </select>
@@ -237,6 +263,24 @@ onMounted(fetchOrders);
 .phone {
   font-size: 13px;
   color: #777;
+}
+
+/* 🟣 Payment Info Box */
+.payment-info {
+  margin-top: 8px;
+  background: #faf6ff;
+  border: 1px solid #eee;
+  padding: 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  text-align: left;
+}
+.payment-info b {
+  color: #4a00e0;
+}
+.payment-info .note {
+  color: #999;
+  font-style: italic;
 }
 
 /* Actions */

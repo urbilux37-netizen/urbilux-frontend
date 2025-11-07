@@ -90,8 +90,8 @@
                   </strong>
                   {{
                     onlinePayment.method === "Bkash"
-                      ? "017XXXXXXXX"
-                      : "018XXXXXXXX"
+                      ? "01631822765"
+                      : "01631822765"
                   }}
                 </p>
                 <p>
