@@ -277,6 +277,7 @@ onMounted(fetchBanners);
   max-width: 1100px;
   margin: 0 auto;
   padding: 20px 16px 60px;
+  overflow: hidden;
 }
 .newBannerFilePreview{
   overflow: hidden;
