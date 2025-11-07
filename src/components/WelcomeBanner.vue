@@ -200,6 +200,11 @@ onUnmounted(() => {
   box-shadow: 0 14px 35px rgba(0,0,0,.12);
   background: #f8f8fb;
 }
+.img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block;
+}
+
 @media (min-width: 1024px) {
   .banner-slider { height: 400px; }
 }
