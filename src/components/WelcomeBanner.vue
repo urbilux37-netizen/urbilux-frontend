@@ -104,7 +104,7 @@ const currentKey = computed(
 
 async function fetchBanners() {
   try {
-    const res = await axios.get(`${API_BASE}/banners`);
+    const res = await axios.get(`${API_BASE}/api/banners`);
     banners.value = res.data;
   } catch (e) {
     console.error("Banner load error:", e);
