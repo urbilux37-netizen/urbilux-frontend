@@ -22,6 +22,10 @@
           />
           <p class="hint">Upload a wide image (1500–2400px recommended)</p>
 
+          <div v-if="uploading" class="uploading">
+            Uploading... {{ uploadProgress }}%
+          </div>
+
           <div v-if="newBannerFilePreview" class="image-preview">
             <img :src="newBannerFilePreview" alt="Preview" />
           </div>
@@ -98,6 +102,9 @@
             <div class="field col-span-2">
               <label>Banner Image</label>
               <input type="file" @change="onEditBannerFileChange" accept="image/*" />
+              <div v-if="editUploading" class="uploading">
+                Uploading... {{ editUploadProgress }}%
+              </div>
               <div v-if="editFilePreview" class="image-preview">
                 <img :src="editFilePreview" alt="Preview" />
               </div>
@@ -142,13 +149,12 @@ const API_BASE =
 const banners = ref([]);
 const loading = ref(false);
 
-const newBanner = ref({
-  title: "",
-  button_text: "",
-  button_link: "",
-});
+// ---------- Add ----------
+const newBanner = ref({ title: "", button_text: "", button_link: "" });
 const newBannerFile = ref(null);
 const newBannerFilePreview = ref(null);
+const uploading = ref(false);
+const uploadProgress = ref(0);
 
 function onBannerFileChange(e) {
   newBannerFile.value = e.target.files[0];
@@ -161,6 +167,7 @@ function resetForm() {
   newBanner.value = { title: "", button_text: "", button_link: "" };
   newBannerFile.value = null;
   newBannerFilePreview.value = null;
+  uploadProgress.value = 0;
 }
 
 async function fetchBanners() {
@@ -177,6 +184,7 @@ async function fetchBanners() {
 
 async function addBanner() {
   if (!newBannerFile.value) return alert("Please select an image");
+
   const formData = new FormData();
   formData.append("image", newBannerFile.value);
   formData.append("title", newBanner.value.title);
@@ -184,13 +192,19 @@ async function addBanner() {
   formData.append("button_link", newBanner.value.button_link);
 
   try {
+    uploading.value = true;
     await axios.post(`${API_BASE}/api/banners`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (e) => {
+        uploadProgress.value = Math.round((e.loaded * 100) / e.total);
+      },
     });
     resetForm();
     fetchBanners();
   } catch (err) {
     console.error("❌ Add banner error:", err);
+  } finally {
+    uploading.value = false;
   }
 }
 
@@ -204,11 +218,13 @@ async function deleteBanner(id) {
   }
 }
 
-/* ========= Edit Modal ========= */
+// ---------- Edit ----------
 const editing = ref(false);
 const editModel = ref({});
 const editFile = ref(null);
 const editFilePreview = ref(null);
+const editUploading = ref(false);
+const editUploadProgress = ref(0);
 
 function openEdit(b) {
   editModel.value = { ...b };
@@ -218,6 +234,7 @@ function closeEdit() {
   editing.value = false;
   editFile.value = null;
   editFilePreview.value = null;
+  editUploadProgress.value = 0;
 }
 function onEditBannerFileChange(e) {
   editFile.value = e.target.files[0];
@@ -234,18 +251,25 @@ async function updateBanner() {
   formData.append("button_link", editModel.value.button_link);
 
   try {
+    editUploading.value = true;
     await axios.put(`${API_BASE}/api/banners/${editModel.value.id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (e) => {
+        editUploadProgress.value = Math.round((e.loaded * 100) / e.total);
+      },
     });
     closeEdit();
     fetchBanners();
   } catch (err) {
     console.error("❌ Update banner error:", err);
+  } finally {
+    editUploading.value = false;
   }
 }
 
 onMounted(fetchBanners);
 </script>
+
 
 
 <style scoped>
