@@ -209,65 +209,67 @@ onMounted(fetchProducts);
 <style scoped>
 @import "../views/home.css";
 
-/* ===== Section Wrapper ===== */
-
-/* ===== Section Wrapper ===== */
+/* ===== Base Section ===== */
 .service-section {
   width: 100%;
   background: #fff;
-  padding: 2rem 1rem;
+  padding: 4rem 2rem;
   text-align: center;
 }
 
-/* ===== Cards Grid ===== */
+/* ===== Desktop Cards Layout ===== */
 .cards-container {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem; /* equal spacing */
-  justify-items: center;
+  display: flex;
+  justify-content: center;
   align-items: stretch;
+  gap: 2rem;
+  flex-wrap: wrap;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 /* ===== Individual Card ===== */
 .card {
   background: #ffffff;
-  border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-  padding: 1rem;
-  width: 100%;
-  max-width: 120px; /* 🟣 small & equal cards */
+  border-radius: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  padding: 2rem 1.5rem;
+  width: 300px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 18px rgba(160, 112, 255, 0.25);
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(122, 0, 255, 0.2);
 }
 
 /* ===== Icon ===== */
 .icon {
-  width: 36px;
-  height: 36px;
-  margin-bottom: 0.6rem;
-  filter: drop-shadow(0 0 4px rgba(122, 0, 255, 0.3));
+  width: 60px;
+  height: 60px;
+  margin-bottom: 1rem;
+  filter: drop-shadow(0 0 6px rgba(122, 0, 255, 0.4));
+  transition: transform 0.3s ease;
+}
+
+.card:hover .icon {
+  transform: scale(1.05);
 }
 
 /* ===== Text ===== */
 .card-title {
-  font-size: 0.9rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: #000;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.6rem;
   font-family: "Georgia", serif;
 }
 
 .card-text {
-  font-size: 0.7rem;
+  font-size: 1rem;
   color: #444;
-  line-height: 1.3;
+  line-height: 1.5;
 }
-
-
 /* ===== Responsive Adjustments ===== */
 
 /* Tablet */
