@@ -9,31 +9,55 @@
     tabindex="0"
   >
     <!-- Slides -->
-    <div class="slides">
-      <transition name="fade" mode="out-in">
-        <div class="slide" :key="currentKey">
-          <img
-            :src="banners[current]?.image_url || placeholder"
-            :alt="banners[current]?.title || 'Banner'"
-            class="img"
-            loading="eager"
-            @load="onLoaded"
-          />
-          <!-- Optional CTA -->
-          <div
-            v-if="banners[current]?.button_text"
-            class="cta"
-          >
-            <router-link
-              class="cta-btn"
-              :to="banners[current]?.button_link || '#'"
-            >
-              {{ banners[current]?.button_text }}
-            </router-link>
-          </div>
-        </div>
-      </transition>
+<div class="slides" v-if="banners.length">
+  <transition name="fade" mode="out-in">
+    <div class="slide" :key="currentKey">
+      <img
+        :src="banners[current]?.image_url"
+        :alt="banners[current]?.title || 'Banner'"
+        class="img"
+        loading="eager"
+        @load="onLoaded"
+      />
+
+      <!-- ✅ Smart CTA (same logic as before) -->
+      <div v-if="banners[current]?.button_text" class="cta">
+        <a
+          v-if="banners[current]?.button_link?.startsWith('http')"
+          class="cta-btn"
+          :href="banners[current]?.button_link"
+          target="_blank"
+          rel="noopener"
+        >
+          {{ banners[current]?.button_text }}
+        </a>
+        <router-link
+          v-else
+          class="cta-btn"
+          :to="banners[current]?.button_link || '#'"
+        >
+          {{ banners[current]?.button_text }}
+        </router-link>
+      </div>
     </div>
+  </transition>
+</div>
+
+<!-- 🟣 Optional loader if you want -->
+<div v-else class="banner-loading"></div>
+
+
+
+  <!-- 🔗 If internal route -->
+  <router-link
+    v-else
+    class="cta-btn"
+    :to="banners[current]?.button_link || '#'"
+  >
+    {{ banners[current]?.button_text }}
+  </router-link>
+</div>
+
 
     <!-- Dots (PC top overlay; mobile bottom) -->
     <div class="dots" :class="{ top: isDesktop }">
@@ -78,8 +102,6 @@ const current = ref(0);
 const timer = ref(null);
 const isDesktop = ref(false);
 const sliderRef = ref(null);
-const placeholder =
-  "https://dummyimage.com/1600x600/eeeeee/222222.jpg&text=Urbilux+Banner";
 
 const currentKey = computed(() => (banners.value[current.value]?.id ?? current.value) + ":" + current.value);
 
@@ -187,6 +209,12 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+@media (max-width: 768px) {
+  .dots {
+    display: none !important;
+  }
+}
+
 /* 🌟 Container */
 .banner-slider {
   position: relative;

@@ -281,6 +281,8 @@ onMounted(fetchBanners);
 }
 .newBannerFilePreview{
   overflow: hidden;
+  height: 200px;
+  width: 200px;
 }
 .page-title {
   font-size: 28px;
