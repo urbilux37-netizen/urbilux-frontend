@@ -203,13 +203,14 @@ onMounted(fetchFooterData);
 .info-details .hours,
 .info-details .text {
   font-size: 12px;
-  color: #888;
+  color: black;
 }
 
 .info-details .number {
   font-size: 18px;
   font-weight: bold;
-  color: #fff;
+    color: black;
+;
 }
 
 .about-us-row {
@@ -222,13 +223,13 @@ onMounted(fetchFooterData);
 }
 
 .address-box {
-  background-color: #1a2a38;
+
   padding: 20px;
   border-radius: 8px;
 }
 
 .address-box h5 {
-  color: #fff;
+    color: black;
   margin-top: 0;
   font-size: 16px;
 }
@@ -240,7 +241,7 @@ onMounted(fetchFooterData);
 }
 
 .address-box a {
-  color: #c0c0c0;
+    color: black;
   text-decoration: underline;
 }
 
@@ -308,7 +309,7 @@ onMounted(fetchFooterData);
   justify-content: space-between;
   align-items: center;
   font-size: 12px;
-  color: #888;
+    color: black;
 }
 
 @media (max-width: 768px) {
