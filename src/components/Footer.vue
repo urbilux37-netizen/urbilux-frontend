@@ -132,7 +132,7 @@ onMounted(fetchFooterData);
 <style scoped>
 .footer {
   background-color: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
-  color: #c0c0c0;
+  color: linear-gradient(135deg, #a070ff, #b682ff, #c394ff) ;
   padding: 40px 80px;
   font-family: "Zalando Sans", sans-serif;
   font-optical-sizing: auto;
