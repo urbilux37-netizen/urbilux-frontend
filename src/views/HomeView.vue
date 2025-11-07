@@ -221,7 +221,8 @@ onMounted(fetchProducts);
   margin-bottom: 30px;
 }
 .wlcbanner{
-  padding-top: 72px;
+  padding-top: 0px;
+  margin-top: 72px;
 }
 
 /* ===== Base Section ===== */

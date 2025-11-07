@@ -191,7 +191,7 @@ onUnmounted(() => {
 .banner-slider {
   position: relative;
   width: 100%;
-  height: 46vw;           /* responsive height */
+  height: 600px;           /* responsive height */
   max-height: 700px;      /* desktop cap */
   min-height: 180px;      /* mobile floor */
   border-radius: 16px;
@@ -209,7 +209,7 @@ onUnmounted(() => {
   position: absolute; inset: 0;
 }
 .img {
-  width: 100%; height: 100%; object-fit: contain;
+  width: 100%; height: 100%; object-fit: cover;
   display: block;
 }
 
