@@ -217,7 +217,7 @@ onUnmounted(() => {
 .img {
   width: 100%;
   height: 100%;
-  object-fit: cover;        /* fills fully — no white gaps */
+  object-fit: contain;        /* fills fully — no white gaps */
   object-position: center;  /* keeps product centered */
   display: block;
   transition: transform 0.4s ease; /* optional smooth adjust */
