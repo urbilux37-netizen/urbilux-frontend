@@ -137,6 +137,40 @@ onMounted(() => {
 
 
 <style scoped>
+/* 🔹 Product Grid: same layout as All Products */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 per row desktop */
+  gap: 20px;
+  width: 85%;
+  margin: 30px auto 60px;
+  justify-items: center; /* centers the card in each cell */
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .products-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); width: 90%; gap: 12px; }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+}
+
+/* Optional: let the page breathe wider on big screens */
+.search-page-wrapper {
+  /* replace max-width with a fluid width like All Products */
+  max-width: none;
+  width: 100%;
+  padding: 0;
+  margin: 120px 0 50px;
+}
+
 /* =============================== */
 /* 🔹 Page Layout */
 /* =============================== */
