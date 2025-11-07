@@ -124,8 +124,6 @@
 
     </div> <!-- ✅ end .home-content -->
 
-    <!-- 🟣 Footer -->
-    <Footer />
   </div>
 </template>
 
