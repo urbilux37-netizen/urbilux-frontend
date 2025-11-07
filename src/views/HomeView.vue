@@ -151,7 +151,7 @@ let intervalId = null;
 
 const fetchBanners = async () => {
   try {
-    const res = await axios.get(`${API_BASE}/banners`);
+const res = await axios.get(`${API_BASE}/api/banners`);
     banners.value = res.data;
   } catch (err) {
     console.error("❌ Banners fetch error:", err);

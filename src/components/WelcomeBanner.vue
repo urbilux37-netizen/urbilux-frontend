@@ -65,7 +65,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import axios from "axios";
 
 const API_BASE =
@@ -85,7 +85,7 @@ const currentKey = computed(() => (banners.value[current.value]?.id ?? current.v
 
 async function fetchBanners() {
   try {
-    const res = await axios.get(`${API_BASE}/banners`);
+const res = await axios.get(`${API_BASE}/api/banners`);
     banners.value = res.data;
     // if no banners, keep placeholder flow
   } catch (e) {
