@@ -209,7 +209,7 @@ onUnmounted(() => {
   position: absolute; inset: 0;
 }
 .img {
-  width: 100%; height: 100%; object-fit: cover;
+  width: 100%; height: 100%; object-fit: contain;
   display: block;
 }
 
