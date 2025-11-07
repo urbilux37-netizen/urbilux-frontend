@@ -406,7 +406,7 @@ watch(itemCount, () => {
   }
   .mobile-bottom-bar li {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-size: 12px; flex: 1; position: relative; text-align: center; color: var(--purple);
+    font-size: 12px; flex: 1; position: relative; text-align: center; color:black;
   }
   .mobile-bottom-bar li img {
     width: 24px; height: 24px; margin-bottom: 3px;

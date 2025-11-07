@@ -216,10 +216,15 @@ onMounted(fetchFooterData);
 .about-us-row {
   display: flex;
   gap: 40px;
+    color: black;
+
+
 }
 
 .about-us-row .sub-column {
   flex: 1;
+    color: black;
+
 }
 
 .address-box {
