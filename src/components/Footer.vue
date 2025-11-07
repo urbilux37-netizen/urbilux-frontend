@@ -175,7 +175,7 @@ onMounted(fetchFooterData);
 }
 
 .footer-column a {
-  color: #c0c0c0;
+  color: black;
   text-decoration: none;
   font-size: 14px;
   transition: color 0.3s;
