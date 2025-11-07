@@ -1,19 +1,16 @@
 <template>
-  <div>
-     <div >
+  <div class="search-page">
     <!-- 🟣 Navbar -->
     <Navbar />
-     </div>
 
-
-    <!-- Main Search Content -->
-    <div class="search-page-wrapper">
+    <!-- 🟣 Main Wrapper -->
+    <div class="search-content">
       <h1 class="search-title">Search Results for "{{ query }}"</h1>
 
-      <!-- Loading State -->
-      <div v-if="loading" class="loading-text">Loading...</div>
+      <!-- 🔄 Loading -->
+      <div v-if="loading" class="loading">Loading...</div>
 
-      <!-- Results -->
+      <!-- ✅ Results -->
       <div v-else>
         <div v-if="products.length" class="products-grid">
           <ProductCard
@@ -23,14 +20,19 @@
           />
         </div>
 
+        <!-- ❌ No Results -->
         <div v-else class="no-results">
+          <img
+            src="https://cdn-icons-png.flaticon.com/512/4076/4076549.png"
+            alt="No Results"
+          />
           <p>No products found for "{{ query }}"</p>
         </div>
       </div>
     </div>
 
-    <!-- Footer -->
-
+    <!-- 🟣 Footer -->
+    <Footer />
   </div>
 </template>
 
@@ -43,32 +45,25 @@ import Navbar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
 import ProductCard from "@/components/ProductCard.vue";
 
-// ===============================
-// 🔹 Auto Detect Backend URL (Local + Render)
-// ===============================
+// 🌍 Auto Detect Backend
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
     : "https://urbilux-backend.onrender.com";
 
-// ✅ Use axios instance (no /api prefix issues)
 const api = axios.create({
   baseURL: API_BASE,
   withCredentials: true,
 });
 
-// ===============================
-// 🔹 Reactive Variables
-// ===============================
+// 🔎 Reactive Data
 const route = useRoute();
 const query = ref(route.query.q || "");
 const products = ref([]);
 const allProducts = ref([]);
 const loading = ref(false);
 
-// ===============================
-// 🔍 Fetch All Products Then Filter (fuzzy search)
-// ===============================
+// 🔍 Fetch and Filter Products
 const fetchProducts = async (searchTerm) => {
   loading.value = true;
   try {
@@ -78,26 +73,18 @@ const fetchProducts = async (searchTerm) => {
       return;
     }
 
-    // 1️⃣ Load all products from backend
     const res = await api.get("/products");
     allProducts.value = res.data || [];
 
-    // 2️⃣ Convert query to lowercase
     const q = searchTerm.toLowerCase().trim();
 
-    // 3️⃣ Filter by partial match (fuzzy logic)
     products.value = allProducts.value
       .filter((p) => {
         const name = (p.name || "").toLowerCase();
         const desc = (p.description || "").toLowerCase();
         const category = (p.category_slug || "").toLowerCase();
-        return (
-          name.includes(q) ||
-          desc.includes(q) ||
-          category.includes(q)
-        );
+        return name.includes(q) || desc.includes(q) || category.includes(q);
       })
-      // 4️⃣ Sort by best match (startsWith first)
       .sort((a, b) => {
         const aName = a.name.toLowerCase();
         const bName = b.name.toLowerCase();
@@ -105,8 +92,6 @@ const fetchProducts = async (searchTerm) => {
         if (!aName.startsWith(q) && bName.startsWith(q)) return 1;
         return aName.localeCompare(bName);
       });
-
-    console.log(`✅ Found ${products.value.length} matches for "${q}"`);
   } catch (err) {
     console.error("❌ Search Error:", err.message);
     products.value = [];
@@ -115,9 +100,7 @@ const fetchProducts = async (searchTerm) => {
   }
 };
 
-// ===============================
-// 🧠 Watch for query param change (reactive search)
-// ===============================
+// 🔁 React to query changes
 watch(
   () => route.query.q,
   (newQuery) => {
@@ -127,95 +110,108 @@ watch(
   { immediate: true }
 );
 
-// ===============================
-// 🚀 Initial Fetch on Mount
-// ===============================
 onMounted(() => {
   fetchProducts(query.value);
 });
 </script>
 
-
 <style scoped>
-/* 🔹 Product Grid: same layout as All Products */
-.products-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); /* 5 per row desktop */
-  gap: 20px;
-  width: 85%;
-  margin: 30px auto 60px;
-  justify-items: center; /* centers the card in each cell */
+/* ===============================
+   🟣 Search Page Layout
+=================================*/
+.search-page {
+  background: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-/* Tablet */
-@media (max-width: 1024px) {
-  .products-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.search-content {
+  flex: 1;
+  padding-top: 120px;
+  text-align: center;
+  width: 90%;
+  max-width: 1300px;
+  margin: 0 auto;
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); width: 90%; gap: 12px; }
-}
-
-/* Small phones */
-@media (max-width: 480px) {
-  .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-}
-
-/* Optional: let the page breathe wider on big screens */
-.search-page-wrapper {
-  /* replace max-width with a fluid width like All Products */
-  max-width: none;
-  width: 100%;
-  padding: 0;
-  margin: 120px 0 50px;
-}
-
-/* =============================== */
-/* 🔹 Page Layout */
-/* =============================== */
-.search-page-wrapper {
-  max-width: 1200px;
-  margin: 120px auto 50px auto; /* navbar height offset */
-  padding: 0 20px;
-  min-height: 70vh;
-}
-
-/* 🔹 Title */
+/* ===============================
+   🟣 Title
+=================================*/
 .search-title {
-  font-size: 28px;
   font-family: "Abril Fatface", serif;
+  font-size: 32px;
   color: #4a00e0;
   margin-bottom: 30px;
-  text-align: center;
 }
 
-/* 🔹 Loading & No Result */
-.loading-text,
+/* ===============================
+   🟣 Loading / No Results
+=================================*/
+.loading,
 .no-results {
   font-size: 18px;
+  color: #555;
+  margin-top: 60px;
   text-align: center;
-  margin-top: 40px;
-}
-.loading-text {
-  color: #333;
-}
-.no-results {
-  color: #888;
 }
 
-/* 🔹 Product Grid */
+.no-results img {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 12px;
+  opacity: 0.7;
+}
+
+/* ===============================
+   🟣 Product Grid Layout
+=================================*/
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
+  justify-items: center;
+  margin-bottom: 60px;
 }
 
-/* 🔹 Responsive */
+/* 📱 Responsive */
+@media (max-width: 1200px) {
+  .products-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .products-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+}
+
 @media (max-width: 768px) {
+  .search-title {
+    font-size: 24px;
+  }
   .products-grid {
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
+    width: 95%;
+    margin: 0 auto 40px;
+    gap: 14px;
   }
+}
+
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+}
+
+/* ===============================
+   🟣 Footer spacing
+=================================*/
+footer {
+  margin-top: auto;
 }
 </style>
