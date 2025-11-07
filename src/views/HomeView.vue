@@ -210,37 +210,36 @@ onMounted(fetchProducts);
 @import "../views/home.css";
 
 /* ===== Base Section ===== */
+/* ===== Section Wrapper ===== */
 .service-section {
   width: 100%;
-  background: #fff;
+  background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
   padding: 4rem 2rem;
   text-align: center;
 }
 
-/* ===== Desktop Cards Layout ===== */
+/* ===== Cards Layout ===== */
 .cards-container {
   display: flex;
   justify-content: center;
   align-items: stretch;
   gap: 2rem;
   flex-wrap: wrap;
-  max-width: 1100px;
-  margin: 0 auto;
 }
 
-/* ===== Individual Card ===== */
+/* ===== Each Card ===== */
 .card {
-  background: #ffffff;
-  border-radius: 20px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-  padding: 2rem 1.5rem;
-  width: 300px;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(74, 0, 224, 0.08);
+  padding: 2rem 1rem;
+  width: 320px;
+  transition: 0.3s ease;
 }
 
 .card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(122, 0, 255, 0.2);
+  box-shadow: 0 6px 20px rgba(142, 45, 226, 0.25);
 }
 
 /* ===== Icon ===== */
@@ -248,8 +247,8 @@ onMounted(fetchProducts);
   width: 60px;
   height: 60px;
   margin-bottom: 1rem;
-  filter: drop-shadow(0 0 6px rgba(122, 0, 255, 0.4));
-  transition: transform 0.3s ease;
+  filter: drop-shadow(0 0 6px rgba(142, 45, 226, 0.4));
+  transition: 0.3s;
 }
 
 .card:hover .icon {
@@ -270,6 +269,8 @@ onMounted(fetchProducts);
   color: #444;
   line-height: 1.5;
 }
+
+/* ===== Responsive ===== */
 /* ===== Responsive Adjustments ===== */
 
 /* Tablet */
