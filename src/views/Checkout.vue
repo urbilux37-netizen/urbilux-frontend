@@ -112,8 +112,8 @@ import { useCart } from "@/composables/useCart";
 // ✅ Auto detect API
 const API_BASE =
   window.location.hostname === "localhost"
-    ? "http://localhost:5000/api"
-    : "https://urbilux-backend.onrender.com/api";
+    ? "http://localhost:5000/"
+    : "https://urbilux-backend.onrender.com/";
 
 // ✅ Ensure cookies work (important for guest user auto-create)
 axios.defaults.withCredentials = true;
