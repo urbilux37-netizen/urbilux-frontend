@@ -1,6 +1,9 @@
 <template>
   <div>
+ <div >
+    <!-- 🟣 Navbar -->
     <Navbar />
+     </div>
 
     <div class="checkout-page">
       <h1 class="checkout-title">Checkout</h1>
@@ -15,9 +18,12 @@
               <img :src="item.image_url" alt="Product Image" class="summary-img" />
               <div class="summary-details">
                 <p class="summary-name">{{ item.name }}</p>
+
                 <p class="summary-price">
                   <template v-if="item.discount_percent">
-                    <span class="discounted">৳{{ discountedPrice(item).toFixed(2) }}</span>
+                    <span class="discounted">
+                      ৳{{ discountedPrice(item).toFixed(2) }}
+                    </span>
                     <span class="original">৳{{ item.price }}</span>
                   </template>
                   <template v-else>
@@ -29,12 +35,7 @@
             </div>
 
             <div class="total-section">
-              <h3>
-                Total: ৳{{ (Number(totalPrice) - Number(onlinePayment.amount || 0)).toFixed(2) }}
-              </h3>
-              <p v-if="onlinePayment.amount">
-                (Paid ৳{{ onlinePayment.amount }} by {{ onlinePayment.method }})
-              </p>
+              <h3>Total: ৳{{ totalPrice }}</h3>
             </div>
           </div>
 
@@ -58,68 +59,32 @@
               <option>Online Payment</option>
             </select>
 
-            <!-- 🟣 Online Payment Section -->
-            <div v-if="paymentMethod === 'Online Payment'" class="payment-box">
-              <label>Choose Payment App:</label>
-              <div class="radio-group">
-                <label>
-                  <input type="radio" value="Bkash" v-model="onlinePayment.method" />
-                  Bkash
-                </label>
-                <label>
-                  <input type="radio" value="Nagad" v-model="onlinePayment.method" />
-                  Nagad
-                </label>
-              </div>
-
-              <div class="instructions">
-                <p>
-                  <strong>{{ onlinePayment.method }} Personal Number:</strong>
-                  {{ onlinePayment.method === "Bkash" ? "017XXXXXXXX" : "018XXXXXXXX" }}
-                </p>
-                <p>অনুগ্রহ করে Send Money করুন উপরের নম্বরে।</p>
-              </div>
-
-              <input
-                v-model="onlinePayment.amount"
-                type="number"
-                placeholder="কতো টাকা পাঠিয়েছেন (৳)"
-                required
-              />
-              <input
-                v-model="onlinePayment.last2"
-                type="text"
-                maxlength="2"
-                placeholder="যে নাম্বার থেকে পাঠিয়েছেন তার শেষ ২ সংখ্যা দিন"
-                required
-              />
-            </div>
-
             <button type="submit" class="checkout-btn">Confirm Order</button>
           </form>
         </div>
       </div>
     </div>
+
   </div>
 </template>
 
 <script setup>
 import Navbar from "@/components/NavBar.vue";
+import Footer from "@/components/Footer.vue";
 import axios from "axios";
 import { ref, computed, onMounted } from "vue";
 import { useCart } from "@/composables/useCart";
 
-// ✅ Auto detect API
+// 🟣 Auto detect backend base URL
 const API_BASE =
   window.location.hostname === "localhost"
-    ? "http://localhost:5000/"
+    ? "http://localhost:5000/api"
     : "https://urbilux-backend.onrender.com/api";
 
-// ✅ Ensure cookies work (important for guest user auto-create)
+// ✅ Always send cookies with requests
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = API_BASE;
 
-// 🛒 Load cart composable
+// 🛒 Use cart composable
 const { cart, fetchCart } = useCart();
 
 // 🧾 Customer info
@@ -127,33 +92,31 @@ const customer = ref({
   name: "",
   phone: "",
   address: "",
+  district: "",
+  upazila: "",
+  thana: "",
 });
 
 const paymentMethod = ref("Cash on Delivery");
-const onlinePayment = ref({
-  method: "Bkash",
-  amount: "",
-  last2: "",
-});
 
-// ✅ Price with discount
+// ✅ Discount calculation
 const discountedPrice = (item) => {
   const price = Number(item.price);
   const discount = Number(item.discount_percent || 0);
-  return discount ? price - (price * discount) / 100 : price;
+  if (!discount) return price;
+  return price - (price * discount) / 100;
 };
 
-// ✅ Total cart amount
+// ✅ Total Price
 const totalPrice = computed(() =>
   cart.value
     .reduce((sum, item) => sum + discountedPrice(item) * (item.quantity || 1), 0)
     .toFixed(2)
 );
 
-// ✅ Place Order (includes manual payment + auto guest)
+// ✅ Place Order Function
 const placeOrder = async () => {
   try {
-    await fetchCart(); // 🟣 refresh cart before order
     if (!cart.value.length) {
       alert("Your cart is empty!");
       return;
@@ -173,73 +136,42 @@ const placeOrder = async () => {
       payment_method: paymentMethod.value,
     };
 
-    // 🟣 Include manual payment data
-    if (paymentMethod.value === "Online Payment") {
-      payload.online_payment = {
-        method: onlinePayment.value.method,
-        amount: Number(onlinePayment.value.amount || 0),
-        last2: onlinePayment.value.last2,
-        note: `Manual ${onlinePayment.value.method} payment verification pending`,
-      };
-    }
+    console.log("🟣 Sending checkout payload:", payload);
 
-    const res = await axios.post("/checkout", payload, { withCredentials: true });
+    const res = await axios.post(`${API_BASE}/checkout`, payload, {
+      withCredentials: true,
+    });
+
+    console.log("🟢 Checkout response:", res.data);
+
     if (res.data.success) {
       alert("✅ Order placed successfully!");
-
-      // Reset everything
-      customer.value = { name: "", phone: "", address: "" };
-      onlinePayment.value = { method: "Bkash", amount: "", last2: "" };
-      paymentMethod.value = "Cash on Delivery";
+      // Reset form
+      customer.value = {
+        name: "",
+        phone: "",
+        address: "",
+        district: "",
+        upazila: "",
+        thana: "",
+      };
       await fetchCart();
     } else {
       alert("❌ Checkout failed: " + (res.data.error || "Unknown error"));
     }
   } catch (err) {
-    console.error("❌ Checkout Error:", err);
+    console.error("❌ Checkout failed:", err.response?.data || err.message);
     alert("Checkout failed! " + (err.response?.data?.error || err.message));
   }
 };
 
-// ✅ Load cart on page open
+// ✅ Fetch cart when page loads
 onMounted(fetchCart);
 </script>
+
+
+
 <style scoped>
-
-.payment-box {
-  background: #faf9ff;
-  border: 1px solid #ddd;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 15px;
-}
-.radio-group {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 10px;
-}
-.instructions {
-  background: #fff5ff;
-  border-left: 3px solid #8e2de2;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 10px;
-}
-.instructions p {
-  margin: 4px 0;
-  font-size: 13px;
-  color: #444;
-}
-.payment-box input {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 13.5px;
-}
-
-
 .checkout-page {
   margin: 100px auto;
   width: 85%;
