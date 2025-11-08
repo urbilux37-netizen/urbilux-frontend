@@ -183,7 +183,7 @@ const placeOrder = async () => {
       };
     }
 
-    const res = await axios.post("/checkout", payload, { withCredentials: true });
+const res = await axios.post(`${API_BASE}/checkout`, payload, { withCredentials: true });
     if (res.data.success) {
       alert("✅ Order placed successfully!");
 
