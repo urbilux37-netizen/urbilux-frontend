@@ -14,7 +14,7 @@
     <!-- 🔹 Main Content -->
     <main class="policy-container">
       <section>
-        <h2>স্টার টেক পণ্য রিটার্ন ও রিফান্ড পলিসি</h2>
+        <h2>Urbilux পণ্য রিটার্ন ও রিফান্ড পলিসি</h2>
         <p>
           শপ থেকে পণ্য ক্রয়ের ক্ষেত্রে অবশ্যই শপে বিক্রয়কর্মীর সামনে চেক করে কিনবেন। পরবর্তীতে সমস্যা হলে যদি পণ্যে ওয়ারেন্টি থাকে তবে তা ওয়ারেন্টির আওতাভুক্ত হবে।
         </p>
@@ -54,7 +54,7 @@
 
         <h2>Return & Refund Policy (English)</h2>
         <p>
-          If a customer is buying the products from our shops, then please make sure to check the products in front of our sellers. Later, if any problems occur then the customer will not be entitled to any changes but will be given services based on the warranty.
+          If a customer is buying the products from Urbilux shops, then please make sure to check the products in front of our sellers. Later, if any problems occur then the customer will not be entitled to any changes but will be given services based on the warranty.
         </p>
         <p>
           In case of online orders, after receiving the product, if any manufacturing issues are noticed, the customer must inform us within 24 hours via our hotline.
@@ -65,7 +65,7 @@
           Once opened or used, the product will not be returnable.
         </p>
         <p>
-          Defective products can be replaced from our shops after our specialists inspect them.
+          Defective products can be replaced from Urbilux shops after our specialists inspect them.
         </p>
         <p>
           For replacement through delivery service, Tk. 200/- replacement charge inside Dhaka is applicable.
