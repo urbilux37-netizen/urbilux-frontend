@@ -5,7 +5,7 @@ import { ref, onMounted, computed } from "vue";
 const orders = ref([]);
 const loading = ref(false);
 const activeTab = ref("Pending");
-const tabs = ["Pending", "Processing", "Delivered"];
+const tabs = ["Pending", "Pending Payment", "Processing", "Delivered"];
 
 const API_BASE =
   window.location.hostname === "localhost"
@@ -71,7 +71,11 @@ const updateStatus = async (order) => {
 
 const filteredOrders = computed(() =>
   orders.value
-    .filter((o) => o.status?.toLowerCase() === activeTab.value.toLowerCase())
+    .filter((o) => {
+      if (activeTab.value.toLowerCase() === "pending payment")
+        return o.status?.toLowerCase() === "pending_payment";
+      return o.status?.toLowerCase() === activeTab.value.toLowerCase();
+    })
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 );
 
