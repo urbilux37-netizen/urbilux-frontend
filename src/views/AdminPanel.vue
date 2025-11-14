@@ -45,6 +45,14 @@
       >
         Footer
       </button>
+
+      <!-- 🟣 NEW TAB: Traffic -->
+      <button
+        @click="activeTab = 'traffic'"
+        :class="activeTab === 'traffic' ? 'active-tab' : 'inactive-tab'"
+      >
+        Traffic
+      </button>
     </nav>
 
     <!-- ===== Tab Content ===== -->
@@ -72,6 +80,11 @@
       <div v-else-if="activeTab === 'footer'">
         <FooterManagement />
       </div>
+
+      <!-- 🟣 NEW TAB CONTENT LOAD -->
+      <div v-else-if="activeTab === 'traffic'">
+        <Traffic />
+      </div>
     </div>
   </div>
 </template>
@@ -85,8 +98,12 @@ import ProductsManager from "../components/admin/ProductManager.vue";
 import OrdersManager from "../components/admin/AdminOrders.vue";
 import FooterManagement from "../components/FooterManagement.vue";
 
-const activeTab = ref("dashboard"); // ✅ Default tab = Dashboard
+// 🟣 NEW IMPORT
+import Traffic from "../components/admin/Traffic.vue";
+
+const activeTab = ref("dashboard"); // Default tab
 </script>
+
 
 <style scoped>
 .admin-page {
