@@ -38,9 +38,9 @@ onMounted(async () => {
     withCredentials: true,
   });
 
-  visitsToday.value = (await api.get("/stats/visits-today")).data.total;
-  visits7.value = (await api.get("/stats/visits-7days")).data.total;
-  visits30.value = (await api.get("/stats/visits-30days")).data.total;
+  visitsToday.value = (await api.get("/traffic/visits-today")).data.total;
+  visits7.value = (await api.get("/traffic/visits-7days")).data.total;
+  visits30.value = (await api.get("/traffic/visits-30days")).data.total;
 });
 </script>
 
