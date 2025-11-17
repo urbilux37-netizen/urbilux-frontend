@@ -107,6 +107,22 @@ onMounted(fetchOrders);
         </div>
 
         <div class="order-body">
+          <div class="order-items">
+  <h4>🛒 Ordered Items:</h4>
+
+  <div v-for="(item, idx) in o.items" :key="idx" class="item-row">
+    <p><b>{{ item.title }}</b></p>
+    <p>Price: ৳{{ item.price }}</p>
+    <p>Qty: {{ item.quantity }}</p>
+
+    <p v-if="item.variant">
+      Variant:
+      <span v-if="item.variant.color">Color: {{ item.variant.color }}</span>
+      <span v-if="item.variant.size">, Size: {{ item.variant.size }}</span>
+    </p>
+  </div>
+</div>
+
           <div class="info">
             <p class="customer"><b>{{ o.customer.name }}</b></p>
             <p class="phone">📞 {{ o.customer.phone }}</p>
