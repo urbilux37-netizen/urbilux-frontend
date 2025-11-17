@@ -66,24 +66,18 @@
   </div>
 </template>
 
-
 <script setup>
 import { computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useCart } from "@/composables/useCart";
 
 const emit = defineEmits(["close"]);
-const { cart, loading, fetchCart, addToCart } = useCart();
+const { cart, loading, fetchCart, addToCart, updateQty, removeItem } = useCart();
 const router = useRouter();
-
-const API_BASE =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://urbilux-backend.onrender.com";
 
 onMounted(fetchCart);
 
-// Correct discounted price
+// Discounted price calculator
 const discounted = (item) => {
   if (!item.discount_percent) return Number(item.final_price);
   const p = Number(item.final_price);
@@ -91,7 +85,7 @@ const discounted = (item) => {
   return p - (p * d) / 100;
 };
 
-// Correct total cart amount
+// Total cart amount
 const totalPrice = computed(() =>
   cart.value.reduce(
     (sum, item) => sum + discounted(item) * item.quantity,
@@ -99,29 +93,21 @@ const totalPrice = computed(() =>
   )
 );
 
+// Increase quantity
 const increase = async (item) => {
-  await addToCart(item.product_id, 1);
-  await fetchCart();
+  await updateQty(item.id, item.quantity + 1);
 };
 
+// Decrease quantity
 const decrease = async (item) => {
   if (item.quantity > 1) {
-    await fetch(`${API_BASE}/api/cart/update/${item.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ quantity: item.quantity - 1 }),
-      credentials: "include",
-    });
-    await fetchCart();
+    await updateQty(item.id, item.quantity - 1);
   }
 };
 
+// Remove item
 const remove = async (id) => {
-  const res = await fetch(`${API_BASE}/api/cart/remove/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-  if (res.ok) fetchCart();
+  await removeItem(id);
 };
 
 const closeDrawer = () => emit("close");
