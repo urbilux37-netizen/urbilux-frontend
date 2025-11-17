@@ -24,6 +24,16 @@ const formatDate = (date) =>
     hour: "2-digit",
     minute: "2-digit",
   });
+const sendToCourier = async (orderId) => {
+  try {
+    const res = await axios.post(`/checkout/admin/${orderId}/send-packzy`);
+    alert("🚚 Order Sent to Courier!\nTracking: " + res.data.tracking);
+    fetchOrders();
+  } catch (err) {
+    console.error("❌ Courier Error:", err);
+    alert("Failed to send to courier!");
+  }
+};
 
 const fetchOrders = async () => {
   try {
@@ -159,6 +169,16 @@ onMounted(fetchOrders);
             </p>
           </div>
         </div>
+<!-- 🟣 Courier Section (Each Order) -->
+<div class="courier-section">
+  <button class="courier-btn" @click="sendToCourier(o.id)">
+    🚚 Send to Courier
+  </button>
+
+  <p v-if="o.courier_tracking" class="courier-info">
+    Tracking Code: <b>{{ o.courier_tracking }}</b>
+  </p>
+</div>
 
         <!-- 🟣 Actions -->
         <div class="order-actions">
@@ -247,6 +267,35 @@ onMounted(fetchOrders);
   box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
   padding: 16px 18px;
   border-left: 5px solid #8e2de2;
+}
+.courier-section {
+  margin: 15px 0;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 10px;
+  background: #faf7ff;
+}
+
+.courier-btn {
+  background: #4a00e0;
+  color: white;
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.courier-btn:hover {
+  background: #8e2de2;
+  transform: translateY(-2px);
+}
+
+.courier-info {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #444;
 }
 
 .order-top {
