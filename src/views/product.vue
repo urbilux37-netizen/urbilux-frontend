@@ -259,13 +259,31 @@ const handleThumbClick = (img) => {
 // ---------- Cart Handlers ----------
 const handleAddToCart = async () => {
   try {
-    await addToCartApi(Number(product.value.id), Number(quantity.value));
+    const payload = {
+      product_id: Number(product.value.id),
+      quantity: Number(quantity.value),
+
+      // 🟣 Final price (with discount + variant price)
+      final_price: Number(displayPriceDiscounted.value),
+
+      // 🟣 Final image (variant image / selected thumb / main)
+      final_image:
+        displayImage.value ||
+        product.value.image_url,
+
+      // 🟣 Selected variants
+      selected_variants: selectedOptions.value
+    };
+
+    await addToCartApi(payload);
     alert("✅ Product added to cart successfully!");
+
   } catch (err) {
     console.error("❌ Add to cart failed:", err);
     alert("Failed to add to cart!");
   }
 };
+
 
 const handleBuyNow = async () => {
   await handleAddToCart();

@@ -28,15 +28,19 @@ export function useCart() {
     }
   };
 
-  // ✅ Add to Cart
-  const addToCart = async (productId, quantity = 1) => {
-    try {
-      await axios.post("/cart/add", { productId, quantity });
-      await fetchCart();
-    } catch (err) {
-      console.error("❌ Add to cart failed:", err);
-    }
-  };
+ const addToCart = async (payload) => {
+  await fetch(`${API_BASE}/api/cart/add`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  await fetchCart();
+};
+
 
   // ✅ Update Quantity
   const updateQty = async (cartId, quantity) => {
