@@ -2,12 +2,13 @@
 import axios from "axios";
 import { ref } from "vue";
 
-// ✅ Auto-detect Base URL (Local + Production)
+// ⚡ API BASE (auto switch)
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
     : "https://urbilux-backend.onrender.com/api";
 
+// Axios global config
 axios.defaults.baseURL = API_BASE;
 axios.defaults.withCredentials = true;
 
@@ -15,7 +16,9 @@ export function useCart() {
   const cart = ref([]);
   const loading = ref(false);
 
-  // ✅ Fetch Cart
+  // ================================
+  // ✅ Fetch Cart (ALWAYS axios)
+  // ================================
   const fetchCart = async () => {
     loading.value = true;
     try {
@@ -28,32 +31,36 @@ export function useCart() {
     }
   };
 
- const addToCart = async (payload) => {
-  await fetch(`${API_BASE}/cart/add`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  credentials: "include",
-  body: JSON.stringify(payload)
-});
+  // ================================
+  // ✅ Add to Cart (axios only)
+  // ================================
+  const addToCart = async (payload) => {
+    try {
+      await axios.post("/cart/add", payload);
+      await fetchCart();
+    } catch (err) {
+      console.error("❌ Add to cart failed:", err);
+    }
+  };
 
-  await fetchCart();
-};
-
-
+  // ================================
   // ✅ Update Quantity
+  // ================================
   const updateQty = async (cartId, quantity) => {
     try {
-      await axios.patch(`/cart/${cartId}`, { quantity });
+      await axios.put(`/cart/update/${cartId}`, { quantity });
       await fetchCart();
     } catch (err) {
       console.error("❌ Update qty failed:", err);
     }
   };
 
+  // ================================
   // ✅ Remove Item
+  // ================================
   const removeItem = async (cartId) => {
     try {
-      await axios.delete(`/cart/${cartId}`);
+      await axios.delete(`/cart/remove/${cartId}`);
       await fetchCart();
     } catch (err) {
       console.error("❌ Remove item failed:", err);
