@@ -5,6 +5,7 @@
 <div class="wlcbanner">
     <!-- 🟣 Banner -->
     <WelcomeBanner />
+     <FloatingIcon /> <!-- এখানে বসাবে -->
 </div>
     <!-- 🟣 Home Page Content -->
     <div class="home-content">
@@ -128,6 +129,8 @@
 </template>
 
 <script setup>
+import FloatingIcon from "@/components/FloatingIcon.vue";
+
 import Navbar from "../components/NavBar.vue";
 import ProductCard from "../components/ProductCard.vue";
 import Footer from "../components/Footer.vue";
