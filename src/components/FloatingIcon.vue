@@ -8,7 +8,7 @@
       class="floating-btn map-btn"
     >
       <img
-        src="https://cdn-icons-png.flaticon.com/512/684/684908.png"
+        src="../assets/icons/icons8-google-maps.svg"
         alt="Map"
       />
     </a>
@@ -61,8 +61,8 @@ const mapLink = "https://maps.app.goo.gl/DTC6xUpMtKwHC4QC7?g_st=ac"; // Google M
 
 /* Button Icons */
 .floating-btn img {
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
 }
 
 /* WhatsApp color */
@@ -83,12 +83,12 @@ const mapLink = "https://maps.app.goo.gl/DTC6xUpMtKwHC4QC7?g_st=ac"; // Google M
   }
 
   .floating-btn img {
-    width: 28px;
-    height: 28px;
+    width: 33px;
+    height: 33px;
   }
 
   .floating-container {
-    bottom: 50px;
+    bottom: 70px;
     right: 15px;
   }
 }
