@@ -12,26 +12,41 @@
 
           <div v-if="cart.length">
             <div v-for="item in cart" :key="item.id" class="summary-item">
-              <img :src="item.image_url" alt="Product Image" class="summary-img" />
+
+              <!-- 🟣 FIXED IMAGE -->
+              <img :src="item.final_image" alt="Product Image" class="summary-img" />
+
               <div class="summary-details">
                 <p class="summary-name">{{ item.name }}</p>
+
+                <!-- 🟣 FIXED PRICE -->
                 <p class="summary-price">
                   <template v-if="item.discount_percent">
-                    <span class="discounted">৳{{ discountedPrice(item).toFixed(2) }}</span>
-                    <span class="original">৳{{ item.price }}</span>
+                    <span class="discounted">
+                      ৳{{ discountedPrice(item).toFixed(2) }}
+                    </span>
+
+                    <span class="original">
+                      ৳{{ item.final_price }}
+                    </span>
                   </template>
+
                   <template v-else>
-                    ৳{{ item.price }}
+                    ৳{{ item.final_price }}
                   </template>
+
                   × {{ item.quantity }}
                 </p>
               </div>
             </div>
 
+            <!-- 🟣 FIXED TOTAL PRICE -->
             <div class="total-section">
               <h3>
-                Total: ৳{{ (Number(totalPrice) - Number(onlinePayment.amount || 0)).toFixed(2) }}
+                Total:
+                ৳{{ (Number(totalPrice) - Number(onlinePayment.amount || 0)).toFixed(2) }}
               </h3>
+
               <p v-if="onlinePayment.amount">
                 (Paid ৳{{ onlinePayment.amount }} by {{ onlinePayment.method }})
               </p>
@@ -109,20 +124,19 @@ import axios from "axios";
 import { ref, computed, onMounted } from "vue";
 import { useCart } from "@/composables/useCart";
 
-// ✅ Auto detect API
+// API
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
     : "https://urbilux-backend.onrender.com/api";
 
-// ✅ Ensure cookies work (important for guest user auto-create)
 axios.defaults.withCredentials = true;
 axios.defaults.baseURL = API_BASE;
 
-// 🛒 Load cart composable
+// Cart
 const { cart, fetchCart } = useCart();
 
-// 🧾 Customer info
+// Customer Info
 const customer = ref({
   name: "",
   phone: "",
@@ -136,24 +150,26 @@ const onlinePayment = ref({
   last2: "",
 });
 
-// ✅ Price with discount
+// 🟣 FIXED — Use final_price
 const discountedPrice = (item) => {
-  const price = Number(item.price);
+  const price = Number(item.final_price);
   const discount = Number(item.discount_percent || 0);
   return discount ? price - (price * discount) / 100 : price;
 };
 
-// ✅ Total cart amount
+// 🟣 FIXED — total price calculation
 const totalPrice = computed(() =>
-  cart.value
-    .reduce((sum, item) => sum + discountedPrice(item) * (item.quantity || 1), 0)
-    .toFixed(2)
+  cart.value.reduce(
+    (sum, item) => sum + discountedPrice(item) * (item.quantity || 1),
+    0
+  )
 );
 
-// ✅ Place Order (includes manual payment + auto guest)
+// Place Order
 const placeOrder = async () => {
   try {
-    await fetchCart(); // 🟣 refresh cart before order
+    await fetchCart();
+
     if (!cart.value.length) {
       alert("Your cart is empty!");
       return;
@@ -164,16 +180,20 @@ const placeOrder = async () => {
         product_id: i.product_id,
         name: i.name,
         quantity: i.quantity,
+
+        // 🟣 FIXED
         price: discountedPrice(i).toFixed(2),
-        image_url: i.image_url,
+        image_url: i.final_image,
+
         discount_percent: i.discount_percent,
+        variants: i.variants,
       })),
+
       total: totalPrice.value,
       customer: customer.value,
       payment_method: paymentMethod.value,
     };
 
-    // 🟣 Include manual payment data
     if (paymentMethod.value === "Online Payment") {
       payload.online_payment = {
         method: onlinePayment.value.method,
@@ -183,25 +203,24 @@ const placeOrder = async () => {
       };
     }
 
-const res = await axios.post(`${API_BASE}/checkout`, payload, { withCredentials: true });
-    if (res.data.success) {
-      alert("✅ Order placed successfully!");
+    const res = await axios.post(`${API_BASE}/checkout`, payload);
 
-      // Reset everything
+    if (res.data.success) {
+      alert("Order placed successfully!");
       customer.value = { name: "", phone: "", address: "" };
       onlinePayment.value = { method: "Bkash", amount: "", last2: "" };
       paymentMethod.value = "Cash on Delivery";
       await fetchCart();
     } else {
-      alert("❌ Checkout failed: " + (res.data.error || "Unknown error"));
+      alert("Checkout failed!");
     }
   } catch (err) {
-    console.error("❌ Checkout Error:", err);
-    alert("Checkout failed! " + (err.response?.data?.error || err.message));
+    console.error("Checkout Error:", err);
+    alert("Error: " + err.message);
   }
 };
 
-// ✅ Load cart on page open
+// Load cart
 onMounted(fetchCart);
 </script>
 
