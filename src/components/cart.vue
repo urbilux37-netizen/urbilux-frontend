@@ -10,7 +10,7 @@
       <!-- ✅ Cart Content -->
       <section v-if="cart.length && !loading" class="cart-list">
         <div v-for="item in cart" :key="item.id" class="cart-item">
-          <img :src="item.image_url" alt="Product Image" class="product-image" />
+          <img :src="item.final_image" alt="Product Image" class="product-image" />
 
           <div class="details">
             <h3>{{ item.name }}</h3>
@@ -19,7 +19,8 @@
             <p class="price">
               <template v-if="item.discount_percent">
                 <span class="discounted">৳ {{ discountedPrice(item).toFixed(2) }}</span>
-                <span class="original">৳ {{ item.price }}</span>
+                <span class="original">৳ ৳ {{ item.final_price }}
+</span>
               </template>
               <template v-else>৳ {{ item.price }}</template>
             </p>
