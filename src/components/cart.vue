@@ -1,28 +1,35 @@
 <template>
   <div class="overlay" @click.self="closeDrawer">
     <div class="drawer">
-      <!-- ✅ Header -->
       <header>
         <h2>🛒 My Cart</h2>
         <button class="close" @click="closeDrawer">✖</button>
       </header>
 
-      <!-- ✅ Cart Content -->
       <section v-if="cart.length && !loading" class="cart-list">
         <div v-for="item in cart" :key="item.id" class="cart-item">
+
+          <!-- Correct image -->
           <img :src="item.final_image" alt="Product Image" class="product-image" />
 
           <div class="details">
             <h3>{{ item.name }}</h3>
 
-            <!-- ✅ Price (support discount) -->
+            <!-- Correct price logic -->
             <p class="price">
               <template v-if="item.discount_percent">
-                <span class="discounted">৳ {{ discountedPrice(item).toFixed(2) }}</span>
-                <span class="original">৳ ৳ {{ item.final_price }}
-</span>
+                <span class="discounted">
+                  ৳ {{ discounted(item).toFixed(2) }}
+                </span>
+
+                <span class="original">
+                  ৳ {{ item.final_price }}
+                </span>
               </template>
-              <template v-else>৳ {{ item.price }}</template>
+
+              <template v-else>
+                ৳ {{ item.final_price }}
+              </template>
             </p>
 
             <div class="quantity">
@@ -32,16 +39,19 @@
             </div>
           </div>
 
-          <button class="remove" @click="remove(item.id)" title="Remove item">🗑</button>
+          <button class="remove" @click="remove(item.id)">🗑</button>
         </div>
 
-        <!-- ✅ Subtotal -->
         <div class="cart-summary">
           <p class="total-text">Subtotal:</p>
-          <p class="total-amount">৳ {{ totalPrice }}</p>
+          <p class="total-amount">
+            ৳ {{ totalPrice }}
+          </p>
         </div>
 
-        <button class="checkout-btn" @click="goCheckout">Proceed to Checkout</button>
+        <button class="checkout-btn" @click="goCheckout">
+          Proceed to Checkout
+        </button>
       </section>
 
       <section v-else-if="loading" class="empty-box">
@@ -56,6 +66,7 @@
   </div>
 </template>
 
+
 <script setup>
 import { computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -65,7 +76,6 @@ const emit = defineEmits(["close"]);
 const { cart, loading, fetchCart, addToCart } = useCart();
 const router = useRouter();
 
-// ✅ Dynamic API base
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
@@ -73,29 +83,27 @@ const API_BASE =
 
 onMounted(fetchCart);
 
-// ✅ Discounted Price
-const discountedPrice = (item) => {
-  if (!item.discount_percent) return item.price;
-  const price = Number(item.price);
-  const discount = Number(item.discount_percent);
-  return price - (price * discount) / 100;
+// Correct discounted price
+const discounted = (item) => {
+  if (!item.discount_percent) return Number(item.final_price);
+  const p = Number(item.final_price);
+  const d = Number(item.discount_percent);
+  return p - (p * d) / 100;
 };
 
-// ✅ Total with discounts
+// Correct total cart amount
 const totalPrice = computed(() =>
   cart.value.reduce(
-    (sum, item) => sum + discountedPrice(item) * item.quantity,
+    (sum, item) => sum + discounted(item) * item.quantity,
     0
   )
 );
 
-// ✅ Increase
 const increase = async (item) => {
   await addToCart(item.product_id, 1);
   await fetchCart();
 };
 
-// ✅ Decrease
 const decrease = async (item) => {
   if (item.quantity > 1) {
     await fetch(`${API_BASE}/api/cart/update/${item.id}`, {
@@ -108,22 +116,14 @@ const decrease = async (item) => {
   }
 };
 
-// ✅ Remove Product
 const remove = async (id) => {
-  try {
-    const res = await fetch(`${API_BASE}/api/cart/remove/${id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
-    if (res.ok) {
-      await fetchCart();
-    }
-  } catch (err) {
-    console.error("❌ Remove item failed:", err);
-  }
+  const res = await fetch(`${API_BASE}/api/cart/remove/${id}`, {
+    method: "DELETE",
+    credentials: "include",
+  });
+  if (res.ok) fetchCart();
 };
 
-// ✅ Close Drawer & Checkout
 const closeDrawer = () => emit("close");
 const goCheckout = () => {
   emit("close");
