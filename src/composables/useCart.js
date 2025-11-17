@@ -29,14 +29,12 @@ export function useCart() {
   };
 
  const addToCart = async (payload) => {
-  await fetch(`${API_BASE}/api/cart/add`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
+  await fetch(`${API_BASE}/cart/add`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  credentials: "include",
+  body: JSON.stringify(payload)
+});
 
   await fetchCart();
 };
