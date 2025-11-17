@@ -68,7 +68,7 @@ const whatsAppLink = "https://wa.me/8801631822765";
   }
 
   .floating-container {
-    bottom: 15px;
+    bottom: 40px;
     right: 15px;
   }
 }
