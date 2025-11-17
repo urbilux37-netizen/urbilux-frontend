@@ -107,22 +107,7 @@ onMounted(fetchOrders);
         </div>
 
         <div class="order-body">
-          <div class="order-items">
-  <h4>🛒 Ordered Items:</h4>
-
-  <div v-for="(item, idx) in o.items" :key="idx" class="item-row">
-    <p><b>{{ item.title }}</b></p>
-    <p>Price: ৳{{ item.price }}</p>
-    <p>Qty: {{ item.quantity }}</p>
-
-    <p v-if="item.variant">
-      Variant:
-      <span v-if="item.variant.color">Color: {{ item.variant.color }}</span>
-      <span v-if="item.variant.size">, Size: {{ item.variant.size }}</span>
-    </p>
-  </div>
-</div>
-
+          <!-- 🟣 Customer Info -->
           <div class="info">
             <p class="customer"><b>{{ o.customer.name }}</b></p>
             <p class="phone">📞 {{ o.customer.phone }}</p>
@@ -135,28 +120,22 @@ onMounted(fetchOrders);
             </p>
           </div>
 
+          <!-- 🟣 Payment Info -->
           <div class="details">
             <p><b>Payment:</b> {{ o.payment_method }}</p>
             <p class="total"><b>Total:</b> ৳{{ o.total }}</p>
 
-            <!-- 🟣 New Manual Payment Info -->
             <div
               v-if="o.payment_method === 'Online Payment' && o.online_payment"
               class="payment-info"
             >
-              <p>
-                <b>Method:</b> {{ o.online_payment.method }}
-              </p>
-              <p>
-                <b>Paid:</b> ৳{{ o.online_payment.amount || 0 }}
-              </p>
+              <p><b>Method:</b> {{ o.online_payment.method }}</p>
+              <p><b>Paid:</b> ৳{{ o.online_payment.amount || 0 }}</p>
               <p>
                 <b>Due:</b>
                 ৳{{ (o.total - (o.online_payment.amount || 0)).toFixed(2) }}
               </p>
-              <p>
-                <b>Last 2 digit:</b> {{ o.online_payment.last2 }}
-              </p>
+              <p><b>Last 2 digit:</b> {{ o.online_payment.last2 }}</p>
               <p class="note">
                 🕓 {{ o.online_payment.note || "Verification pending" }}
               </p>
@@ -164,6 +143,24 @@ onMounted(fetchOrders);
           </div>
         </div>
 
+        <!-- 🟣 Ordered Items (Correct Position) -->
+        <div class="order-items">
+          <h4>🛒 Ordered Items:</h4>
+
+          <div v-for="(item, idx) in o.items" :key="idx" class="item-row">
+            <p><b>{{ item.title || item.name }}</b></p>
+            <p>Price: ৳{{ item.price }}</p>
+            <p>Qty: {{ item.quantity }}</p>
+
+            <p v-if="item.variant">
+              Variant:
+              <span v-if="item.variant.color">Color: {{ item.variant.color }}</span>
+              <span v-if="item.variant.size">, Size: {{ item.variant.size }}</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- 🟣 Actions -->
         <div class="order-actions">
           <select v-model="o.newStatus" class="status-select">
             <option value="pending">Pending</option>
@@ -192,6 +189,8 @@ onMounted(fetchOrders);
     </div>
   </div>
 </template>
+
+
 
 <style scoped>
 .admin-orders {
