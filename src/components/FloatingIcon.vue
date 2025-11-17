@@ -1,6 +1,19 @@
 <template>
   <div class="floating-container">
-    <!-- WhatsApp Floating Button -->
+    <!-- Google Map Button -->
+    <a
+      :href="mapLink"
+      target="_blank"
+      rel="noopener"
+      class="floating-btn map-btn"
+    >
+      <img
+        src="https://cdn-icons-png.flaticon.com/512/684/684908.png"
+        alt="Map"
+      />
+    </a>
+
+    <!-- WhatsApp Button -->
     <a
       :href="whatsAppLink"
       target="_blank"
@@ -8,7 +21,7 @@
       class="floating-btn whatsapp-btn"
     >
       <img
-        src="../assets/icons/whatsapp-business-icon.svg"
+        src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
         alt="WhatsApp"
       />
     </a>
@@ -16,9 +29,9 @@
 </template>
 
 <script setup>
-const whatsAppLink = "https://wa.me/8801631822765";
-// 👉 এখানে তোমার WhatsApp number বসাবে
-// example: https://wa.me/88018XXXXXXXX
+// 👉 এখানেই তোমার লিঙ্কগুলো বসাবে
+const whatsAppLink = "https://wa.me/8801631822765"; // তোমার WhatsApp নম্বর
+const mapLink = "https://maps.app.goo.gl/DTC6xUpMtKwHC4QC7?g_st=ac"; // Google Map Link
 </script>
 
 <style scoped>
@@ -32,11 +45,11 @@ const whatsAppLink = "https://wa.me/8801631822765";
   gap: 15px;
 }
 
-/* WhatsApp Button Style */
+/* Floating Button Base Style */
 .floating-btn {
   width: 60px;
   height: 60px;
-  background: #25d366;
+  background: white;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -46,11 +59,18 @@ const whatsAppLink = "https://wa.me/8801631822765";
   transition: 0.3s;
 }
 
+/* Button Icons */
 .floating-btn img {
-  width: 35px;
-  height: 35px;
+  width: 34px;
+  height: 34px;
 }
 
+/* WhatsApp color */
+.whatsapp-btn {
+  background: #25d366;
+}
+
+/* Hover effect */
 .floating-btn:hover {
   transform: scale(1.1);
 }
@@ -68,7 +88,7 @@ const whatsAppLink = "https://wa.me/8801631822765";
   }
 
   .floating-container {
-    bottom: 40px;
+    bottom: 50px;
     right: 15px;
   }
 }
