@@ -209,9 +209,9 @@ const handleBuyNow = async () => {
     height: 120px;
   }
   .discount-badge{
-    width: 35px;
-    height: 35px;
-    font-size: 11px;
+    width: 25px;
+    height: 25px;
+    font-size: 8px;
   }
 }
 @media (max-width: 480px) {
