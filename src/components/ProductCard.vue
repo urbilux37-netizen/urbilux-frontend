@@ -208,6 +208,11 @@ const handleBuyNow = async () => {
   .image-box {
     height: 120px;
   }
+  .discount-badge{
+    width: 35px;
+    height: 35px;
+    font-size: 11px;
+  }
 }
 @media (max-width: 480px) {
   .product-card {
