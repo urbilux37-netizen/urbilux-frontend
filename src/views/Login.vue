@@ -1,9 +1,9 @@
 <template>
   <div>
-    <div >
-    <!-- 🟣 Navbar -->
-    <Navbar />
-     </div>
+    <div>
+      <!-- 🟣 Navbar -->
+      <Navbar />
+    </div>
 
     <div class="login-container">
       <h2 class="login-title">Login</h2>
@@ -29,7 +29,7 @@ const router = useRouter();
 const loginInput = ref("");
 const password = ref("");
 
-// ✅ Auto-detect local or Cloudflare API base
+// Auto-select backend
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
@@ -38,16 +38,24 @@ const API_BASE =
 axios.defaults.baseURL = API_BASE;
 axios.defaults.withCredentials = true;
 
-console.log("🔗 Using API base URL:", API_BASE);
-
-// ✅ Handle Login
+// Handle Login
 const handleLogin = async () => {
   try {
     const res = await axios.post(`${API_BASE}/auth/login`, {
       loginInput: loginInput.value,
       password: password.value,
     });
+
+    const token = res.data.token;
+
     alert(res.data.message || "Login successful!");
+
+    // 🔥 Android WebView Bridge → FCM Token Sync
+    if (window.Android && window.Android.onAdminLogin) {
+      window.Android.onAdminLogin(token);
+      console.log("📲 JWT sent to Android WebView");
+    }
+
     router.push("/");
   } catch (err) {
     console.error("❌ Login error:", err);

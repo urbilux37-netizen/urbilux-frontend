@@ -203,11 +203,11 @@ const fetchProducts = async () => {
     topProducts.value = data
       .filter(p => p.is_top_product)
       .slice(-10)
-      .reverse();
+     ;
     hotDeals.value = data
       .filter(p => p.is_hot_deal)
       .slice(-10)
-      .reverse();
+   ;
     allProducts.value = data.slice(-10).reverse();
   } catch (err) {
     console.error("❌ Products fetch error:", err);

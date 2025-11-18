@@ -30,3 +30,6 @@ coverage
 *.tsbuildinfo
 
 .vercel
+firebase-service.json
+firebase-service.json.json
+*.json
