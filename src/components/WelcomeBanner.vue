@@ -10,40 +10,40 @@
   >
     <div
       class="banner-grid"
-      v-if="mainBanners.length || sideTopCurrent || sideBottomCurrent"
+      v-if="mainCurrent || sideTopCurrent || sideBottomCurrent"
     >
-      <!-- ========== LEFT: MAIN SLIDER (slot = main) ========== -->
-      <div class="main-banner" v-if="mainBanners.length">
+      <!-- ================= LEFT: MAIN (slot = main) ================= -->
+      <div class="main-banner" v-if="mainCurrent">
         <transition name="fade" mode="out-in">
           <div class="slide" :key="mainKey">
             <img
-              :src="mainBanners[mainIndex]?.image_url"
-              :alt="mainBanners[mainIndex]?.title || 'Banner'"
+              :src="mainCurrent.image_url"
+              :alt="mainCurrent.title || 'Banner'"
               class="img-main"
               loading="eager"
               @load="onLoaded"
             />
 
-            <!-- Main CTA (bottom center) -->
-            <div v-if="mainCTA" class="cta">
+            <!-- ⭐ Main CTA – bottom center, only if text+link -->
+            <div v-if="showMainCTA" class="cta">
               <!-- External -->
               <a
-                v-if="mainBanners[mainIndex]?.button_link?.startsWith('http')"
+                v-if="mainCurrent.button_link?.startsWith('http')"
                 class="cta-btn"
-                :href="mainBanners[mainIndex]?.button_link"
+                :href="mainCurrent.button_link"
                 target="_blank"
                 rel="noopener"
               >
-                {{ mainCTA }}
+                {{ mainCurrent.button_text }}
               </a>
 
               <!-- Internal -->
               <router-link
                 v-else
                 class="cta-btn"
-                :to="mainBanners[mainIndex]?.button_link || '#'"
+                :to="mainCurrent.button_link"
               >
-                {{ mainCTA }}
+                {{ mainCurrent.button_text }}
               </router-link>
             </div>
           </div>
@@ -78,9 +78,9 @@
         </button>
       </div>
 
-      <!-- ========== RIGHT: 2 SMALL SLIDERS ========== -->
+      <!-- ================= RIGHT: 2 SMALL (side_top & side_bottom) ================= -->
       <div class="side-banners">
-        <!-- TOP small (slot = side_top) -->
+        <!-- ---------- TOP (slot = side_top) ---------- -->
         <div class="side-item" v-if="sideTopCurrent">
           <div class="side-inner">
             <transition name="fade" mode="out-in">
@@ -114,13 +114,15 @@
                   class="img-side"
                   loading="lazy"
                 />
-                <div v-if="sideTopCTA" class="side-cta">
-                  {{ sideTopCTA }}
+
+                <!-- ⭐ CTA – bottom center -->
+                <div v-if="showSideTopCTA" class="side-cta">
+                  {{ sideTopCurrent.button_text }}
                 </div>
               </component>
             </transition>
 
-            <!-- side top dots & arrows (PC only if multiple) -->
+            <!-- dots + arrows (PC only) -->
             <div
               class="side-dots"
               v-if="isDesktop && sideTopList.length > 1"
@@ -151,7 +153,7 @@
           </div>
         </div>
 
-        <!-- BOTTOM small (slot = side_bottom) -->
+        <!-- ---------- BOTTOM (slot = side_bottom) ---------- -->
         <div class="side-item" v-if="sideBottomCurrent">
           <div class="side-inner">
             <transition name="fade" mode="out-in">
@@ -185,8 +187,10 @@
                   class="img-side"
                   loading="lazy"
                 />
-                <div v-if="sideBottomCTA" class="side-cta">
-                  {{ sideBottomCTA }}
+
+                <!-- ⭐ CTA – bottom center -->
+                <div v-if="showSideBottomCTA" class="side-cta">
+                  {{ sideBottomCurrent.button_text }}
                 </div>
               </component>
             </transition>
@@ -223,7 +227,7 @@
       </div>
     </div>
 
-    <!-- Empty -->
+    <!-- Empty state -->
     <div v-else class="banner-loading"></div>
   </div>
 </template>
@@ -250,9 +254,7 @@ const sideBottomTimer = ref(null);
 const isDesktop = ref(false);
 const sliderRef = ref(null);
 
-/* -------------------------
-   Filter by slot
--------------------------- */
+/* ---------- filter by slot ---------- */
 const mainBanners = computed(() =>
   banners.value.filter((b) => b.slot === "main")
 );
@@ -263,59 +265,56 @@ const sideBottomList = computed(() =>
   banners.value.filter((b) => b.slot === "side_bottom")
 );
 
-const sideTopCurrent = computed(() => {
-  if (!sideTopList.value.length) return null;
-  return sideTopList.value[sideTopIndex.value % sideTopList.value.length];
-});
-const sideBottomCurrent = computed(() => {
-  if (!sideBottomList.value.length) return null;
-  return sideBottomList.value[sideBottomIndex.value % sideBottomList.value.length];
+/* ---------- current items ---------- */
+const mainCurrent = computed(() =>
+  mainBanners.value.length
+    ? mainBanners.value[mainIndex.value % mainBanners.value.length]
+    : null
+);
+
+const sideTopCurrent = computed(() =>
+  sideTopList.value.length
+    ? sideTopList.value[sideTopIndex.value % sideTopList.value.length]
+    : null
+);
+
+const sideBottomCurrent = computed(() =>
+  sideBottomList.value.length
+    ? sideBottomList.value[sideBottomIndex.value % sideBottomList.value.length]
+    : null
+);
+
+/* ---------- CTA visibility (need text + link) ---------- */
+const showMainCTA = computed(() => {
+  const b = mainCurrent.value;
+  if (!b) return false;
+  return !!b.button_text?.trim() && !!b.button_link?.trim();
 });
 
-/* -------------------------
-   CTA text – always show something
--------------------------- */
-const mainCTA = computed(() => {
-  const b = mainBanners.value[mainIndex.value];
-  if (!b) return "";
-  const txt = (b.button_text || "").trim();
-  return txt || "Shop Now";
-});
-
-const sideTopCTA = computed(() => {
+const showSideTopCTA = computed(() => {
   const b = sideTopCurrent.value;
-  if (!b) return "";
-  const txt = (b.button_text || "").trim();
-  return txt || "Shop Now";
+  if (!b) return false;
+  return !!b.button_text?.trim() && !!b.button_link?.trim();
 });
 
-const sideBottomCTA = computed(() => {
+const showSideBottomCTA = computed(() => {
   const b = sideBottomCurrent.value;
-  if (!b) return "";
-  const txt = (b.button_text || "").trim();
-  return txt || "Shop Now";
+  if (!b) return false;
+  return !!b.button_text?.trim() && !!b.button_link?.trim();
 });
 
-/* keys for transitions */
+/* ---------- keys for transition ---------- */
 const mainKey = computed(
-  () =>
-    (mainBanners.value[mainIndex.value]?.id ?? mainIndex.value) +
-    ":" +
-    mainIndex.value
+  () => (mainCurrent.value?.id ?? mainIndex.value) + ":main"
 );
 const sideTopKey = computed(
-  () =>
-    (sideTopCurrent.value?.id ?? sideTopIndex.value) +
-    ":top:" +
-    sideTopIndex.value
+  () => (sideTopCurrent.value?.id ?? sideTopIndex.value) + ":top"
 );
 const sideBottomKey = computed(
-  () =>
-    (sideBottomCurrent.value?.id ?? sideBottomIndex.value) +
-    ":bot:" +
-    sideBottomIndex.value
+  () => (sideBottomCurrent.value?.id ?? sideBottomIndex.value) + ":bottom"
 );
 
+/* ---------- API ---------- */
 async function fetchBanners() {
   try {
     const res = await axios.get(`${API_BASE}/api/banners`);
@@ -325,112 +324,99 @@ async function fetchBanners() {
   }
 }
 
-/* ==== Main controls ==== */
+/* ===== main controls ===== */
 function mainNext() {
   if (!mainBanners.value.length) return;
   mainIndex.value = (mainIndex.value + 1) % mainBanners.value.length;
 }
-
 function mainPrev() {
   if (!mainBanners.value.length) return;
   mainIndex.value =
     (mainIndex.value - 1 + mainBanners.value.length) %
     mainBanners.value.length;
 }
-
 function mainGo(i) {
   if (!mainBanners.value.length) return;
   mainIndex.value = i;
 }
-
 function startMainTimer() {
   clearMainTimer();
   if (mainBanners.value.length > 1) {
     mainTimer.value = setInterval(mainNext, 5000);
   }
 }
-
 function clearMainTimer() {
   if (mainTimer.value) clearInterval(mainTimer.value);
   mainTimer.value = null;
 }
 
-/* ==== Side top controls ==== */
+/* ===== side top controls ===== */
 function sideTopNext() {
   if (!sideTopList.value.length) return;
   sideTopIndex.value =
     (sideTopIndex.value + 1) % sideTopList.value.length;
 }
-
 function sideTopPrev() {
   if (!sideTopList.value.length) return;
   sideTopIndex.value =
     (sideTopIndex.value - 1 + sideTopList.value.length) %
     sideTopList.value.length;
 }
-
 function sideTopGo(i) {
   if (!sideTopList.value.length) return;
   sideTopIndex.value = i;
 }
-
 function startSideTopTimer() {
   clearSideTopTimer();
   if (sideTopList.value.length > 1) {
     sideTopTimer.value = setInterval(sideTopNext, 6000);
   }
 }
-
 function clearSideTopTimer() {
   if (sideTopTimer.value) clearInterval(sideTopTimer.value);
   sideTopTimer.value = null;
 }
 
-/* ==== Side bottom controls ==== */
+/* ===== side bottom controls ===== */
 function sideBottomNext() {
   if (!sideBottomList.value.length) return;
   sideBottomIndex.value =
     (sideBottomIndex.value + 1) % sideBottomList.value.length;
 }
-
 function sideBottomPrev() {
   if (!sideBottomList.value.length) return;
   sideBottomIndex.value =
     (sideBottomIndex.value - 1 + sideBottomList.value.length) %
     sideBottomList.value.length;
 }
-
 function sideBottomGo(i) {
   if (!sideBottomList.value.length) return;
   sideBottomIndex.value = i;
 }
-
 function startSideBottomTimer() {
   clearSideBottomTimer();
   if (sideBottomList.value.length > 1) {
     sideBottomTimer.value = setInterval(sideBottomNext, 7000);
   }
 }
-
 function clearSideBottomTimer() {
   if (sideBottomTimer.value) clearInterval(sideBottomTimer.value);
   sideBottomTimer.value = null;
 }
 
-/* ==== Global pause/resume ==== */
+/* ===== global pause/resume ===== */
 function pauseAll() {
   clearMainTimer();
   clearSideTopTimer();
   clearSideBottomTimer();
 }
-
 function resumeAll() {
   startMainTimer();
   startSideTopTimer();
   startSideBottomTimer();
 }
 
-/* ==== Others ==== */
+/* ===== others (touch swipe only main) ===== */
 function onLoaded() {}
 
 let startX = 0;
@@ -475,7 +461,6 @@ onUnmounted(() => {
 });
 </script>
 
-
 <style scoped>
 .banner-slider {
   width: 100%;
@@ -490,7 +475,7 @@ onUnmounted(() => {
   align-items: stretch;
 }
 
-/* LEFT MAIN */
+/* ========== MAIN ========== */
 .main-banner {
   position: relative;
   border-radius: 14px;
@@ -503,7 +488,7 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* 🔁 No crop/zoom – full image dekhao */
+/* full image, no crop/zoom */
 .img-main {
   width: 100%;
   height: 100%;
@@ -512,14 +497,14 @@ onUnmounted(() => {
   background: #ffffff;
 }
 
-/* ⭐ Main center CTA – nicher dike, upar e layer e */
+/* Main CTA – bottom center */
 .cta {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 26px;
+  bottom: 24px;
   pointer-events: none;
-  z-index: 10; /* important */
+  z-index: 10;
 }
 
 .cta-btn {
@@ -589,7 +574,7 @@ onUnmounted(() => {
   border-radius: 6px 0 0 6px;
 }
 
-/* RIGHT COLUMN 2 SMALL */
+/* ========== RIGHT (2 small) ========== */
 .side-banners {
   display: flex;
   flex-direction: column;
@@ -616,7 +601,7 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* 🔁 No crop/zoom for side */
+/* full image, no crop/zoom */
 .img-side {
   width: 100%;
   height: 100%;
@@ -625,7 +610,7 @@ onUnmounted(() => {
   display: block;
 }
 
-/* ⭐ Side CTA – purple chip, bottom center */
+/* Side CTA chip – bottom center */
 .side-cta {
   position: absolute;
   left: 50%;
@@ -638,7 +623,7 @@ onUnmounted(() => {
   font-size: 12px;
   font-weight: 500;
   box-shadow: 0 8px 18px rgba(67, 56, 202, 0.4);
-  z-index: 10; /* 🔥 bottom-er button ekdom upore */
+  z-index: 10;
 }
 
 /* side dots */
@@ -695,7 +680,7 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* Mobile / tablet */
+/* ========== Responsive ========== */
 @media (max-width: 1023px) {
   .banner-grid {
     grid-template-columns: 1fr;
@@ -726,7 +711,6 @@ onUnmounted(() => {
   }
 }
 
-/* Extra small phones <=480px */
 @media (max-width: 480px) {
   .side-item {
     height: 140px;
