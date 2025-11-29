@@ -4,7 +4,7 @@
     <Navbar />
 <div class="wlcbanner">
     <!-- 🟣 Banner -->
-
+ <WelcomeBanner />
      <FloatingIcon /> <!-- এখানে বসাবে -->
 </div>
 
@@ -227,6 +227,7 @@ onMounted(fetchProducts);
 .wlcbanner{
   padding-top: 0px;
   margin-top: 72px;
+  max-height: 100%;
 }
 
 /* ===== Base Section ===== */
