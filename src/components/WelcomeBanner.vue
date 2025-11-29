@@ -273,24 +273,27 @@ const sideBottomCurrent = computed(() => {
 });
 
 /* -------------------------
-   CTA text (fallback “Shop Now”)
+   CTA text – always show something
 -------------------------- */
 const mainCTA = computed(() => {
   const b = mainBanners.value[mainIndex.value];
   if (!b) return "";
-  return b.button_text || (b.button_link ? "Shop Now" : "");
+  const txt = (b.button_text || "").trim();
+  return txt || "Shop Now";
 });
 
 const sideTopCTA = computed(() => {
   const b = sideTopCurrent.value;
   if (!b) return "";
-  return b.button_text || (b.button_link ? "Shop Now" : "");
+  const txt = (b.button_text || "").trim();
+  return txt || "Shop Now";
 });
 
 const sideBottomCTA = computed(() => {
   const b = sideBottomCurrent.value;
   if (!b) return "";
-  return b.button_text || (b.button_link ? "Shop Now" : "");
+  const txt = (b.button_text || "").trim();
+  return txt || "Shop Now";
 });
 
 /* keys for transitions */
@@ -471,6 +474,7 @@ onUnmounted(() => {
   }
 });
 </script>
+
 
 <style scoped>
 .banner-slider {
