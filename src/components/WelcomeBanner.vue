@@ -458,7 +458,6 @@ onUnmounted(() => {
 .banner-slider {
   width: 100%;
   margin: 0 auto;
-  max-height: 100%;
 }
 
 /* GRID: big left, 2 small right */
@@ -482,22 +481,23 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* 🚫 Zoom/Crop বন্ধ – full image দেখাবে, পাশে blank থাকলে থাকবে */
+/* 🔁 No crop/zoom – full image dekhao */
 .img-main {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: contain;      /* আগে cover ছিল */
+  object-fit: contain;
   background: #ffffff;
 }
 
-/* Main CTA – নিচের দিকে, মাঝখানে */
+/* ⭐ Main center CTA – nicher dike, upar e layer e */
 .cta {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   bottom: 26px;
   pointer-events: none;
+  z-index: 10; /* important */
 }
 
 .cta-btn {
@@ -528,6 +528,7 @@ onUnmounted(() => {
   right: 22px;
   display: flex;
   gap: 6px;
+  z-index: 5;
 }
 .dot {
   width: 9px;
@@ -555,6 +556,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 5;
 }
 .arrow.left {
   left: 0;
@@ -592,16 +594,16 @@ onUnmounted(() => {
   height: 100%;
 }
 
-/* এখানেও crop বন্ধ */
+/* 🔁 No crop/zoom for side */
 .img-side {
   width: 100%;
   height: 100%;
-  object-fit: contain;     /* আগে cover ছিল */
+  object-fit: contain;
   background: #ffffff;
   display: block;
 }
 
-/* side CTA – purple chip, নিচের দিকে */
+/* ⭐ Side CTA – purple chip, bottom center */
 .side-cta {
   position: absolute;
   left: 50%;
@@ -614,7 +616,7 @@ onUnmounted(() => {
   font-size: 12px;
   font-weight: 500;
   box-shadow: 0 8px 18px rgba(67, 56, 202, 0.4);
-  z-index: 2; /* 🔥 bottom slot-e jeno লুকিয়ে না যায় */
+  z-index: 10; /* 🔥 bottom-er button ekdom upore */
 }
 
 /* side dots */
@@ -624,7 +626,7 @@ onUnmounted(() => {
   right: 10px;
   display: flex;
   gap: 4px;
-  z-index: 2;
+  z-index: 6;
 }
 .side-dot {
   width: 7px;
@@ -650,7 +652,7 @@ onUnmounted(() => {
   height: 40px;
   cursor: pointer;
   font-size: 14px;
-  z-index: 2;
+  z-index: 6;
 }
 .side-left {
   left: 0;
@@ -686,7 +688,7 @@ onUnmounted(() => {
   }
 
   .side-item {
-    height: 150px; /* একটু বড়, full image দেখার জন্য */
+    height: 150px;
   }
 
   /* phone e arrow/dots নাই */
@@ -698,7 +700,7 @@ onUnmounted(() => {
   }
 
   .cta {
-    bottom: 18px; /* mobile e একটু উপরে */
+    bottom: 18px;
   }
 }
 
