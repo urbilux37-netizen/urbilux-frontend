@@ -7,6 +7,7 @@
 
      <FloatingIcon /> <!-- এখানে বসাবে -->
 </div>
+ <WelcomeBanner />
     <!-- 🟣 Home Page Content -->
     <div class="home-content">
  <WelcomeBanner />
