@@ -24,8 +24,8 @@
               @load="onLoaded"
             />
 
-            <!-- Main CTA (center) -->
-            <div v-if="mainBanners[mainIndex]?.button_text" class="cta">
+            <!-- Main CTA (bottom center) -->
+            <div v-if="mainCTA" class="cta">
               <!-- External -->
               <a
                 v-if="mainBanners[mainIndex]?.button_link?.startsWith('http')"
@@ -34,7 +34,7 @@
                 target="_blank"
                 rel="noopener"
               >
-                {{ mainBanners[mainIndex]?.button_text }}
+                {{ mainCTA }}
               </a>
 
               <!-- Internal -->
@@ -43,7 +43,7 @@
                 class="cta-btn"
                 :to="mainBanners[mainIndex]?.button_link || '#'"
               >
-                {{ mainBanners[mainIndex]?.button_text }}
+                {{ mainCTA }}
               </router-link>
             </div>
           </div>
@@ -114,11 +114,8 @@
                   class="img-side"
                   loading="lazy"
                 />
-                <div
-                  v-if="sideTopCurrent.button_text"
-                  class="side-cta"
-                >
-                  {{ sideTopCurrent.button_text }}
+                <div v-if="sideTopCTA" class="side-cta">
+                  {{ sideTopCTA }}
                 </div>
               </component>
             </transition>
@@ -188,11 +185,8 @@
                   class="img-side"
                   loading="lazy"
                 />
-                <div
-                  v-if="sideBottomCurrent.button_text"
-                  class="side-cta"
-                >
-                  {{ sideBottomCurrent.button_text }}
+                <div v-if="sideBottomCTA" class="side-cta">
+                  {{ sideBottomCTA }}
                 </div>
               </component>
             </transition>
@@ -256,7 +250,9 @@ const sideBottomTimer = ref(null);
 const isDesktop = ref(false);
 const sliderRef = ref(null);
 
-// ---- Filter lists by slot ----
+/* -------------------------
+   Filter by slot
+-------------------------- */
 const mainBanners = computed(() =>
   banners.value.filter((b) => b.slot === "main")
 );
@@ -276,7 +272,28 @@ const sideBottomCurrent = computed(() => {
   return sideBottomList.value[sideBottomIndex.value % sideBottomList.value.length];
 });
 
-// keys for transitions
+/* -------------------------
+   CTA text (fallback “Shop Now”)
+-------------------------- */
+const mainCTA = computed(() => {
+  const b = mainBanners.value[mainIndex.value];
+  if (!b) return "";
+  return b.button_text || (b.button_link ? "Shop Now" : "");
+});
+
+const sideTopCTA = computed(() => {
+  const b = sideTopCurrent.value;
+  if (!b) return "";
+  return b.button_text || (b.button_link ? "Shop Now" : "");
+});
+
+const sideBottomCTA = computed(() => {
+  const b = sideBottomCurrent.value;
+  if (!b) return "";
+  return b.button_text || (b.button_link ? "Shop Now" : "");
+});
+
+/* keys for transitions */
 const mainKey = computed(
   () =>
     (mainBanners.value[mainIndex.value]?.id ?? mainIndex.value) +
@@ -357,7 +374,7 @@ function sideTopGo(i) {
 function startSideTopTimer() {
   clearSideTopTimer();
   if (sideTopList.value.length > 1) {
-    sideTopTimer.value = setInterval(sideTopNext, 6000); // alada time
+    sideTopTimer.value = setInterval(sideTopNext, 6000);
   }
 }
 
@@ -388,7 +405,7 @@ function sideBottomGo(i) {
 function startSideBottomTimer() {
   clearSideBottomTimer();
   if (sideBottomList.value.length > 1) {
-    sideBottomTimer.value = setInterval(sideBottomNext, 7000); // alada time
+    sideBottomTimer.value = setInterval(sideBottomNext, 7000);
   }
 }
 
@@ -454,6 +471,7 @@ onUnmounted(() => {
   }
 });
 </script>
+
 <style scoped>
 .banner-slider {
   width: 100%;
