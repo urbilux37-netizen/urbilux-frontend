@@ -4,13 +4,13 @@
     <Navbar />
 <div class="wlcbanner">
     <!-- 🟣 Banner -->
- <WelcomeBanner />
+
      <FloatingIcon /> <!-- এখানে বসাবে -->
 </div>
 
     <!-- 🟣 Home Page Content -->
     <div class="home-content">
-
+ <WelcomeBanner />
       <!-- 🟣 Service Features Section -->
       <section class="service-section">
         <div class="cards-container">
