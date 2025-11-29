@@ -2,93 +2,72 @@
   <div class="banner-manager">
     <h1 class="page-title">🖼️ Banner Manager</h1>
 
-    <!-- Add form -->
-    <form @submit.prevent="createBanner" class="card form-card">
+    <!-- ===== Add Banner Form ===== -->
+    <form @submit.prevent="addBanner" class="card form-card">
       <h2 class="card-title">Add New Banner</h2>
 
       <div class="grid">
         <div class="field">
           <label>Title (optional)</label>
-          <input v-model.trim="form.title" placeholder="Winter Offer" />
+          <input v-model.trim="newBanner.title" placeholder="Summer Sale" />
         </div>
 
+        <!-- 🔹 Slot select -->
         <div class="field">
-          <label>Slot</label>
-          <select v-model="form.slot">
+          <label>Banner Slot</label>
+          <select v-model="newBanner.slot">
             <option value="main">Main (big)</option>
             <option value="side_top">Right Top (small)</option>
             <option value="side_bottom">Right Bottom (small)</option>
           </select>
         </div>
 
-        <!-- 🔥 Image upload instead of raw URL -->
         <div class="field col-span-2">
-          <label>Image <span class="req">*</span></label>
-
-          <div class="upload-row">
-            <input
-              type="file"
-              accept="image/*"
-              @change="(e) => onFileChange(e, 'create')"
-            />
-
-            <button
-              v-if="form.image_url"
-              type="button"
-              class="btn-ghost small"
-              @click="openInNew(form.image_url)"
-            >
-              View
-            </button>
-
-            <span v-if="uploadingCreate" class="uploading-text">
-              Uploading...
-            </span>
-          </div>
-
+          <label>Banner Image <span class="req">*</span></label>
+          <input
+            type="file"
+            @change="onBannerFileChange"
+            accept="image/*"
+            required
+          />
           <p class="hint">
-            Use 1600×700 for main, ~800×500 for side banners.
+            Use 1600×700 for main, ~800×500 for side banners. (Wide image recommended)
           </p>
 
-          <div v-if="form.image_url" class="preview">
-            <img :src="form.image_url" alt="Preview" />
+          <div v-if="uploading" class="uploading">
+            Uploading... {{ uploadProgress }}%
+          </div>
+
+          <div v-if="newBannerFilePreview" class="image-preview">
+            <img :src="newBannerFilePreview" alt="Preview" />
           </div>
         </div>
 
         <div class="field">
           <label>Button Text (optional)</label>
-          <input v-model.trim="form.button_text" placeholder="Shop Now" />
+          <input v-model.trim="newBanner.button_text" placeholder="Shop Now" />
         </div>
 
         <div class="field">
           <label>Button Link (optional)</label>
-          <input
-            v-model.trim="form.button_link"
-            placeholder="/category/health"
-          />
+          <input v-model.trim="newBanner.button_link" placeholder="/category/new" />
         </div>
       </div>
 
       <div class="actions">
-        <button
-          class="btn-primary"
-          type="submit"
-          :disabled="saving || uploadingCreate"
-        >
-          {{ saving ? "Saving..." : "Add Banner" }}
+        <button type="submit" class="btn-primary" :disabled="uploading">
+          {{ uploading ? "Uploading..." : "Add Banner" }}
         </button>
-        <button class="btn-ghost" type="button" @click="resetForm">
-          Reset
-        </button>
+        <button type="button" class="btn-ghost" @click="resetForm">Reset</button>
       </div>
     </form>
 
-    <!-- List -->
+    <!-- ===== Banner List ===== -->
     <div class="card list-card">
       <div class="list-header">
         <h2 class="card-title">All Banners</h2>
         <button class="btn-ghost" @click="fetchBanners" :disabled="loading">
-          {{ loading ? "Refreshing..." : "Refresh" }}
+          {{ loading ? "Refreshing…" : "Refresh" }}
         </button>
       </div>
 
@@ -96,44 +75,37 @@
         <div class="skeleton" v-for="n in 3" :key="n"></div>
       </div>
 
-      <div v-else-if="!banners.length" class="empty">
-        No banners yet.
-      </div>
+      <div v-else-if="!banners.length" class="empty">No banners found.</div>
 
       <div v-else class="items">
         <div v-for="b in banners" :key="b.id" class="item">
           <img :src="b.image_url" class="thumb" alt="Banner" />
           <div class="meta">
-            <p class="title">{{ b.title || "Untitled banner" }}</p>
-            <p class="sub">
-              <strong>Slot:</strong>
-              <span class="tag">{{ humanSlot(b.slot) }}</span>
-            </p>
+            <div class="title-row">
+              <p class="title">{{ b.title || "Untitled banner" }}</p>
+              <span class="slot-tag">{{ humanSlot(b.slot) }}</span>
+            </div>
             <p class="sub">
               <strong>Button:</strong>
               <span v-if="b.button_text">{{ b.button_text }}</span>
               <span v-else class="muted">—</span>
-              <span v-if="b.button_link" class="link">
-                → {{ b.button_link }}
-              </span>
+              <span v-if="b.button_link" class="link">→ {{ b.button_link }}</span>
             </p>
           </div>
 
           <div class="row-actions">
             <button class="btn-small" @click="openEdit(b)">Edit</button>
-            <button class="btn-danger" @click="removeBanner(b.id)">
-              Delete
-            </button>
+            <button class="btn-danger" @click="deleteBanner(b.id)">Delete</button>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Edit modal -->
+    <!-- ===== Edit Modal ===== -->
     <div v-if="editing" class="modal-mask" @click.self="closeEdit">
       <div class="modal">
         <div class="modal-header">
-          <h3>Edit Banner #{{ editForm.id }}</h3>
+          <h3>Edit Banner #{{ editModel.id }}</h3>
           <button class="x" @click="closeEdit">✕</button>
         </div>
 
@@ -141,68 +113,58 @@
           <div class="grid">
             <div class="field">
               <label>Title</label>
-              <input v-model.trim="editForm.title" />
+              <input v-model.trim="editModel.title" />
             </div>
 
+            <!-- 🔹 Slot select (edit) -->
             <div class="field">
-              <label>Slot</label>
-              <select v-model="editForm.slot">
+              <label>Banner Slot</label>
+              <select v-model="editModel.slot">
                 <option value="main">Main (big)</option>
                 <option value="side_top">Right Top (small)</option>
                 <option value="side_bottom">Right Bottom (small)</option>
               </select>
             </div>
 
-            <!-- 🔥 Edit image upload -->
             <div class="field col-span-2">
-              <label>Image</label>
+              <label>Banner Image</label>
+              <input
+                type="file"
+                @change="onEditBannerFileChange"
+                accept="image/*"
+              />
 
-              <div class="upload-row">
-                <input
-                  type="file"
-                  accept="image/*"
-                  @change="(e) => onFileChange(e, 'edit')"
-                />
-
-                <button
-                  v-if="editForm.image_url"
-                  type="button"
-                  class="btn-ghost small"
-                  @click="openInNew(editForm.image_url)"
-                >
-                  View
-                </button>
-
-                <span v-if="uploadingEdit" class="uploading-text">
-                  Uploading...
-                </span>
+              <div v-if="editUploading" class="uploading">
+                Uploading... {{ editUploadProgress }}%
               </div>
 
-              <div v-if="editForm.image_url" class="preview">
-                <img :src="editForm.image_url" alt="Preview" />
+              <div v-if="editFilePreview" class="image-preview">
+                <img :src="editFilePreview" alt="Preview" />
               </div>
+              <img
+                v-else-if="editModel.image_url"
+                :src="editModel.image_url"
+                class="preview"
+                alt="Current"
+              />
             </div>
 
             <div class="field">
               <label>Button Text</label>
-              <input v-model.trim="editForm.button_text" />
+              <input v-model.trim="editModel.button_text" />
             </div>
 
             <div class="field">
               <label>Button Link</label>
-              <input v-model.trim="editForm.button_link" />
+              <input v-model.trim="editModel.button_link" />
             </div>
           </div>
 
           <div class="actions">
-            <button
-              class="btn-primary"
-              type="submit"
-              :disabled="savingEdit || uploadingEdit"
-            >
-              {{ savingEdit ? "Saving..." : "Save" }}
+            <button type="submit" class="btn-primary" :disabled="editUploading">
+              {{ editUploading ? "Saving..." : "Save" }}
             </button>
-            <button class="btn-ghost" type="button" @click="closeEdit">
+            <button type="button" class="btn-ghost" @click="closeEdit">
               Cancel
             </button>
           </div>
@@ -223,22 +185,18 @@ const API_BASE =
 
 const banners = ref([]);
 const loading = ref(false);
-const saving = ref(false);
-const savingEdit = ref(false);
 
-const uploadingCreate = ref(false);
-const uploadingEdit = ref(false);
-
-const form = ref({
+// ---------- Add ----------
+const newBanner = ref({
   title: "",
-  image_url: "",
   button_text: "",
   button_link: "",
   slot: "main",
 });
-
-const editing = ref(false);
-const editForm = ref({});
+const newBannerFile = ref(null);
+const newBannerFilePreview = ref(null);
+const uploading = ref(false);
+const uploadProgress = ref(0);
 
 function humanSlot(slot) {
   if (slot === "side_top") return "Right Top";
@@ -246,14 +204,22 @@ function humanSlot(slot) {
   return "Main";
 }
 
+function onBannerFileChange(e) {
+  const file = e.target.files[0];
+  newBannerFile.value = file || null;
+  newBannerFilePreview.value = file ? URL.createObjectURL(file) : null;
+}
+
 function resetForm() {
-  form.value = {
+  newBanner.value = {
     title: "",
-    image_url: "",
     button_text: "",
     button_link: "",
     slot: "main",
   };
+  newBannerFile.value = null;
+  newBannerFilePreview.value = null;
+  uploadProgress.value = 0;
 }
 
 async function fetchBanners() {
@@ -262,116 +228,108 @@ async function fetchBanners() {
     const res = await axios.get(`${API_BASE}/api/banners`);
     banners.value = res.data || [];
   } catch (err) {
-    console.error("Fetch banners error:", err);
+    console.error("❌ Fetch banners error:", err);
   } finally {
     loading.value = false;
   }
 }
 
-async function createBanner() {
-  if (!form.value.image_url) return alert("Please upload an image first");
-  saving.value = true;
+async function addBanner() {
+  if (!newBannerFile.value) return alert("Please select an image");
+
+  const formData = new FormData();
+  formData.append("image", newBannerFile.value);
+  formData.append("title", newBanner.value.title || "");
+  formData.append("button_text", newBanner.value.button_text || "");
+  formData.append("button_link", newBanner.value.button_link || "");
+  formData.append("slot", newBanner.value.slot || "main");
+
   try {
-    await axios.post(`${API_BASE}/api/banners`, form.value);
+    uploading.value = true;
+    await axios.post(`${API_BASE}/api/banners`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+      onUploadProgress: (e) => {
+        if (!e.total) return;
+        uploadProgress.value = Math.round((e.loaded * 100) / e.total);
+      },
+    });
     resetForm();
     fetchBanners();
   } catch (err) {
-    console.error("Create banner error:", err);
-    alert("Failed to create banner");
+    console.error("❌ Add banner error:", err);
+    alert("Failed to add banner");
   } finally {
-    saving.value = false;
+    uploading.value = false;
   }
 }
 
-function openEdit(b) {
-  editForm.value = { ...b };
-  editing.value = true;
-}
-function closeEdit() {
-  editing.value = false;
-}
-
-/* --------- upload helpers ---------- */
-async function uploadImage(file, mode) {
-  if (!file) return;
-
-  const isEdit = mode === "edit";
-  if (isEdit) uploadingEdit.value = true;
-  else uploadingCreate.value = true;
-
-  try {
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const res = await axios.post(
-      `${API_BASE}/api/upload/banner`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-
-    const url = res.data.url;
-
-    if (isEdit) {
-      editForm.value.image_url = url;
-    } else {
-      form.value.image_url = url;
-    }
-  } catch (err) {
-    console.error("Upload error:", err);
-    alert("Image upload failed");
-  } finally {
-    if (isEdit) uploadingEdit.value = false;
-    else uploadingCreate.value = false;
-  }
-}
-
-function onFileChange(e, mode) {
-  const file = e.target.files && e.target.files[0];
-  if (!file) return;
-  uploadImage(file, mode);
-}
-
-function openInNew(url) {
-  if (!url) return;
-  window.open(url, "_blank");
-}
-
-async function updateBanner() {
-  if (!editForm.value.image_url) {
-    if (
-      !confirm(
-        "No image uploaded. Save anyway with empty image_url?"
-      )
-    ) {
-      return;
-    }
-  }
-
-  savingEdit.value = true;
-  try {
-    await axios.put(
-      `${API_BASE}/api/banners/${editForm.value.id}`,
-      editForm.value
-    );
-    editing.value = false;
-    fetchBanners();
-  } catch (err) {
-    console.error("Update banner error:", err);
-    alert("Failed to update");
-  } finally {
-    savingEdit.value = false;
-  }
-}
-
-async function removeBanner(id) {
+async function deleteBanner(id) {
   if (!confirm("Delete this banner?")) return;
   try {
     await axios.delete(`${API_BASE}/api/banners/${id}`);
     fetchBanners();
   } catch (err) {
-    console.error("Delete banner error:", err);
+    console.error("❌ Delete banner error:", err);
+    alert("Failed to delete banner");
+  }
+}
+
+// ---------- Edit ----------
+const editing = ref(false);
+const editModel = ref({});
+const editFile = ref(null);
+const editFilePreview = ref(null);
+const editUploading = ref(false);
+const editUploadProgress = ref(0);
+
+function openEdit(b) {
+  editModel.value = { ...b }; // includes slot, button fields, etc.
+  editing.value = true;
+}
+
+function closeEdit() {
+  editing.value = false;
+  editFile.value = null;
+  editFilePreview.value = null;
+  editUploadProgress.value = 0;
+}
+
+function onEditBannerFileChange(e) {
+  const file = e.target.files[0];
+  editFile.value = file || null;
+  editFilePreview.value = file ? URL.createObjectURL(file) : null;
+}
+
+async function updateBanner() {
+  const formData = new FormData();
+  if (editFile.value) formData.append("image", editFile.value);
+  formData.append("title", editModel.value.title || "");
+  formData.append("button_text", editModel.value.button_text || "");
+  formData.append("button_link", editModel.value.button_link || "");
+  formData.append("slot", editModel.value.slot || "main");
+
+  try {
+    editUploading.value = true;
+    await axios.put(
+      `${API_BASE}/api/banners/${editModel.value.id}`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+        onUploadProgress: (e) => {
+          if (!e.total) return;
+          editUploadProgress.value = Math.round(
+            (e.loaded * 100) / e.total
+          );
+        },
+      }
+    );
+    closeEdit();
+    fetchBanners();
+  } catch (err) {
+    console.error("❌ Update banner error:", err);
+    alert("Failed to update banner");
+  } finally {
+    editUploading.value = false;
   }
 }
 
@@ -382,259 +340,266 @@ onMounted(fetchBanners);
 .banner-manager {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 24px 16px 48px;
+  padding: 20px 16px 60px;
+  overflow: hidden;
+}
+.newBannerFilePreview {
+  overflow: hidden;
+  height: 200px;
+  width: 200px;
 }
 .page-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin-bottom: 16px;
+  font-size: 28px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 18px;
+  background: linear-gradient(90deg, #4a00e0, #8e2de2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* cards */
+/* Card Layouts */
 .card {
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.08);
-  padding: 16px 18px 20px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+  padding: 18px;
   margin-bottom: 20px;
 }
 .card-title {
+  font-weight: 700;
   font-size: 18px;
-  font-weight: 600;
+  margin-bottom: 14px;
 }
 
-/* grid */
+/* Grid Layout */
 .grid {
   display: grid;
-  gap: 12px 18px;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-top: 12px;
+  gap: 14px;
 }
 .col-span-2 {
-  grid-column: 1 / -1;
+  grid-column: span 2;
+}
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .col-span-2 {
+    grid-column: auto;
+  }
 }
 
-/* field */
+/* Inputs */
 .field label {
-  font-size: 13px;
-  font-weight: 500;
-  margin-bottom: 4px;
   display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
 }
 .field input,
 .field select {
   width: 100%;
-  border-radius: 8px;
   border: 1px solid #e5e7eb;
-  padding: 8px 10px;
-  font-size: 14px;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.field input:focus,
+.field select:focus {
+  border-color: #7b61ff;
+  box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.15);
 }
 .req {
-  color: #ef4444;
+  color: #ff4d4f;
 }
 .hint {
   font-size: 12px;
   color: #6b7280;
+  margin-top: 4px;
 }
 
-/* upload row & preview */
-.upload-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.uploading-text {
-  font-size: 12px;
-  color: #6b7280;
-}
+/* Preview */
+.image-preview img,
 .preview {
+  margin-top: 10px;
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+.uploading {
+  font-size: 14px;
+  color: #8e2de2;
+  font-weight: 600;
   margin-top: 8px;
 }
-.preview img {
-  max-width: 260px;
-  max-height: 130px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  object-fit: cover;
-}
 
-/* buttons */
+/* Buttons */
 .actions {
-  margin-top: 14px;
   display: flex;
   gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
 }
 .btn-primary {
-  background: linear-gradient(135deg, #4a00e0, #8e2de2);
-  color: #fff;
+  background: linear-gradient(90deg, #4a00e0, #8e2de2);
+  color: white;
   border: none;
-  border-radius: 999px;
-  padding: 8px 18px;
-  font-size: 14px;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 700;
   cursor: pointer;
 }
 .btn-ghost {
-  border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  background: #fff;
-  padding: 8px 14px;
-  font-size: 14px;
+  background: #f5f5f7;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-weight: 600;
   cursor: pointer;
 }
-.btn-ghost.small {
-  padding: 4px 10px;
-  font-size: 12px;
+.btn-small {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-danger {
+  background: #ff4d4f;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-/* list */
+/* List */
 .list-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 10px;
+  align-items: center;
+  margin-bottom: 12px;
 }
 .items {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  gap: 12px;
 }
 .item {
-  display: flex;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
   align-items: center;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #edf2f7;
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 14px;
 }
 .thumb {
-  width: 140px;
-  height: 70px;
+  width: 100%;
+  height: 84px;
   object-fit: cover;
-  border-radius: 8px;
+  border-radius: 10px;
 }
-.meta {
-  flex: 1;
+.meta .title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
 }
-.title {
-  font-weight: 600;
-  margin-bottom: 4px;
+.meta .title {
+  font-weight: 700;
 }
-.sub {
+.slot-tag {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.meta .sub {
   font-size: 13px;
   color: #4b5563;
 }
-.tag {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 11px;
-  background: #eef2ff;
-  color: #4f46e5;
+.meta .link {
+  color: #7b61ff;
   margin-left: 4px;
 }
 .muted {
   color: #9ca3af;
 }
-.link {
-  margin-left: 6px;
-  font-size: 12px;
-  color: #6366f1;
-}
-.row-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.btn-small {
-  border-radius: 999px;
-  border: 1px solid #e5e7eb;
-  padding: 4px 10px;
-  font-size: 12px;
-  cursor: pointer;
-}
-.btn-danger {
-  border-radius: 999px;
-  border: 1px solid #fecaca;
-  padding: 4px 10px;
-  font-size: 12px;
-  color: #b91c1c;
-  background: #fef2f2;
-  cursor: pointer;
+
+/* Empty */
+.empty {
+  padding: 20px;
+  text-align: center;
+  color: #6b7280;
 }
 
-/* modal */
-.modal-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.35);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 50;
-}
-.modal {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 16px 18px 20px;
-  width: 520px;
-  max-width: 95%;
-}
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-.modal-header .x {
-  border: none;
-  background: transparent;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-/* skeleton / empty */
+/* Skeleton */
 .skeleton-wrap {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 .skeleton {
-  height: 60px;
-  border-radius: 10px;
-  background: linear-gradient(
-    90deg,
-    #f3f4f6 0%,
-    #e5e7eb 50%,
-    #f3f4f6 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
+  height: 110px;
+  background: linear-gradient(90deg, #f2f2f2 25%, #eaeaea 37%, #f2f2f2 63%);
+  background-size: 400% 100%;
+  border-radius: 14px;
+  animation: shimmer 1.4s ease infinite;
 }
-.empty {
-  padding: 12px 4px 8px;
-  font-size: 14px;
-  color: #6b7280;
-}
-
 @keyframes shimmer {
   0% {
-    background-position: -200% 0;
+    background-position: 100% 0;
   }
   100% {
-    background-position: 200% 0;
+    background-position: -100% 0;
   }
 }
 
-@media (max-width: 768px) {
-  .banner-manager {
-    padding: 16px 10px 32px;
-  }
-  .grid {
-    grid-template-columns: 1fr;
-  }
-  .thumb {
-    width: 110px;
-    height: 60px;
-  }
+/* Modal */
+.modal-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: grid;
+  place-items: center;
+  padding: 14px;
+  z-index: 50;
+}
+.modal {
+  width: 100%;
+  max-width: 720px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
+}
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid #f1f1f1;
+}
+.modal-header h3 {
+  font-weight: 800;
+  background: linear-gradient(90deg, #4a00e0, #8e2de2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.modal .x {
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+}
+.modal-body {
+  padding: 14px 16px 18px;
 }
 </style>
