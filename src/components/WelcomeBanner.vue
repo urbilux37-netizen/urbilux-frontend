@@ -8,77 +8,121 @@
     @keydown.right.prevent="next"
     tabindex="0"
   >
-    <!-- Slides -->
-    <div class="slides" v-if="banners.length">
-      <transition name="fade" mode="out-in">
-        <div class="slide" :key="currentKey">
-          <img
-            :src="banners[current]?.image_url"
-            :alt="banners[current]?.title || 'Banner'"
-            class="img"
-            loading="eager"
-            @load="onLoaded"
-          />
+    <!-- 🟣 GRID: Left big slider + right 2 small -->
+    <div class="banner-grid" v-if="mainBanners.length || sideTop || sideBottom">
+      <!-- ========== LEFT: MAIN SLIDER (slot = main) ========== -->
+      <div class="main-banner" v-if="mainBanners.length">
+        <transition name="fade" mode="out-in">
+          <div class="slide" :key="currentKey">
+            <img
+              :src="mainBanners[current]?.image_url"
+              :alt="mainBanners[current]?.title || 'Banner'"
+              class="img-main"
+              loading="eager"
+              @load="onLoaded"
+            />
 
-          <!-- ✅ Smart CTA -->
-          <div v-if="banners[current]?.button_text" class="cta">
-            <!-- 🌐 External link -->
-            <a
-              v-if="banners[current]?.button_link?.startsWith('http')"
-              class="cta-btn"
-              :href="banners[current]?.button_link"
-              target="_blank"
-              rel="noopener"
-            >
-              {{ banners[current]?.button_text }}
-            </a>
+            <!-- ✅ Smart CTA on main banner -->
+            <div v-if="mainBanners[current]?.button_text" class="cta">
+              <!-- 🌐 External link -->
+              <a
+                v-if="mainBanners[current]?.button_link?.startsWith('http')"
+                class="cta-btn"
+                :href="mainBanners[current]?.button_link"
+                target="_blank"
+                rel="noopener"
+              >
+                {{ mainBanners[current]?.button_text }}
+              </a>
 
-            <!-- 🔗 Internal route -->
-            <router-link
-              v-else
-              class="cta-btn"
-              :to="banners[current]?.button_link || '#'"
-            >
-              {{ banners[current]?.button_text }}
-            </router-link>
+              <!-- 🔗 Internal route -->
+              <router-link
+                v-else
+                class="cta-btn"
+                :to="mainBanners[current]?.button_link || '#'"
+              >
+                {{ mainBanners[current]?.button_text }}
+              </router-link>
+            </div>
           </div>
+        </transition>
+
+        <!-- ⚪ Dots (only on desktop, bottom of main banner) -->
+        <div class="dots" v-if="isDesktop && mainBanners.length > 1">
+          <button
+            v-for="(b, i) in mainBanners"
+            :key="b.id ?? i"
+            class="dot"
+            :class="{ active: i === current }"
+            @click="go(i)"
+            :aria-label="`Go to slide ${i + 1}`"
+          />
         </div>
-      </transition>
+
+        <!-- ⬅️➡️ Arrows -->
+        <button
+          v-if="isDesktop && mainBanners.length > 1"
+          class="arrow left"
+          @click="prev"
+          aria-label="Previous"
+        >
+          ‹
+        </button>
+
+        <button
+          v-if="isDesktop && mainBanners.length > 1"
+          class="arrow right"
+          @click="next"
+          aria-label="Next"
+        >
+          ›
+        </button>
+      </div>
+
+      <!-- ========== RIGHT: 2 SMALL BANNERS (slot = side_top / side_bottom) ========== -->
+      <div class="side-banners" v-if="isDesktop">
+        <!-- TOP small banner -->
+        <div class="side-item" v-if="sideTop">
+          <component
+            :is="sideTop.button_link ? (sideTop.button_link.startsWith('http') ? 'a' : 'router-link') : 'div'"
+            class="side-link"
+            :href="sideTop.button_link?.startsWith('http') ? sideTop.button_link : undefined"
+            :to="!sideTop.button_link || sideTop.button_link.startsWith('http') ? undefined : sideTop.button_link"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              :src="sideTop.image_url"
+              :alt="sideTop.title || 'Banner'"
+              class="img-side"
+              loading="lazy"
+            />
+          </component>
+        </div>
+
+        <!-- BOTTOM small banner -->
+        <div class="side-item" v-if="sideBottom">
+          <component
+            :is="sideBottom.button_link ? (sideBottom.button_link.startsWith('http') ? 'a' : 'router-link') : 'div'"
+            class="side-link"
+            :href="sideBottom.button_link?.startsWith('http') ? sideBottom.button_link : undefined"
+            :to="!sideBottom.button_link || sideBottom.button_link.startsWith('http') ? undefined : sideBottom.button_link"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              :src="sideBottom.image_url"
+              :alt="sideBottom.title || 'Banner'"
+              class="img-side"
+              loading="lazy"
+            />
+          </component>
+        </div>
+      </div>
     </div>
 
-    <!-- 🟣 Empty space (no placeholder) -->
+    <!-- 🟣 Empty state -->
     <div v-else class="banner-loading"></div>
-
-    <!-- ⚪ Dots (PC only) -->
-    <div class="dots" :class="{ top: isDesktop }" v-if="isDesktop">
-      <button
-        v-for="(b, i) in banners"
-        :key="b.id ?? i"
-        class="dot"
-        :class="{ active: i === current }"
-        @click="go(i)"
-        :aria-label="`Go to slide ${i + 1}`"
-      />
-    </div>
-
-    <!-- ⬅️➡️ Arrows -->
-    <button
-      v-if="isDesktop && banners.length > 1"
-      class="arrow left"
-      @click="prev"
-      aria-label="Previous"
-    >
-      ‹
-    </button>
-
-    <button
-      v-if="isDesktop && banners.length > 1"
-      class="arrow right"
-      @click="next"
-      aria-label="Next"
-    >
-      ›
-    </button>
   </div>
 </template>
 
@@ -88,7 +132,7 @@ import axios from "axios";
 
 const API_BASE =
   window.location.hostname === "localhost"
-    ? "http://localhost:5000/api"
+    ? "http://localhost:5000"
     : "https://urbilux-backend.onrender.com";
 
 const banners = ref([]);
@@ -97,9 +141,22 @@ const timer = ref(null);
 const isDesktop = ref(false);
 const sliderRef = ref(null);
 
+// 🔹 Main big slider banners (slot = main)
+const mainBanners = computed(() =>
+  banners.value.filter((b) => b.slot === "main")
+);
+
+// 🔹 Right top + bottom (single each)
+const sideTop = computed(
+  () => banners.value.find((b) => b.slot === "side_top") || null
+);
+const sideBottom = computed(
+  () => banners.value.find((b) => b.slot === "side_bottom") || null
+);
+
 const currentKey = computed(
   () =>
-    (banners.value[current.value]?.id ?? current.value) + ":" + current.value
+    (mainBanners.value[current.value]?.id ?? current.value) + ":" + current.value
 );
 
 async function fetchBanners() {
@@ -112,25 +169,27 @@ async function fetchBanners() {
 }
 
 function next() {
-  if (!banners.value.length) return;
-  current.value = (current.value + 1) % banners.value.length;
+  if (!mainBanners.value.length) return;
+  current.value = (current.value + 1) % mainBanners.value.length;
   softPreload(current.value + 1);
 }
 function prev() {
-  if (!banners.value.length) return;
+  if (!mainBanners.value.length) return;
   current.value =
-    (current.value - 1 + banners.value.length) % banners.value.length;
+    (current.value - 1 + mainBanners.value.length) % mainBanners.value.length;
   softPreload(current.value - 1);
 }
 function go(i) {
-  if (!banners.value.length) return;
+  if (!mainBanners.value.length) return;
   current.value = i;
   softPreload(i + 1);
 }
 
 function start() {
   stop();
-  timer.value = setInterval(next, 4500);
+  if (mainBanners.value.length > 1) {
+    timer.value = setInterval(next, 4500);
+  }
 }
 function stop() {
   if (timer.value) clearInterval(timer.value);
@@ -144,9 +203,9 @@ function resume() {
 }
 
 function softPreload(idx) {
-  if (!banners.value.length) return;
-  const nextIndex = (idx + banners.value.length) % banners.value.length;
-  const url = banners.value[nextIndex]?.image_url;
+  if (!mainBanners.value.length) return;
+  const nextIndex = (idx + mainBanners.value.length) % mainBanners.value.length;
+  const url = mainBanners.value[nextIndex]?.image_url;
   if (url) {
     const img = new Image();
     img.src = url;
@@ -176,7 +235,7 @@ onMounted(async () => {
   updateDesktopFlag();
   window.addEventListener("resize", updateDesktopFlag);
   await fetchBanners();
-  if (banners.value.length > 1) start();
+  start();
 
   const el = sliderRef.value;
   if (el) {
@@ -196,148 +255,129 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-@media (max-width: 768px) {
-  .dots {
-    display: none !important;
-  }
-}
-
-/* 🌟 Container */
 .banner-slider {
-  position: relative;
   width: 100%;
-  height: 700px;           /* desktop height */
-  min-height: 180px;       /* safety for very small screens */
-  border-radius: 16px;
+  margin: 0 auto;
+}
+
+/* 2-column grid: big left, 2 small right */
+.banner-grid {
+  display: grid;
+  grid-template-columns: 2.1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* LEFT MAIN */
+.main-banner {
+  position: relative;
+  border-radius: 10px;
   overflow: hidden;
-  outline: none;
-  box-shadow: 0 14px 35px rgba(0,0,0,.12);
-  background: transparent; /* no background fill */
+  background: #f3f3f3;
 }
 
-@media (max-width: 1024px) {
-  .banner-slider {
-    height: 400px;         /* mobile height */
-  }
-}
-
-/* 🌄 Slides */
-.slides,
 .slide {
-  position: absolute;
-  inset: 0;
-}
-
-/* 🖼️ Image (full visible, no crop or zoom) */
-.img {
   width: 100%;
   height: 100%;
-  object-fit: contain;        /* fills fully — no white gaps */
-  object-position: center;  /* keeps product centered */
-  display: block;
-  transition: transform 0.4s ease; /* optional smooth adjust */
 }
 
+.img-main {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
 
-/* 🎯 CTA Button */
+/* CTA on main banner */
 .cta {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 10%;
+  bottom: 18px;
+  left: 18px;
 }
-
-@media (max-width: 480px) {
-  .cta {
-    bottom: 8%;
-  }
-}
-
 .cta-btn {
-  text-decoration: none;
-  padding: 12px 28px;
-  font-weight: 800;
+  display: inline-block;
+  padding: 8px 16px;
   border-radius: 999px;
-  background: linear-gradient(90deg, #4A00E0, #8E2DE2);
+  background: #ff6b00;
   color: #fff;
-  box-shadow: 0 12px 24px rgba(142,45,226,.25);
+  font-weight: 600;
+  font-size: 14px;
 }
 
-/* ⚪ Dots */
+/* Dots */
 .dots {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 12px;
+  bottom: 18px;
+  right: 22px;
   display: flex;
-  gap: 10px;
+  gap: 6px;
 }
-
-.dots.top {
-  top: 14px;
-  bottom: auto;
-}
-
 .dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.75);
-  border: 2px solid rgba(0, 0, 0, 0.12);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-  cursor: pointer;
-  transition: transform 0.15s, opacity 0.15s, background 0.15s;
-  opacity: 0.7;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  background: rgba(0, 0, 0, 0.15);
 }
-
 .dot.active {
-  background: #fff;
-  opacity: 1;
-  transform: scale(1.08);
-  border-color: transparent;
+  background: #ff6b00;
 }
 
-/* ⬅️➡️ Arrows (desktop hover only) */
+/* Arrows */
 .arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.78);
   border: none;
-  font-size: 26px;
-  font-weight: 700;
-  display: none;
-  align-items: center;
-  justify-content: center;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  width: 28px;
+  height: 48px;
   cursor: pointer;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.18);
 }
-
 .arrow.left {
-  left: 12px;
+  left: 0;
+  border-radius: 0 4px 4px 0;
 }
-
 .arrow.right {
-  right: 12px;
+  right: 0;
+  border-radius: 4px 0 0 4px;
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .banner-slider:hover .arrow {
-    display: inline-flex;
+/* RIGHT COLUMN 2 SMALL */
+.side-banners {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.side-item {
+  flex: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f3f3;
+}
+
+.side-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.img-side {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Mobile / tablet: শুধু main banner দেখাও */
+@media (max-width: 1023px) {
+  .banner-grid {
+    grid-template-columns: 1fr;
   }
-}
-
-/* ✨ Fade Transition */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.55s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+  .side-banners {
+    display: none;
+  }
 }
 </style>
