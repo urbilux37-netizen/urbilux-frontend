@@ -21,16 +21,38 @@
           </select>
         </div>
 
+        <!-- 🔥 Image upload instead of raw URL -->
         <div class="field col-span-2">
-          <label>Image URL <span class="req">*</span></label>
-          <input
-            v-model.trim="form.image_url"
-            placeholder="https://cdn.example.com/banner.jpg"
-            required
-          />
+          <label>Image <span class="req">*</span></label>
+
+          <div class="upload-row">
+            <input
+              type="file"
+              accept="image/*"
+              @change="(e) => onFileChange(e, 'create')"
+            />
+
+            <button
+              v-if="form.image_url"
+              type="button"
+              class="btn-ghost small"
+              @click="openInNew(form.image_url)"
+            >
+              View
+            </button>
+
+            <span v-if="uploadingCreate" class="uploading-text">
+              Uploading...
+            </span>
+          </div>
+
           <p class="hint">
             Use 1600×700 for main, ~800×500 for side banners.
           </p>
+
+          <div v-if="form.image_url" class="preview">
+            <img :src="form.image_url" alt="Preview" />
+          </div>
         </div>
 
         <div class="field">
@@ -40,12 +62,19 @@
 
         <div class="field">
           <label>Button Link (optional)</label>
-          <input v-model.trim="form.button_link" placeholder="/category/health" />
+          <input
+            v-model.trim="form.button_link"
+            placeholder="/category/health"
+          />
         </div>
       </div>
 
       <div class="actions">
-        <button class="btn-primary" type="submit" :disabled="saving">
+        <button
+          class="btn-primary"
+          type="submit"
+          :disabled="saving || uploadingCreate"
+        >
           {{ saving ? "Saving..." : "Add Banner" }}
         </button>
         <button class="btn-ghost" type="button" @click="resetForm">
@@ -124,9 +153,34 @@
               </select>
             </div>
 
+            <!-- 🔥 Edit image upload -->
             <div class="field col-span-2">
-              <label>Image URL</label>
-              <input v-model.trim="editForm.image_url" />
+              <label>Image</label>
+
+              <div class="upload-row">
+                <input
+                  type="file"
+                  accept="image/*"
+                  @change="(e) => onFileChange(e, 'edit')"
+                />
+
+                <button
+                  v-if="editForm.image_url"
+                  type="button"
+                  class="btn-ghost small"
+                  @click="openInNew(editForm.image_url)"
+                >
+                  View
+                </button>
+
+                <span v-if="uploadingEdit" class="uploading-text">
+                  Uploading...
+                </span>
+              </div>
+
+              <div v-if="editForm.image_url" class="preview">
+                <img :src="editForm.image_url" alt="Preview" />
+              </div>
             </div>
 
             <div class="field">
@@ -141,7 +195,11 @@
           </div>
 
           <div class="actions">
-            <button class="btn-primary" type="submit" :disabled="savingEdit">
+            <button
+              class="btn-primary"
+              type="submit"
+              :disabled="savingEdit || uploadingEdit"
+            >
               {{ savingEdit ? "Saving..." : "Save" }}
             </button>
             <button class="btn-ghost" type="button" @click="closeEdit">
@@ -167,6 +225,9 @@ const banners = ref([]);
 const loading = ref(false);
 const saving = ref(false);
 const savingEdit = ref(false);
+
+const uploadingCreate = ref(false);
+const uploadingEdit = ref(false);
 
 const form = ref({
   title: "",
@@ -208,7 +269,7 @@ async function fetchBanners() {
 }
 
 async function createBanner() {
-  if (!form.value.image_url) return alert("Image URL required");
+  if (!form.value.image_url) return alert("Please upload an image first");
   saving.value = true;
   try {
     await axios.post(`${API_BASE}/api/banners`, form.value);
@@ -230,7 +291,64 @@ function closeEdit() {
   editing.value = false;
 }
 
+/* --------- upload helpers ---------- */
+async function uploadImage(file, mode) {
+  if (!file) return;
+
+  const isEdit = mode === "edit";
+  if (isEdit) uploadingEdit.value = true;
+  else uploadingCreate.value = true;
+
+  try {
+    const formData = new FormData();
+    formData.append("image", file);
+
+    const res = await axios.post(
+      `${API_BASE}/api/upload/banner`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    const url = res.data.url;
+
+    if (isEdit) {
+      editForm.value.image_url = url;
+    } else {
+      form.value.image_url = url;
+    }
+  } catch (err) {
+    console.error("Upload error:", err);
+    alert("Image upload failed");
+  } finally {
+    if (isEdit) uploadingEdit.value = false;
+    else uploadingCreate.value = false;
+  }
+}
+
+function onFileChange(e, mode) {
+  const file = e.target.files && e.target.files[0];
+  if (!file) return;
+  uploadImage(file, mode);
+}
+
+function openInNew(url) {
+  if (!url) return;
+  window.open(url, "_blank");
+}
+
 async function updateBanner() {
+  if (!editForm.value.image_url) {
+    if (
+      !confirm(
+        "No image uploaded. Save anyway with empty image_url?"
+      )
+    ) {
+      return;
+    }
+  }
+
   savingEdit.value = true;
   try {
     await axios.put(
@@ -319,6 +437,27 @@ onMounted(fetchBanners);
   color: #6b7280;
 }
 
+/* upload row & preview */
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.uploading-text {
+  font-size: 12px;
+  color: #6b7280;
+}
+.preview {
+  margin-top: 8px;
+}
+.preview img {
+  max-width: 260px;
+  max-height: 130px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  object-fit: cover;
+}
+
 /* buttons */
 .actions {
   margin-top: 14px;
@@ -341,6 +480,10 @@ onMounted(fetchBanners);
   padding: 8px 14px;
   font-size: 14px;
   cursor: pointer;
+}
+.btn-ghost.small {
+  padding: 4px 10px;
+  font-size: 12px;
 }
 
 /* list */
