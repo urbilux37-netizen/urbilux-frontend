@@ -458,6 +458,7 @@ onUnmounted(() => {
 .banner-slider {
   width: 100%;
   margin: 0 auto;
+  max-height: 100%;
 }
 
 /* GRID: big left, 2 small right */
