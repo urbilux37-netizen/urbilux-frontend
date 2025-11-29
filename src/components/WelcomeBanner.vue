@@ -454,7 +454,6 @@ onUnmounted(() => {
   }
 });
 </script>
-
 <style scoped>
 .banner-slider {
   width: 100%;
@@ -474,7 +473,7 @@ onUnmounted(() => {
   position: relative;
   border-radius: 14px;
   overflow: hidden;
-  background: #f3f3f3;
+  background: #ffffff;
 }
 
 .slide {
@@ -482,21 +481,22 @@ onUnmounted(() => {
   height: 100%;
 }
 
+/* 🚫 Zoom/Crop বন্ধ – full image দেখাবে, পাশে blank থাকলে থাকবে */
 .img-main {
   width: 100%;
   height: 100%;
   display: block;
-  object-fit: cover;
+  object-fit: contain;      /* আগে cover ছিল */
+  background: #ffffff;
 }
 
-/* Main center CTA */
+/* Main CTA – নিচের দিকে, মাঝখানে */
 .cta {
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none; /* jeno img click-able thake */
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 26px;
+  pointer-events: none;
 }
 
 .cta-btn {
@@ -575,7 +575,7 @@ onUnmounted(() => {
   flex: 1;
   border-radius: 14px;
   overflow: hidden;
-  background: #f3f3f3;
+  background: #ffffff;
   position: relative;
 }
 
@@ -591,25 +591,29 @@ onUnmounted(() => {
   height: 100%;
 }
 
+/* এখানেও crop বন্ধ */
 .img-side {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;     /* আগে cover ছিল */
+  background: #ffffff;
   display: block;
 }
 
-/* side CTA */
+/* side CTA – purple chip, নিচের দিকে */
 .side-cta {
   position: absolute;
-  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 5px 12px;
+  bottom: 10px;
+  padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.75);
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
   color: #ffffff;
   font-size: 12px;
   font-weight: 500;
+  box-shadow: 0 8px 18px rgba(67, 56, 202, 0.4);
+  z-index: 2; /* 🔥 bottom slot-e jeno লুকিয়ে না যায় */
 }
 
 /* side dots */
@@ -619,6 +623,7 @@ onUnmounted(() => {
   right: 10px;
   display: flex;
   gap: 4px;
+  z-index: 2;
 }
 .side-dot {
   width: 7px;
@@ -644,6 +649,7 @@ onUnmounted(() => {
   height: 40px;
   cursor: pointer;
   font-size: 14px;
+  z-index: 2;
 }
 .side-left {
   left: 0;
@@ -668,24 +674,37 @@ onUnmounted(() => {
 @media (max-width: 1023px) {
   .banner-grid {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
 
-  /* main top, side below side-by-side */
+  /* main top, side নিচে side-by-side */
   .side-banners {
     flex-direction: row;
     gap: 10px;
-    margin-top: 12px;
+    margin-top: 4px;
   }
 
   .side-item {
-    height: 120px;
+    height: 150px; /* একটু বড়, full image দেখার জন্য */
   }
 
+  /* phone e arrow/dots নাই */
   .arrow,
   .side-arrow,
   .dots,
   .side-dots {
-    display: none; /* no arrows/dots on phone */
+    display: none;
+  }
+
+  .cta {
+    bottom: 18px; /* mobile e একটু উপরে */
+  }
+}
+
+/* Extra small phones <=480px */
+@media (max-width: 480px) {
+  .side-item {
+    height: 140px;
   }
 }
 </style>
