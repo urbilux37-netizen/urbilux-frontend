@@ -24,24 +24,24 @@
               @load="onLoaded"
             />
 
-            <!-- ⭐ Main CTA – bottom center, only if text+link -->
+            <!-- ⭐ Main CTA – bottom center, only if text -->
             <div v-if="showMainCTA" class="cta">
               <!-- External -->
               <a
                 v-if="mainCurrent.button_link?.startsWith('http')"
                 class="cta-btn"
-                :href="mainCurrent.button_link"
+                :href="mainCurrent.button_link || '#'"
                 target="_blank"
                 rel="noopener"
               >
                 {{ mainCurrent.button_text }}
               </a>
 
-              <!-- Internal -->
+              <!-- Internal / no-link fallback -->
               <router-link
                 v-else
                 class="cta-btn"
-                :to="mainCurrent.button_link"
+                :to="mainCurrent.button_link || '#'"
               >
                 {{ mainCurrent.button_text }}
               </router-link>
@@ -284,23 +284,20 @@ const sideBottomCurrent = computed(() =>
     : null
 );
 
-/* ---------- CTA visibility (need text + link) ---------- */
+/* ---------- CTA visibility (ONLY text required) ---------- */
 const showMainCTA = computed(() => {
   const b = mainCurrent.value;
-  if (!b) return false;
-  return !!b.button_text?.trim() && !!b.button_link?.trim();
+  return !!b?.button_text?.trim();
 });
 
 const showSideTopCTA = computed(() => {
   const b = sideTopCurrent.value;
-  if (!b) return false;
-  return !!b.button_text?.trim() && !!b.button_link?.trim();
+  return !!b?.button_text?.trim();
 });
 
 const showSideBottomCTA = computed(() => {
   const b = sideBottomCurrent.value;
-  if (!b) return false;
-  return !!b.button_text?.trim() && !!b.button_link?.trim();
+  return !!b?.button_text?.trim();
 });
 
 /* ---------- keys for transition ---------- */
@@ -460,6 +457,7 @@ onUnmounted(() => {
   }
 });
 </script>
+
 
 <style scoped>
 .banner-slider {
