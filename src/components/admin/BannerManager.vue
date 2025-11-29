@@ -1,527 +1,382 @@
 <template>
-  <div class="banner-manager">
-    <h1 class="page-title">🖼️ Banner Manager</h1>
+  <div
+    class="banner-slider"
+    ref="sliderRef"
+    @mouseenter="pause"
+    @mouseleave="resume"
+    @keydown.left.prevent="prev"
+    @keydown.right.prevent="next"
+    tabindex="0"
+  >
+    <!-- 🟣 GRID: Left big slider + right 2 small -->
+    <div class="banner-grid" v-if="banners.length">
+      <!-- ========== LEFT: MAIN SLIDER ========== -->
+      <div class="main-banner">
+        <transition name="fade" mode="out-in">
+          <div class="slide" :key="currentKey">
+            <img
+              :src="banners[current]?.image_url"
+              :alt="banners[current]?.title || 'Banner'"
+              class="img-main"
+              loading="eager"
+              @load="onLoaded"
+            />
 
-    <!-- ===== Add Banner Form ===== -->
-    <form @submit.prevent="addBanner" class="card form-card">
-      <h2 class="card-title">Add New Banner</h2>
+            <!-- ✅ Smart CTA on main banner -->
+            <div v-if="banners[current]?.button_text" class="cta">
+              <!-- 🌐 External link -->
+              <a
+                v-if="banners[current]?.button_link?.startsWith('http')"
+                class="cta-btn"
+                :href="banners[current]?.button_link"
+                target="_blank"
+                rel="noopener"
+              >
+                {{ banners[current]?.button_text }}
+              </a>
 
-      <div class="grid">
-        <div class="field">
-          <label>Title (optional)</label>
-          <input v-model.trim="newBanner.title" placeholder="Summer Sale" />
-        </div>
+              <!-- 🔗 Internal route -->
+              <router-link
+                v-else
+                class="cta-btn"
+                :to="banners[current]?.button_link || '#'"
+              >
+                {{ banners[current]?.button_text }}
+              </router-link>
+            </div>
+          </div>
+        </transition>
 
-        <div class="field col-span-2">
-          <label>Banner Image <span class="req">*</span></label>
-          <input
-            type="file"
-            @change="onBannerFileChange"
-            accept="image/*"
-            required
+        <!-- ⚪ Dots (only on desktop, bottom of main banner) -->
+        <div class="dots" v-if="isDesktop && banners.length > 1">
+          <button
+            v-for="(b, i) in banners"
+            :key="b.id ?? i"
+            class="dot"
+            :class="{ active: i === current }"
+            @click="go(i)"
+            :aria-label="`Go to slide ${i + 1}`"
           />
-          <p class="hint">Upload a wide image (1500–2400px recommended)</p>
-
-          <div v-if="uploading" class="uploading">
-            Uploading... {{ uploadProgress }}%
-          </div>
-
-          <div v-if="newBannerFilePreview" class="image-preview">
-            <img :src="newBannerFilePreview" alt="Preview" />
-          </div>
         </div>
 
-        <div class="field">
-          <label>Button Text (optional)</label>
-          <input v-model.trim="newBanner.button_text" placeholder="Shop Now" />
-        </div>
+        <!-- ⬅️➡️ Arrows -->
+        <button
+          v-if="isDesktop && banners.length > 1"
+          class="arrow left"
+          @click="prev"
+          aria-label="Previous"
+        >
+          ‹
+        </button>
 
-        <div class="field">
-          <label>Button Link (optional)</label>
-          <input v-model.trim="newBanner.button_link" placeholder="/category/new" />
-        </div>
-      </div>
-
-      <div class="actions">
-        <button type="submit" class="btn-primary">Add Banner</button>
-        <button type="button" class="btn-ghost" @click="resetForm">Reset</button>
-      </div>
-    </form>
-
-    <!-- ===== Banner List ===== -->
-    <div class="card list-card">
-      <div class="list-header">
-        <h2 class="card-title">All Banners</h2>
-        <button class="btn-ghost" @click="fetchBanners" :disabled="loading">
-          {{ loading ? "Refreshing…" : "Refresh" }}
+        <button
+          v-if="isDesktop && banners.length > 1"
+          class="arrow right"
+          @click="next"
+          aria-label="Next"
+        >
+          ›
         </button>
       </div>
 
-      <div v-if="loading" class="skeleton-wrap">
-        <div class="skeleton" v-for="n in 3" :key="n"></div>
-      </div>
+      <!-- ========== RIGHT: 2 SMALL BANNERS ========== -->
+      <div class="side-banners" v-if="isDesktop">
+        <!-- TOP small banner -->
+        <div class="side-item" v-if="side1">
+          <component
+            :is="side1.button_link ? (side1.button_link.startsWith('http') ? 'a' : 'router-link') : 'div'"
+            class="side-link"
+            :href="side1.button_link?.startsWith('http') ? side1.button_link : undefined"
+            :to="!side1.button_link || side1.button_link.startsWith('http') ? undefined : side1.button_link"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              :src="side1.image_url"
+              :alt="side1.title || 'Banner'"
+              class="img-side"
+              loading="lazy"
+            />
+          </component>
+        </div>
 
-      <div v-else-if="!banners.length" class="empty">No banners found.</div>
-
-      <div v-else class="items">
-        <div v-for="b in banners" :key="b.id" class="item">
-          <img :src="b.image_url" class="thumb" alt="Banner" />
-          <div class="meta">
-            <p class="title">{{ b.title || "Untitled banner" }}</p>
-            <p class="sub">
-              <strong>Button:</strong>
-              <span v-if="b.button_text">{{ b.button_text }}</span>
-              <span v-else class="muted">—</span>
-              <span v-if="b.button_link" class="link">→ {{ b.button_link }}</span>
-            </p>
-          </div>
-
-          <div class="row-actions">
-            <button class="btn-small" @click="openEdit(b)">Edit</button>
-            <button class="btn-danger" @click="deleteBanner(b.id)">Delete</button>
-          </div>
+        <!-- BOTTOM small banner -->
+        <div class="side-item" v-if="side2">
+          <component
+            :is="side2.button_link ? (side2.button_link.startsWith('http') ? 'a' : 'router-link') : 'div'"
+            class="side-link"
+            :href="side2.button_link?.startsWith('http') ? side2.button_link : undefined"
+            :to="!side2.button_link || side2.button_link.startsWith('http') ? undefined : side2.button_link"
+            target="_blank"
+            rel="noopener"
+          >
+            <img
+              :src="side2.image_url"
+              :alt="side2.title || 'Banner'"
+              class="img-side"
+              loading="lazy"
+            />
+          </component>
         </div>
       </div>
     </div>
 
-    <!-- ===== Edit Modal ===== -->
-    <div v-if="editing" class="modal-mask" @click.self="closeEdit">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Edit Banner #{{ editModel.id }}</h3>
-          <button class="x" @click="closeEdit">✕</button>
-        </div>
-
-        <form @submit.prevent="updateBanner" class="modal-body">
-          <div class="grid">
-            <div class="field">
-              <label>Title</label>
-              <input v-model.trim="editModel.title" />
-            </div>
-
-            <div class="field col-span-2">
-              <label>Banner Image</label>
-              <input type="file" @change="onEditBannerFileChange" accept="image/*" />
-              <div v-if="editUploading" class="uploading">
-                Uploading... {{ editUploadProgress }}%
-              </div>
-              <div v-if="editFilePreview" class="image-preview">
-                <img :src="editFilePreview" alt="Preview" />
-              </div>
-              <img
-                v-else-if="editModel.image_url"
-                :src="editModel.image_url"
-                class="preview"
-                alt="Current"
-              />
-            </div>
-
-            <div class="field">
-              <label>Button Text</label>
-              <input v-model.trim="editModel.button_text" />
-            </div>
-
-            <div class="field">
-              <label>Button Link</label>
-              <input v-model.trim="editModel.button_link" />
-            </div>
-          </div>
-
-          <div class="actions">
-            <button type="submit" class="btn-primary">Save</button>
-            <button type="button" class="btn-ghost" @click="closeEdit">Cancel</button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- 🟣 Empty state -->
+    <div v-else class="banner-loading"></div>
   </div>
 </template>
 
 <script setup>
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import axios from "axios";
-import { ref, onMounted } from "vue";
 
 const API_BASE =
   window.location.hostname === "localhost"
-    ? "http://localhost:5000"
+    ? "http://localhost:5000" // ✅ /api double bug fixed
     : "https://urbilux-backend.onrender.com";
 
 const banners = ref([]);
-const loading = ref(false);
+const current = ref(0);
+const timer = ref(null);
+const isDesktop = ref(false);
+const sliderRef = ref(null);
 
-// ---------- Add ----------
-const newBanner = ref({ title: "", button_text: "", button_link: "" });
-const newBannerFile = ref(null);
-const newBannerFilePreview = ref(null);
-const uploading = ref(false);
-const uploadProgress = ref(0);
+const currentKey = computed(
+  () =>
+    (banners.value[current.value]?.id ?? current.value) + ":" + current.value
+);
 
-function onBannerFileChange(e) {
-  newBannerFile.value = e.target.files[0];
-  newBannerFilePreview.value = newBannerFile.value
-    ? URL.createObjectURL(newBannerFile.value)
-    : null;
-}
+// 👉 Right side 2 banner (always current+1, current+2)
+const side1 = computed(() => {
+  if (banners.value.length <= 1) return null;
+  return banners.value[(current.value + 1) % banners.value.length];
+});
 
-function resetForm() {
-  newBanner.value = { title: "", button_text: "", button_link: "" };
-  newBannerFile.value = null;
-  newBannerFilePreview.value = null;
-  uploadProgress.value = 0;
-}
+const side2 = computed(() => {
+  if (banners.value.length <= 2) return null;
+  return banners.value[(current.value + 2) % banners.value.length];
+});
 
 async function fetchBanners() {
-  loading.value = true;
   try {
     const res = await axios.get(`${API_BASE}/api/banners`);
     banners.value = res.data;
-  } catch (err) {
-    console.error("❌ Fetch banners error:", err);
-  } finally {
-    loading.value = false;
+  } catch (e) {
+    console.error("Banner load error:", e);
   }
 }
 
-async function addBanner() {
-  if (!newBannerFile.value) return alert("Please select an image");
+function next() {
+  if (!banners.value.length) return;
+  current.value = (current.value + 1) % banners.value.length;
+  softPreload(current.value + 1);
+}
+function prev() {
+  if (!banners.value.length) return;
+  current.value =
+    (current.value - 1 + banners.value.length) % banners.value.length;
+  softPreload(current.value - 1);
+}
+function go(i) {
+  if (!banners.value.length) return;
+  current.value = i;
+  softPreload(i + 1);
+}
 
-  const formData = new FormData();
-  formData.append("image", newBannerFile.value);
-  formData.append("title", newBanner.value.title);
-  formData.append("button_text", newBanner.value.button_text);
-  formData.append("button_link", newBanner.value.button_link);
+function start() {
+  stop();
+  if (banners.value.length > 1) {
+    timer.value = setInterval(next, 4500);
+  }
+}
+function stop() {
+  if (timer.value) clearInterval(timer.value);
+  timer.value = null;
+}
+function pause() {
+  stop();
+}
+function resume() {
+  start();
+}
 
-  try {
-    uploading.value = true;
-    await axios.post(`${API_BASE}/api/banners`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: (e) => {
-        uploadProgress.value = Math.round((e.loaded * 100) / e.total);
-      },
-    });
-    resetForm();
-    fetchBanners();
-  } catch (err) {
-    console.error("❌ Add banner error:", err);
-  } finally {
-    uploading.value = false;
+function softPreload(idx) {
+  if (!banners.value.length) return;
+  const nextIndex = (idx + banners.value.length) % banners.value.length;
+  const url = banners.value[nextIndex]?.image_url;
+  if (url) {
+    const img = new Image();
+    img.src = url;
   }
 }
 
-async function deleteBanner(id) {
-  if (!confirm("Delete this banner?")) return;
-  try {
-    await axios.delete(`${API_BASE}/api/banners/${id}`);
-    fetchBanners();
-  } catch (err) {
-    console.error("❌ Delete banner error:", err);
+function onLoaded() {}
+
+let startX = 0;
+let touchActive = false;
+function onTouchStart(e) {
+  touchActive = true;
+  startX = e.touches[0].clientX;
+}
+function onTouchEnd(e) {
+  if (!touchActive) return;
+  const dx = e.changedTouches[0].clientX - startX;
+  if (dx > 50) prev();
+  else if (dx < -50) next();
+  touchActive = false;
+}
+function updateDesktopFlag() {
+  isDesktop.value = window.matchMedia("(min-width: 1024px)").matches;
+}
+
+onMounted(async () => {
+  updateDesktopFlag();
+  window.addEventListener("resize", updateDesktopFlag);
+  await fetchBanners();
+  start();
+
+  const el = sliderRef.value;
+  if (el) {
+    el.addEventListener("touchstart", onTouchStart, { passive: true });
+    el.addEventListener("touchend", onTouchEnd, { passive: true });
   }
-}
-
-// ---------- Edit ----------
-const editing = ref(false);
-const editModel = ref({});
-const editFile = ref(null);
-const editFilePreview = ref(null);
-const editUploading = ref(false);
-const editUploadProgress = ref(0);
-
-function openEdit(b) {
-  editModel.value = { ...b };
-  editing.value = true;
-}
-function closeEdit() {
-  editing.value = false;
-  editFile.value = null;
-  editFilePreview.value = null;
-  editUploadProgress.value = 0;
-}
-function onEditBannerFileChange(e) {
-  editFile.value = e.target.files[0];
-  editFilePreview.value = editFile.value
-    ? URL.createObjectURL(editFile.value)
-    : null;
-}
-
-async function updateBanner() {
-  const formData = new FormData();
-  if (editFile.value) formData.append("image", editFile.value);
-  formData.append("title", editModel.value.title);
-  formData.append("button_text", editModel.value.button_text);
-  formData.append("button_link", editModel.value.button_link);
-
-  try {
-    editUploading.value = true;
-    await axios.put(`${API_BASE}/api/banners/${editModel.value.id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: (e) => {
-        editUploadProgress.value = Math.round((e.loaded * 100) / e.total);
-      },
-    });
-    closeEdit();
-    fetchBanners();
-  } catch (err) {
-    console.error("❌ Update banner error:", err);
-  } finally {
-    editUploading.value = false;
+});
+onUnmounted(() => {
+  stop();
+  window.removeEventListener("resize", updateDesktopFlag);
+  const el = sliderRef.value;
+  if (el) {
+    el.removeEventListener("touchstart", onTouchStart);
+    el.removeEventListener("touchend", onTouchEnd);
   }
-}
-
-onMounted(fetchBanners);
+});
 </script>
 
 
-
 <style scoped>
-.banner-manager {
-  max-width: 1100px;
+.banner-slider {
+  width: 100%;
   margin: 0 auto;
-  padding: 20px 16px 60px;
-  overflow: hidden;
-}
-.newBannerFilePreview{
-  overflow: hidden;
-  height: 200px;
-  width: 200px;
-}
-.page-title {
-  font-size: 28px;
-  font-weight: 800;
-  text-align: center;
-  margin-bottom: 18px;
-  background: linear-gradient(90deg, #4a00e0, #8e2de2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
-/* Card Layouts */
-.card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
-  padding: 18px;
-  margin-bottom: 20px;
-}
-.card-title {
-  font-weight: 700;
-  font-size: 18px;
-  margin-bottom: 14px;
-}
-
-/* Grid Layout */
-.grid {
+/* 2-column grid: big left, 2 small right */
+.banner-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: 2.1fr 1fr;
+  gap: 16px;
+  align-items: stretch;
 }
-.col-span-2 {
-  grid-column: span 2;
+
+/* LEFT MAIN */
+.main-banner {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f3f3;
 }
-@media (max-width: 768px) {
-  .grid {
+
+.slide {
+  width: 100%;
+  height: 100%;
+}
+
+.img-main {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+/* CTA on main banner */
+.cta {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+}
+.cta-btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: #ff6b00;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+/* Dots */
+.dots {
+  position: absolute;
+  bottom: 18px;
+  right: 22px;
+  display: flex;
+  gap: 6px;
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid #fff;
+  background: rgba(0, 0, 0, 0.15);
+}
+.dot.active {
+  background: #ff6b00;
+}
+
+/* Arrows */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(0, 0, 0, 0.25);
+  color: #fff;
+  width: 28px;
+  height: 48px;
+  cursor: pointer;
+}
+.arrow.left {
+  left: 0;
+  border-radius: 0 4px 4px 0;
+}
+.arrow.right {
+  right: 0;
+  border-radius: 4px 0 0 4px;
+}
+
+/* RIGHT COLUMN 2 SMALL */
+.side-banners {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.side-item {
+  flex: 1;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #f3f3f3;
+}
+
+.side-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.img-side {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Mobile / tablet: শুধু main banner দেখাও */
+@media (max-width: 1023px) {
+  .banner-grid {
     grid-template-columns: 1fr;
   }
-  .col-span-2 {
-    grid-column: auto;
+  .side-banners {
+    display: none;
   }
-}
-
-/* Inputs */
-.field label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 6px;
-}
-.field input {
-  width: 100%;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 10px 12px;
-  outline: none;
-  transition: border 0.2s, box-shadow 0.2s;
-}
-.field input:focus {
-  border-color: #7b61ff;
-  box-shadow: 0 0 0 3px rgba(123, 97, 255, 0.15);
-}
-.req {
-  color: #ff4d4f;
-}
-.hint {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 4px;
-}
-
-/* Preview */
-.preview {
-  margin-top: 10px;
-  width: 100%;
-  max-height: 220px;
-  object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid #eee;
-}
-.uploading {
-  font-size: 14px;
-  color: #8e2de2;
-  font-weight: 600;
-  margin-top: 8px;
-}
-
-/* Buttons */
-.actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-  flex-wrap: wrap;
-}
-.btn-primary {
-  background: linear-gradient(90deg, #4a00e0, #8e2de2);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 700;
-  cursor: pointer;
-}
-.btn-ghost {
-  background: #f5f5f7;
-  border: 1px solid #eee;
-  border-radius: 12px;
-  padding: 10px 16px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-small {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-weight: 600;
-  cursor: pointer;
-}
-.btn-danger {
-  background: #ff4d4f;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 12px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-/* List */
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-.items {
-  display: grid;
-  gap: 12px;
-}
-.item {
-  display: grid;
-  grid-template-columns: 140px 1fr auto;
-  align-items: center;
-  gap: 14px;
-  padding: 12px;
-  border: 1px solid #eee;
-  border-radius: 14px;
-}
-.thumb {
-  width: 100%;
-  height: 84px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-.meta .title-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-.meta .title {
-  font-weight: 700;
-}
-.meta .id {
-  font-size: 12px;
-  color: #9ca3af;
-}
-.meta .sub {
-  font-size: 13px;
-  color: #4b5563;
-}
-.meta .link {
-  color: #7b61ff;
-  margin-left: 4px;
-}
-
-/* Empty */
-.empty {
-  padding: 20px;
-  text-align: center;
-  color: #6b7280;
-}
-
-/* Skeleton */
-.skeleton {
-  height: 110px;
-  background: linear-gradient(90deg, #f2f2f2 25%, #eaeaea 37%, #f2f2f2 63%);
-  background-size: 400% 100%;
-  border-radius: 14px;
-  animation: shimmer 1.4s ease infinite;
-}
-@keyframes shimmer {
-  0% {
-    background-position: 100% 0;
-  }
-  100% {
-    background-position: -100% 0;
-  }
-}
-
-/* Modal */
-.modal-mask {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.35);
-  display: grid;
-  place-items: center;
-  padding: 14px;
-  z-index: 50;
-}
-.modal {
-  width: 100%;
-  max-width: 720px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.18);
-}
-.modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 16px;
-  border-bottom: 1px solid #f1f1f1;
-}
-.modal-header h3 {
-  font-weight: 800;
-  background: linear-gradient(90deg, #4a00e0, #8e2de2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-.modal .x {
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
-  cursor: pointer;
-}
-.modal-body {
-  padding: 14px 16px 18px;
 }
 </style>
