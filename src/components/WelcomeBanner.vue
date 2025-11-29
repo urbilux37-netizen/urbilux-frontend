@@ -517,6 +517,7 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   color: #ffffff;
   font-weight: 600;
+  z-index: 10000;
   font-size: 15px;
   text-decoration: none;
   box-shadow: 0 10px 25px rgba(67, 56, 202, 0.45);
