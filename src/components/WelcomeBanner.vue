@@ -8,8 +8,11 @@
     @keydown.right.prevent="next"
     tabindex="0"
   >
-    <!-- 🟣 GRID: Left big slider + right 2 small -->
-    <div class="banner-grid" v-if="mainBanners.length || sideTop || sideBottom">
+    <!-- GRID: Left big + right 2 small -->
+    <div
+      class="banner-grid"
+      v-if="mainBanners.length || sideTopCurrent || sideBottomCurrent"
+    >
       <!-- ========== LEFT: MAIN SLIDER (slot = main) ========== -->
       <div class="main-banner" v-if="mainBanners.length">
         <transition name="fade" mode="out-in">
@@ -22,9 +25,9 @@
               @load="onLoaded"
             />
 
-            <!-- ✅ Smart CTA on main banner -->
+            <!-- Main CTA -->
             <div v-if="mainBanners[current]?.button_text" class="cta">
-              <!-- 🌐 External link -->
+              <!-- External -->
               <a
                 v-if="mainBanners[current]?.button_link?.startsWith('http')"
                 class="cta-btn"
@@ -35,7 +38,7 @@
                 {{ mainBanners[current]?.button_text }}
               </a>
 
-              <!-- 🔗 Internal route -->
+              <!-- Internal -->
               <router-link
                 v-else
                 class="cta-btn"
@@ -47,7 +50,7 @@
           </div>
         </transition>
 
-        <!-- ⚪ Dots (only on desktop, bottom of main banner) -->
+        <!-- Dots -->
         <div class="dots" v-if="isDesktop && mainBanners.length > 1">
           <button
             v-for="(b, i) in mainBanners"
@@ -55,16 +58,14 @@
             class="dot"
             :class="{ active: i === current }"
             @click="go(i)"
-            :aria-label="`Go to slide ${i + 1}`"
           />
         </div>
 
-        <!-- ⬅️➡️ Arrows -->
+        <!-- Arrows -->
         <button
           v-if="isDesktop && mainBanners.length > 1"
           class="arrow left"
           @click="prev"
-          aria-label="Previous"
         >
           ‹
         </button>
@@ -73,55 +74,96 @@
           v-if="isDesktop && mainBanners.length > 1"
           class="arrow right"
           @click="next"
-          aria-label="Next"
         >
           ›
         </button>
       </div>
 
-      <!-- ========== RIGHT: 2 SMALL BANNERS (slot = side_top / side_bottom) ========== -->
+      <!-- ========== RIGHT: 2 SMALL SLIDERS ========== -->
       <div class="side-banners" v-if="isDesktop">
-        <!-- TOP small banner -->
-        <div class="side-item" v-if="sideTop">
+        <!-- TOP small (slot = side_top) -->
+        <div class="side-item" v-if="sideTopCurrent">
           <component
-            :is="sideTop.button_link ? (sideTop.button_link.startsWith('http') ? 'a' : 'router-link') : 'div'"
+            :is="
+              sideTopCurrent.button_link
+                ? sideTopCurrent.button_link.startsWith('http')
+                  ? 'a'
+                  : 'router-link'
+                : 'div'
+            "
             class="side-link"
-            :href="sideTop.button_link?.startsWith('http') ? sideTop.button_link : undefined"
-            :to="!sideTop.button_link || sideTop.button_link.startsWith('http') ? undefined : sideTop.button_link"
+            :href="
+              sideTopCurrent.button_link?.startsWith('http')
+                ? sideTopCurrent.button_link
+                : undefined
+            "
+            :to="
+              !sideTopCurrent.button_link ||
+              sideTopCurrent.button_link.startsWith('http')
+                ? undefined
+                : sideTopCurrent.button_link
+            "
             target="_blank"
             rel="noopener"
           >
             <img
-              :src="sideTop.image_url"
-              :alt="sideTop.title || 'Banner'"
+              :src="sideTopCurrent.image_url"
+              :alt="sideTopCurrent.title || 'Banner'"
               class="img-side"
               loading="lazy"
             />
+            <div
+              v-if="sideTopCurrent.button_text"
+              class="side-cta"
+            >
+              {{ sideTopCurrent.button_text }}
+            </div>
           </component>
         </div>
 
-        <!-- BOTTOM small banner -->
-        <div class="side-item" v-if="sideBottom">
+        <!-- BOTTOM small (slot = side_bottom) -->
+        <div class="side-item" v-if="sideBottomCurrent">
           <component
-            :is="sideBottom.button_link ? (sideBottom.button_link.startsWith('http') ? 'a' : 'router-link') : 'div'"
+            :is="
+              sideBottomCurrent.button_link
+                ? sideBottomCurrent.button_link.startsWith('http')
+                  ? 'a'
+                  : 'router-link'
+                : 'div'
+            "
             class="side-link"
-            :href="sideBottom.button_link?.startsWith('http') ? sideBottom.button_link : undefined"
-            :to="!sideBottom.button_link || sideBottom.button_link.startsWith('http') ? undefined : sideBottom.button_link"
+            :href="
+              sideBottomCurrent.button_link?.startsWith('http')
+                ? sideBottomCurrent.button_link
+                : undefined
+            "
+            :to="
+              !sideBottomCurrent.button_link ||
+              sideBottomCurrent.button_link.startsWith('http')
+                ? undefined
+                : sideBottomCurrent.button_link
+            "
             target="_blank"
             rel="noopener"
           >
             <img
-              :src="sideBottom.image_url"
-              :alt="sideBottom.title || 'Banner'"
+              :src="sideBottomCurrent.image_url"
+              :alt="sideBottomCurrent.title || 'Banner'"
               class="img-side"
               loading="lazy"
             />
+            <div
+              v-if="sideBottomCurrent.button_text"
+              class="side-cta"
+            >
+              {{ sideBottomCurrent.button_text }}
+            </div>
           </component>
         </div>
       </div>
     </div>
 
-    <!-- 🟣 Empty state -->
+    <!-- Empty state -->
     <div v-else class="banner-loading"></div>
   </div>
 </template>
@@ -136,23 +178,37 @@ const API_BASE =
     : "https://urbilux-backend.onrender.com";
 
 const banners = ref([]);
-const current = ref(0);
+
+const current = ref(0); // main
+const sideTopIndex = ref(0);
+const sideBottomIndex = ref(0);
+
 const timer = ref(null);
 const isDesktop = ref(false);
 const sliderRef = ref(null);
 
-// 🔹 Main big slider banners (slot = main)
+// ---- Filtered lists by slot ----
 const mainBanners = computed(() =>
   banners.value.filter((b) => b.slot === "main")
 );
+const sideTopList = computed(() =>
+  banners.value.filter((b) => b.slot === "side_top")
+);
+const sideBottomList = computed(() =>
+  banners.value.filter((b) => b.slot === "side_bottom")
+);
 
-// 🔹 Right top + bottom (single each)
-const sideTop = computed(
-  () => banners.value.find((b) => b.slot === "side_top") || null
-);
-const sideBottom = computed(
-  () => banners.value.find((b) => b.slot === "side_bottom") || null
-);
+// Current items for each side
+const sideTopCurrent = computed(() => {
+  if (!sideTopList.value.length) return null;
+  return sideTopList.value[sideTopIndex.value % sideTopList.value.length];
+});
+const sideBottomCurrent = computed(() => {
+  if (!sideBottomList.value.length) return null;
+  return sideBottomList.value[
+    sideBottomIndex.value % sideBottomList.value.length
+  ];
+});
 
 const currentKey = computed(
   () =>
@@ -169,16 +225,39 @@ async function fetchBanners() {
 }
 
 function next() {
-  if (!mainBanners.value.length) return;
-  current.value = (current.value + 1) % mainBanners.value.length;
-  softPreload(current.value + 1);
+  if (mainBanners.value.length) {
+    current.value = (current.value + 1) % mainBanners.value.length;
+    softPreload(current.value + 1);
+  }
+  if (sideTopList.value.length > 1) {
+    sideTopIndex.value =
+      (sideTopIndex.value + 1) % sideTopList.value.length;
+  }
+  if (sideBottomList.value.length > 1) {
+    sideBottomIndex.value =
+      (sideBottomIndex.value + 1) % sideBottomList.value.length;
+  }
 }
+
 function prev() {
-  if (!mainBanners.value.length) return;
-  current.value =
-    (current.value - 1 + mainBanners.value.length) % mainBanners.value.length;
-  softPreload(current.value - 1);
+  if (mainBanners.value.length) {
+    current.value =
+      (current.value - 1 + mainBanners.value.length) %
+      mainBanners.value.length;
+    softPreload(current.value - 1);
+  }
+  if (sideTopList.value.length > 1) {
+    sideTopIndex.value =
+      (sideTopIndex.value - 1 + sideTopList.value.length) %
+      sideTopList.value.length;
+  }
+  if (sideBottomList.value.length > 1) {
+    sideBottomIndex.value =
+      (sideBottomIndex.value - 1 + sideBottomList.value.length) %
+      sideBottomList.value.length;
+  }
 }
+
 function go(i) {
   if (!mainBanners.value.length) return;
   current.value = i;
@@ -187,7 +266,12 @@ function go(i) {
 
 function start() {
   stop();
-  if (mainBanners.value.length > 1) {
+  // jodi kono ekta place e multiple banner thake tahole auto slide
+  if (
+    mainBanners.value.length > 1 ||
+    sideTopList.value.length > 1 ||
+    sideBottomList.value.length > 1
+  ) {
     timer.value = setInterval(next, 4500);
   }
 }
@@ -356,6 +440,7 @@ onUnmounted(() => {
   border-radius: 10px;
   overflow: hidden;
   background: #f3f3f3;
+  position: relative;
 }
 
 .side-link {
@@ -369,6 +454,19 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   display: block;
+}
+
+/* side CTA label */
+.side-cta {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
 }
 
 /* Mobile / tablet: শুধু main banner দেখাও */
