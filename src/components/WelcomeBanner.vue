@@ -624,7 +624,7 @@ onUnmounted(() => {
   font-size: 12px;
   font-weight: 500;
   box-shadow: 0 8px 18px rgba(67, 56, 202, 0.4);
-  z-index: 10;
+  z-index: 1000;
 }
 
 /* side dots */
