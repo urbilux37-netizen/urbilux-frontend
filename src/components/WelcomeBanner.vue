@@ -502,7 +502,7 @@ onUnmounted(() => {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 24px;
+  bottom: 70px;
   pointer-events: none;
   z-index: 10;
 }
@@ -615,7 +615,7 @@ onUnmounted(() => {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 10px;
+  bottom: 70px;
   padding: 6px 14px;
   border-radius: 999px;
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
