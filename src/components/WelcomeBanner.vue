@@ -4,15 +4,13 @@
     ref="sliderRef"
     @mouseenter="pauseAll"
     @mouseleave="resumeAll"
-    @keydown.left.prevent="mainPrev"
-    @keydown.right.prevent="mainNext"
     tabindex="0"
   >
     <div
       class="banner-grid"
       v-if="mainCurrent || sideTopCurrent || sideBottomCurrent"
     >
-      <!-- ================= LEFT: MAIN (slot = main) ================= -->
+      <!-- ========== LEFT: MAIN ========== -->
       <div class="main-banner" v-if="mainCurrent">
         <transition name="fade" mode="out-in">
           <div class="slide" :key="mainKey">
@@ -21,23 +19,21 @@
               :alt="mainCurrent.title || 'Banner'"
               class="img-main"
               loading="eager"
-              @load="onLoaded"
             />
 
-            <!-- ⭐ Main CTA – bottom center, only if text -->
-            <div v-if="showMainCTA" class="cta">
-              <!-- External -->
+            <!-- CTA only if text exists -->
+            <div v-if="mainCurrent.button_text" class="cta">
+              <!-- external -->
               <a
-                v-if="mainCurrent.button_link?.startsWith('http')"
+                v-if="isExternal(mainCurrent.button_link)"
                 class="cta-btn"
-                :href="mainCurrent.button_link || '#'"
+                :href="mainCurrent.button_link"
                 target="_blank"
                 rel="noopener"
               >
                 {{ mainCurrent.button_text }}
               </a>
-
-              <!-- Internal / no-link fallback -->
+              <!-- internal -->
               <router-link
                 v-else
                 class="cta-btn"
@@ -49,10 +45,10 @@
           </div>
         </transition>
 
-        <!-- Dots for main (PC only) -->
-        <div class="dots" v-if="isDesktop && mainBanners.length > 1">
+        <!-- dots (desktop) -->
+        <div class="dots" v-if="isDesktop && mainList.length > 1">
           <button
-            v-for="(b, i) in mainBanners"
+            v-for="(b, i) in mainList"
             :key="b.id ?? i"
             class="dot"
             :class="{ active: i === mainIndex }"
@@ -60,17 +56,16 @@
           />
         </div>
 
-        <!-- Arrows for main (PC only) -->
+        <!-- arrows (desktop) -->
         <button
-          v-if="isDesktop && mainBanners.length > 1"
+          v-if="isDesktop && mainList.length > 1"
           class="arrow left"
           @click="mainPrev"
         >
           ‹
         </button>
-
         <button
-          v-if="isDesktop && mainBanners.length > 1"
+          v-if="isDesktop && mainList.length > 1"
           class="arrow right"
           @click="mainNext"
         >
@@ -78,33 +73,18 @@
         </button>
       </div>
 
-      <!-- ================= RIGHT: 2 SMALL (side_top & side_bottom) ================= -->
+      <!-- ========== RIGHT: TWO SMALL ========== -->
       <div class="side-banners">
-        <!-- ---------- TOP (slot = side_top) ---------- -->
+        <!-- TOP -->
         <div class="side-item" v-if="sideTopCurrent">
           <div class="side-inner">
             <transition name="fade" mode="out-in">
               <component
                 :key="sideTopKey"
-                :is="
-                  sideTopCurrent.button_link
-                    ? sideTopCurrent.button_link.startsWith('http')
-                      ? 'a'
-                      : 'router-link'
-                    : 'div'
-                "
+                :is="linkTag(sideTopCurrent.button_link)"
                 class="side-link"
-                :href="
-                  sideTopCurrent.button_link?.startsWith('http')
-                    ? sideTopCurrent.button_link
-                    : undefined
-                "
-                :to="
-                  !sideTopCurrent.button_link ||
-                  sideTopCurrent.button_link.startsWith('http')
-                    ? undefined
-                    : sideTopCurrent.button_link
-                "
+                :href="hrefValue(sideTopCurrent.button_link)"
+                :to="toValue(sideTopCurrent.button_link)"
                 target="_blank"
                 rel="noopener"
               >
@@ -114,15 +94,15 @@
                   class="img-side"
                   loading="lazy"
                 />
-
-                <!-- ⭐ CTA – bottom center -->
-                <div v-if="showSideTopCTA" class="side-cta">
+                <div
+                  v-if="sideTopCurrent.button_text"
+                  class="side-cta"
+                >
                   {{ sideTopCurrent.button_text }}
                 </div>
               </component>
             </transition>
 
-            <!-- dots + arrows (PC only) -->
             <div
               class="side-dots"
               v-if="isDesktop && sideTopList.length > 1"
@@ -153,31 +133,16 @@
           </div>
         </div>
 
-        <!-- ---------- BOTTOM (slot = side_bottom) ---------- -->
+        <!-- BOTTOM -->
         <div class="side-item" v-if="sideBottomCurrent">
           <div class="side-inner">
             <transition name="fade" mode="out-in">
               <component
                 :key="sideBottomKey"
-                :is="
-                  sideBottomCurrent.button_link
-                    ? sideBottomCurrent.button_link.startsWith('http')
-                      ? 'a'
-                      : 'router-link'
-                    : 'div'
-                "
+                :is="linkTag(sideBottomCurrent.button_link)"
                 class="side-link"
-                :href="
-                  sideBottomCurrent.button_link?.startsWith('http')
-                    ? sideBottomCurrent.button_link
-                    : undefined
-                "
-                :to="
-                  !sideBottomCurrent.button_link ||
-                  sideBottomCurrent.button_link.startsWith('http')
-                    ? undefined
-                    : sideBottomCurrent.button_link
-                "
+                :href="hrefValue(sideBottomCurrent.button_link)"
+                :to="toValue(sideBottomCurrent.button_link)"
                 target="_blank"
                 rel="noopener"
               >
@@ -187,9 +152,10 @@
                   class="img-side"
                   loading="lazy"
                 />
-
-                <!-- ⭐ CTA – bottom center -->
-                <div v-if="showSideBottomCTA" class="side-cta">
+                <div
+                  v-if="sideBottomCurrent.button_text"
+                  class="side-cta"
+                >
                   {{ sideBottomCurrent.button_text }}
                 </div>
               </component>
@@ -227,7 +193,6 @@
       </div>
     </div>
 
-    <!-- Empty state -->
     <div v-else class="banner-loading"></div>
   </div>
 </template>
@@ -254,8 +219,20 @@ const sideBottomTimer = ref(null);
 const isDesktop = ref(false);
 const sliderRef = ref(null);
 
-/* ---------- filter by slot ---------- */
-const mainBanners = computed(() =>
+/* ----- helpers for links ----- */
+const isExternal = (link) =>
+  !!link && /^https?:\/\//i.test(link);
+
+const linkTag = (link) => {
+  if (!link) return "div";
+  return isExternal(link) ? "a" : "router-link";
+};
+const hrefValue = (link) => (isExternal(link) ? link : undefined);
+const toValue = (link) =>
+  link && !isExternal(link) ? link : undefined;
+
+/* ----- slot lists ----- */
+const mainList = computed(() =>
   banners.value.filter((b) => b.slot === "main")
 );
 const sideTopList = computed(() =>
@@ -265,42 +242,24 @@ const sideBottomList = computed(() =>
   banners.value.filter((b) => b.slot === "side_bottom")
 );
 
-/* ---------- current items ---------- */
+/* ----- current banner per slot ----- */
 const mainCurrent = computed(() =>
-  mainBanners.value.length
-    ? mainBanners.value[mainIndex.value % mainBanners.value.length]
+  mainList.value.length
+    ? mainList.value[mainIndex.value % mainList.value.length]
     : null
 );
-
 const sideTopCurrent = computed(() =>
   sideTopList.value.length
     ? sideTopList.value[sideTopIndex.value % sideTopList.value.length]
     : null
 );
-
 const sideBottomCurrent = computed(() =>
   sideBottomList.value.length
     ? sideBottomList.value[sideBottomIndex.value % sideBottomList.value.length]
     : null
 );
 
-/* ---------- CTA visibility (ONLY text required) ---------- */
-const showMainCTA = computed(() => {
-  const b = mainCurrent.value;
-  return !!b?.button_text?.trim();
-});
-
-const showSideTopCTA = computed(() => {
-  const b = sideTopCurrent.value;
-  return !!b?.button_text?.trim();
-});
-
-const showSideBottomCTA = computed(() => {
-  const b = sideBottomCurrent.value;
-  return !!b?.button_text?.trim();
-});
-
-/* ---------- keys for transition ---------- */
+/* ----- keys for transition ----- */
 const mainKey = computed(
   () => (mainCurrent.value?.id ?? mainIndex.value) + ":main"
 );
@@ -311,34 +270,33 @@ const sideBottomKey = computed(
   () => (sideBottomCurrent.value?.id ?? sideBottomIndex.value) + ":bottom"
 );
 
-/* ---------- API ---------- */
+/* ----- API ----- */
 async function fetchBanners() {
   try {
     const res = await axios.get(`${API_BASE}/api/banners`);
-    banners.value = res.data;
-  } catch (e) {
-    console.error("Banner load error:", e);
+    banners.value = res.data || [];
+  } catch (err) {
+    console.error("Banner fetch error:", err);
   }
 }
 
-/* ===== main controls ===== */
+/* ----- main controls ----- */
 function mainNext() {
-  if (!mainBanners.value.length) return;
-  mainIndex.value = (mainIndex.value + 1) % mainBanners.value.length;
+  if (!mainList.value.length) return;
+  mainIndex.value = (mainIndex.value + 1) % mainList.value.length;
 }
 function mainPrev() {
-  if (!mainBanners.value.length) return;
+  if (!mainList.value.length) return;
   mainIndex.value =
-    (mainIndex.value - 1 + mainBanners.value.length) %
-    mainBanners.value.length;
+    (mainIndex.value - 1 + mainList.value.length) % mainList.value.length;
 }
 function mainGo(i) {
-  if (!mainBanners.value.length) return;
+  if (!mainList.value.length) return;
   mainIndex.value = i;
 }
 function startMainTimer() {
   clearMainTimer();
-  if (mainBanners.value.length > 1) {
+  if (mainList.value.length > 1) {
     mainTimer.value = setInterval(mainNext, 5000);
   }
 }
@@ -347,7 +305,7 @@ function clearMainTimer() {
   mainTimer.value = null;
 }
 
-/* ===== side top controls ===== */
+/* ----- side top controls ----- */
 function sideTopNext() {
   if (!sideTopList.value.length) return;
   sideTopIndex.value =
@@ -374,7 +332,7 @@ function clearSideTopTimer() {
   sideTopTimer.value = null;
 }
 
-/* ===== side bottom controls ===== */
+/* ----- side bottom controls ----- */
 function sideBottomNext() {
   if (!sideBottomList.value.length) return;
   sideBottomIndex.value =
@@ -401,7 +359,7 @@ function clearSideBottomTimer() {
   sideBottomTimer.value = null;
 }
 
-/* ===== global pause/resume ===== */
+/* ----- pause/resume ----- */
 function pauseAll() {
   clearMainTimer();
   clearSideTopTimer();
@@ -413,8 +371,10 @@ function resumeAll() {
   startSideBottomTimer();
 }
 
-/* ===== others (touch swipe only main) ===== */
-function onLoaded() {}
+/* ----- responsive / touch ----- */
+function updateDesktopFlag() {
+  isDesktop.value = window.matchMedia("(min-width: 1024px)").matches;
+}
 
 let startX = 0;
 let touchActive = false;
@@ -430,13 +390,10 @@ function onTouchEnd(e) {
   touchActive = false;
 }
 
-function updateDesktopFlag() {
-  isDesktop.value = window.matchMedia("(min-width: 1024px)").matches;
-}
-
 onMounted(async () => {
   updateDesktopFlag();
   window.addEventListener("resize", updateDesktopFlag);
+
   await fetchBanners();
   resumeAll();
 
@@ -458,14 +415,13 @@ onUnmounted(() => {
 });
 </script>
 
-
 <style scoped>
 .banner-slider {
   width: 100%;
   margin: 0 auto;
 }
 
-/* GRID: big left, 2 small right */
+/* Desktop grid */
 .banner-grid {
   display: grid;
   grid-template-columns: 2.1fr 1fr;
@@ -473,7 +429,7 @@ onUnmounted(() => {
   align-items: stretch;
 }
 
-/* ========== MAIN ========== */
+/* MAIN */
 .main-banner {
   position: relative;
   border-radius: 14px;
@@ -481,30 +437,34 @@ onUnmounted(() => {
   background: #ffffff;
 }
 
-.slide {
-  width: 100%;
-  height: 100%;
+/* fixed ratio using padding hack */
+.main-banner::before {
+  content: "";
+  display: block;
+  padding-top: 42%; /* ~1600x700 ratio */
 }
 
-/* full image, no crop/zoom */
+.slide {
+  position: absolute;
+  inset: 0;
+}
+
 .img-main {
   width: 100%;
   height: 100%;
+  object-fit: cover;
   display: block;
-  object-fit: contain;
-  background: #ffffff;
 }
 
-/* Main CTA – bottom center */
+/* main CTA */
 .cta {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 70px;
+  bottom: 24px;
   pointer-events: none;
   z-index: 10;
 }
-
 .cta-btn {
   pointer-events: auto;
   display: inline-flex;
@@ -515,7 +475,6 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   color: #ffffff;
   font-weight: 600;
-  z-index: 10000;
   font-size: 15px;
   text-decoration: none;
   box-shadow: 0 10px 25px rgba(67, 56, 202, 0.45);
@@ -527,19 +486,19 @@ onUnmounted(() => {
   opacity: 0.96;
 }
 
-/* Dots for main */
+/* main dots & arrows */
 .dots {
   position: absolute;
   bottom: 18px;
   right: 22px;
   display: flex;
   gap: 6px;
-  z-index: 5;
+  z-index: 6;
 }
 .dot {
   width: 9px;
   height: 9px;
-  border-radius: 50%;
+  border-radius: 999px;
   border: 1px solid #ffffff;
   background: rgba(0, 0, 0, 0.25);
   cursor: pointer;
@@ -547,8 +506,6 @@ onUnmounted(() => {
 .dot.active {
   background: #f97316;
 }
-
-/* Arrows for main */
 .arrow {
   position: absolute;
   top: 50%;
@@ -562,7 +519,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5;
+  z-index: 6;
 }
 .arrow.left {
   left: 0;
@@ -573,48 +530,45 @@ onUnmounted(() => {
   border-radius: 6px 0 0 6px;
 }
 
-/* ========== RIGHT (2 small) ========== */
+/* SIDE */
 .side-banners {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
-
 .side-item {
-  flex: 1;
+  position: relative;
   border-radius: 14px;
   overflow: hidden;
   background: #ffffff;
-  position: relative;
 }
-
+.side-item::before {
+  content: "";
+  display: block;
+  padding-top: 48%; /* little more height for side banners */
+}
 .side-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 }
-
 .side-link {
   display: block;
   width: 100%;
   height: 100%;
 }
-
-/* full image, no crop/zoom */
 .img-side {
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  background: #ffffff;
+  object-fit: cover;
   display: block;
 }
 
-/* Side CTA chip – bottom center */
+/* side CTA */
 .side-cta {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-  bottom: 70px;
+  bottom: 14px;
   padding: 6px 14px;
   border-radius: 999px;
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
@@ -622,22 +576,22 @@ onUnmounted(() => {
   font-size: 12px;
   font-weight: 500;
   box-shadow: 0 8px 18px rgba(67, 56, 202, 0.4);
-  z-index: 1000;
+  z-index: 10;
 }
 
-/* side dots */
+/* side dots / arrows */
 .side-dots {
   position: absolute;
-  bottom: 8px;
+  bottom: 10px;
   right: 10px;
   display: flex;
   gap: 4px;
-  z-index: 6;
+  z-index: 7;
 }
 .side-dot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: 999px;
   border: 1px solid #e5e7eb;
   background: rgba(0, 0, 0, 0.25);
   cursor: pointer;
@@ -645,8 +599,6 @@ onUnmounted(() => {
 .side-dot.active {
   background: #f97316;
 }
-
-/* side arrows */
 .side-arrow {
   position: absolute;
   top: 50%;
@@ -658,7 +610,7 @@ onUnmounted(() => {
   height: 40px;
   cursor: pointer;
   font-size: 14px;
-  z-index: 6;
+  z-index: 7;
 }
 .side-left {
   left: 0;
@@ -669,7 +621,7 @@ onUnmounted(() => {
   border-radius: 6px 0 0 6px;
 }
 
-/* Fade transition */
+/* fade transition */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.4s ease;
@@ -679,40 +631,25 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* ========== Responsive ========== */
+/* RESPONSIVE */
 @media (max-width: 1023px) {
   .banner-grid {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-
-  /* main top, side নিচে side-by-side */
   .side-banners {
     flex-direction: row;
     gap: 10px;
-    margin-top: 4px;
+  }
+  .side-item::before {
+    padding-top: 60%;
   }
 
-  .side-item {
-    height: 150px;
-  }
-
-  /* phone e arrow/dots নাই */
   .arrow,
   .side-arrow,
   .dots,
   .side-dots {
-    display: none;
-  }
-
-  .cta {
-    bottom: 18px;
-  }
-}
-
-@media (max-width: 480px) {
-  .side-item {
-    height: 140px;
+    display: none; /* mobile e arrow/dot off, swipe on main only */
   }
 }
 </style>
