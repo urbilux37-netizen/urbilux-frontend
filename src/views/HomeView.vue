@@ -217,149 +217,260 @@ const fetchProducts = async () => {
 onMounted(fetchProducts);
 </script>
 
-
 <style scoped>
-@import "../views/home.css";
-.banner-wrapper {
+.banner-slider {
   width: 100%;
-  margin-bottom: 30px;
-}
-.wlcbanner{
-  padding-top: 0px;
-  margin-top: 72px;
-  max-height: 100%;
+  margin: 0 auto;
 }
 
-/* ===== Base Section ===== */
-/* ===== Section Wrapper ===== */
-.service-section {
-  width: 100%;
-  background: white;
-  padding: 4rem 2rem;
-  text-align: center;
-}
-
-/* ===== Cards Layout ===== */
-.cards-container {
-  display: flex;
-  justify-content: center;
+/* GRID: big left, 2 small right */
+.banner-grid {
+  display: grid;
+  grid-template-columns: 2.1fr 1fr;
+  gap: 16px;
   align-items: stretch;
-  gap: 2rem;
-  flex-wrap: wrap;
 }
 
-/* ===== Each Card ===== */
-.card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(74, 0, 224, 0.08);
-  padding: 2rem 1rem;
-  width: 320px;
-  transition: 0.3s ease;
+/* LEFT MAIN */
+.main-banner {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
 }
 
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 6px 20px rgba(142, 45, 226, 0.25);
+.slide {
+  width: 100%;
+  height: 100%;
 }
 
-/* ===== Icon ===== */
-.icon {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 1rem;
-  filter: drop-shadow(0 0 6px rgba(142, 45, 226, 0.4));
-  transition: 0.3s;
+/* 🔁 No crop/zoom – full image dekhao */
+.img-main {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;
+  background: #ffffff;
 }
 
-.card:hover .icon {
-  transform: scale(1.05);
+/* ⭐ Main center CTA – nicher dike, upar e layer e */
+.cta {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 26px;
+  pointer-events: none;
+  z-index: 10; /* important */
 }
 
-/* ===== Text ===== */
-.card-title {
-  font-size: 1.3rem;
+.cta-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
   font-weight: 600;
-  color: #000;
-  margin-bottom: 0.6rem;
-  font-family: "Georgia", serif;
+  font-size: 15px;
+  text-decoration: none;
+  box-shadow: 0 10px 25px rgba(67, 56, 202, 0.45);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.cta-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 30px rgba(67, 56, 202, 0.6);
+  opacity: 0.96;
 }
 
-.card-text {
-  font-size: 1rem;
-  color: #444;
-  line-height: 1.5;
+/* Dots for main */
+.dots {
+  position: absolute;
+  bottom: 18px;
+  right: 22px;
+  display: flex;
+  gap: 6px;
+  z-index: 5;
+}
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid #ffffff;
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+.dot.active {
+  background: #f97316;
 }
 
-/* ===== Responsive ===== */
-/* ===== Responsive Adjustments ===== */
+/* Arrows for main */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(15, 23, 42, 0.35);
+  color: #fff;
+  width: 30px;
+  height: 52px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+.arrow.left {
+  left: 0;
+  border-radius: 0 6px 6px 0;
+}
+.arrow.right {
+  right: 0;
+  border-radius: 6px 0 0 6px;
+}
 
-/* Tablet */
-@media (max-width: 1024px) {
-  .cards-container {
-    gap: 0.7rem;
+/* RIGHT COLUMN 2 SMALL */
+.side-banners {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.side-item {
+  flex: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+  position: relative;
+}
+
+.side-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.side-link {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* 🔁 No crop/zoom for side */
+.img-side {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #ffffff;
+  display: block;
+}
+
+/* ⭐ Side CTA – purple chip, bottom center */
+.side-cta {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 10px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  box-shadow: 0 8px 18px rgba(67, 56, 202, 0.4);
+  z-index: 10; /* 🔥 bottom-er button ekdom upore */
+}
+
+/* side dots */
+.side-dots {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  display: flex;
+  gap: 4px;
+  z-index: 6;
+}
+.side-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid #e5e7eb;
+  background: rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+.side-dot.active {
+  background: #f97316;
+}
+
+/* side arrows */
+.side-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: rgba(15, 23, 42, 0.4);
+  color: #ffffff;
+  width: 24px;
+  height: 40px;
+  cursor: pointer;
+  font-size: 14px;
+  z-index: 6;
+}
+.side-left {
+  left: 0;
+  border-radius: 0 6px 6px 0;
+}
+.side-right {
+  right: 0;
+  border-radius: 6px 0 0 6px;
+}
+
+/* Fade transition */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+/* Mobile / tablet */
+@media (max-width: 1023px) {
+  .banner-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
-  .card {
-    max-width: 100px;
-    padding: 0.9rem 0.5rem;
+
+  /* main top, side নিচে side-by-side */
+  .side-banners {
+    flex-direction: row;
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .side-item {
+    height: 150px;
+  }
+
+  /* phone e arrow/dots নাই */
+  .arrow,
+  .side-arrow,
+  .dots,
+  .side-dots {
+    display: none;
+  }
+
+  .cta {
+    bottom: 18px;
   }
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .service-section {
-    padding: 1.8rem 0;
-  }
-
-  .cards-container {
-    gap: 0.6rem;
-    max-width: 340px; /* ✅ balances edge spacing */
-  }
-
-  .card {
-    max-width: 95px;
-    padding: 0.8rem 0.4rem;
-  }
-
-  .icon {
-    width: 30px;
-    height: 30px;
-  }
-
-  .card-title {
-    font-size: 0.8rem;
-  }
-
-  .card-text {
-    font-size: 0.65rem;
-  }
-}
-
-/* Very small phones */
+/* Extra small phones <=480px */
 @media (max-width: 480px) {
-  .cards-container {
-    gap: 0.5rem;
-    max-width: 310px; /* ✅ keeps perfect equal margin on both sides */
-  }
-
-  .card {
-    max-width: 90px;
-    padding: 0.7rem 0.4rem;
-  }
-
-  .icon {
-    width: 28px;
-    height: 28px;
-  }
-
-  .card-title {
-    font-size: 0.75rem;
-  }
-
-  .card-text {
-    font-size: 0.6rem;
+  .side-item {
+    height: 140px;
   }
 }
-
-
 </style>
