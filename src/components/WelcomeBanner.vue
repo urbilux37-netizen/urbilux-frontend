@@ -256,7 +256,7 @@ onUnmounted(() => {
 
 <style scoped>
 .banner-slider {
-  width: 80%;
+  width: 100%;
   margin: 0 auto;
 }
 
