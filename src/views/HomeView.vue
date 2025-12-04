@@ -54,6 +54,8 @@
           </div>
         </div>
       </section>
+<!-- 🟣 Top Categories (Component) -->
+<TopCategories :categories="categories" :placeholder="placeholder" />
 
 <!-- 🟣 Top Categories -->
 <div class="categories-section" v-if="categories.length">
@@ -134,6 +136,7 @@
 
 <script setup>
 import FloatingIcon from "@/components/FloatingIcon.vue";
+import TopCategories from "../components/TopCategories.vue"; // ⭐ new
 
 import Navbar from "../components/NavBar.vue";
 import ProductCard from "../components/ProductCard.vue";
