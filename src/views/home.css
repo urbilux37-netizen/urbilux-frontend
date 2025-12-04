@@ -31,23 +31,22 @@
 .category-card {
   text-align: center;
   border-radius: 8px;
-  overflow: hidden;
   background: #fff;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   transition: transform 0.2s;
   width: 200px;
-  height: 150px;
+  /* height: 150px;  👉 এটা কেটে দাও */
   margin-top: 10px;
+  padding-bottom: 8px; /* text er jonno ektu space */
+  overflow: visible;   /* চাইলে সরাসরি এই line দিয়ো */
 }
 
-.category-card:hover {
-  transform: scale(1.05);
-}
-
+/* image টা একটু ছোট করে নাও যাতে নিচে text এর জায়গা থাকে */
 .category-image {
   width: 100%;
-  height: 100%;
+  height: 120px;      /* আগে 150 থাকলে কমিয়ে দাও */
   object-fit: cover;
+  border-radius: 8px;
 }
 
 .category-card p {
