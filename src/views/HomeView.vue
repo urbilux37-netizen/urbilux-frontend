@@ -54,6 +54,9 @@
           </div>
         </div>
       </section>
+
+<HeaderTickerBar />
+
 <!-- 🟣 Top Categories (Component) -->
 <TopCategories :categories="categories" :placeholder="placeholder" />
 
@@ -112,6 +115,7 @@
 <script setup>
 import FloatingIcon from "@/components/FloatingIcon.vue";
 import TopCategories from "../components/TopCategories.vue"; // ⭐ new
+import HeaderTickerBar from "@/components/HeaderTickerBar.vue";
 
 import Navbar from "../components/NavBar.vue";
 import ProductCard from "../components/ProductCard.vue";

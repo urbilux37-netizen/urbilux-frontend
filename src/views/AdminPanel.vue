@@ -18,6 +18,14 @@
         Banners
       </button>
 
+      <!-- 🟣 NEW TAB: Tickers -->
+      <button
+        @click="activeTab = 'tickers'"
+        :class="activeTab === 'tickers' ? 'active-tab' : 'inactive-tab'"
+      >
+        Tickers
+      </button>
+
       <button
         @click="activeTab = 'categories'"
         :class="activeTab === 'categories' ? 'active-tab' : 'inactive-tab'"
@@ -65,6 +73,11 @@
         <BannerManager />
       </div>
 
+      <!-- 🟣 NEW TAB CONTENT LOAD: Tickers -->
+      <div v-else-if="activeTab === 'tickers'">
+        <TickerManager />
+      </div>
+
       <div v-else-if="activeTab === 'categories'">
         <CategoryManager />
       </div>
@@ -101,9 +114,11 @@ import FooterManagement from "../components/FooterManagement.vue";
 // 🟣 NEW IMPORT
 import Traffic from "../components/admin/Traffic.vue";
 
+// 🟣 NEW IMPORT: Ticker Manager
+import TickerManager from "../components/admin/TickerManager.vue";
+
 const activeTab = ref("dashboard"); // Default tab
 </script>
-
 
 <style scoped>
 .admin-page {
