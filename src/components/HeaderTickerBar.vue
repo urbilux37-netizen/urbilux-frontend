@@ -37,7 +37,8 @@ const props = defineProps({
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
-    : "https://avadotechbackend.onrender.com/api";
+   : "https://urbilux-backend.onrender.com/api";
+
 
 const messages = ref([]);
 const error = ref("");
