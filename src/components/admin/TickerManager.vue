@@ -163,10 +163,11 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 
+// ✅ API base ekhane correct kore dilam – baki sob file er moto
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
-    : "https://avadotechbackend.onrender.com/api";
+    : "https://urbilux-backend.onrender.com/api";
 
 const tickers = ref([]);
 const loading = ref(false);
@@ -274,9 +275,7 @@ const toggleActive = async (ticker) => {
       tickers.value[index].is_active = data.is_active;
     }
     showMessage(
-      `Ticker ${
-        data.is_active ? "Active" : "Inactive"
-      } hoyeche.`
+      `Ticker ${data.is_active ? "Active" : "Inactive"} hoyeche.`
     );
   } catch (err) {
     console.error(err);
