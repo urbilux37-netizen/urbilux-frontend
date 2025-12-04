@@ -55,29 +55,32 @@
         </div>
       </section>
 
-      <!-- 🟣 Top Categories -->
-      <div class="categories-section" v-if="categories.length">
-        <h2 class="section-title">Top Categories</h2>
-        <div class="categories-grid">
-          <div
-            v-for="category in categories"
-            :key="category.id"
-            class="category-card"
-          >
-            <router-link :to="`/category/${category.slug}`">
-              <img
-                :src="category.image_url || placeholder"
-                :alt="category.slug"
-                class="category-image"
-              />
-              <p>{{ category.slug }}</p>
-            </router-link>
-          </div>
-        </div>
-        <span class="section-link" @click="router.push('/categories')">
-          See All Categories
-        </span>
-      </div>
+<!-- 🟣 Top Categories -->
+<div class="categories-section" v-if="categories.length">
+  <h2 class="section-title">Top Categories</h2>
+  <div class="categories-grid">
+    <div
+      v-for="category in categories"
+      :key="category.id"
+      class="category-card"
+    >
+      <router-link :to="`/category/${category.slug}`">
+        <img
+          :src="category.image_url || placeholder"
+          :alt="category.title || category.slug"
+          class="category-image"
+        />
+        <!-- ⭐ title priority, slug fallback -->
+        <p>{{ category.title || category.slug }}</p>
+      </router-link>
+    </div>
+  </div>
+  <span class="section-link" @click="router.push('/categories')">
+    See All Categories
+  </span>
+</div>
+
+
 
       <!-- 🟣 Top Products -->
       <div class="products-section" v-if="topProducts.length">
@@ -149,33 +152,6 @@ const API_BASE =
     : "https://urbilux-backend.onrender.com";
 
 // ------------------ Banners ------------------
-const banners = ref([]);
-const currentIndex = ref(0);
-let intervalId = null;
-
-const fetchBanners = async () => {
-  try {
-const res = await axios.get(`${API_BASE}/api/banners`);
-    banners.value = res.data;
-  } catch (err) {
-    console.error("❌ Banners fetch error:", err);
-  }
-};
-
-const startSlider = () => {
-  intervalId = setInterval(() => {
-    if (banners.value.length) {
-      currentIndex.value = (currentIndex.value + 1) % banners.value.length;
-    }
-  }, 4000);
-};
-
-onMounted(async () => {
-  await fetchBanners();
-  startSlider();
-});
-
-onUnmounted(() => clearInterval(intervalId));
 
 // ------------------ Categories ------------------
 const categories = ref([]);

@@ -25,6 +25,17 @@
         </div>
       </div>
 
+      <!-- Title Input -->
+      <div class="form-section">
+        <label class="form-label">Category Title</label>
+        <input
+          v-model="newCategoryTitle"
+          placeholder="e.g. Electronics, Kids Toys..."
+          required
+          class="text-input"
+        />
+      </div>
+
       <!-- Slug Input -->
       <div class="form-section">
         <label class="form-label">Category Slug</label>
@@ -53,7 +64,12 @@
           <img :src="c.image_url" alt="Category" />
         </div>
         <div class="card-info">
-          <p class="slug-text">{{ c.slug }}</p>
+          <!-- Title + Slug show -->
+          <p class="slug-text">
+            {{ c.title || c.slug }}
+            <!-- চাইলে নিচেরটা comment করে dite paro -->
+            <span class="slug-small">({{ c.slug }})</span>
+          </p>
           <button @click="deleteCategory(c.id)" class="btn-delete">
             Delete
           </button>
@@ -79,6 +95,7 @@ const categories = ref([]);
 const newCategoryFile = ref(null);
 const newCategoryFilePreview = ref(null);
 const newCategorySlug = ref("");
+const newCategoryTitle = ref(""); // ⭐ new
 
 const onCategoryFileChange = (e) => {
   newCategoryFile.value = e.target.files[0] || null;
@@ -97,10 +114,17 @@ const fetchCategories = async () => {
 };
 
 const addCategory = async () => {
-  if (!newCategoryFile.value || !newCategorySlug.value) return;
+  if (
+    !newCategoryFile.value ||
+    !newCategorySlug.value ||
+    !newCategoryTitle.value
+  )
+    return;
+
   const formData = new FormData();
   formData.append("image", newCategoryFile.value);
   formData.append("slug", newCategorySlug.value);
+  formData.append("title", newCategoryTitle.value); // ⭐ new
 
   try {
     await axios.post(`${API_BASE}/categories`, formData, {
@@ -109,6 +133,7 @@ const addCategory = async () => {
     newCategoryFile.value = null;
     newCategoryFilePreview.value = null;
     newCategorySlug.value = "";
+    newCategoryTitle.value = ""; // ⭐ reset
     await fetchCategories();
   } catch (err) {
     console.error("❌ Add category error:", err);
@@ -126,7 +151,6 @@ const deleteCategory = async (id) => {
 
 onMounted(fetchCategories);
 </script>
-
 <style scoped>
 .category-manager {
   max-width: 1100px;
