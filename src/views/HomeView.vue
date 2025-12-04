@@ -57,31 +57,6 @@
 <!-- 🟣 Top Categories (Component) -->
 <TopCategories :categories="categories" :placeholder="placeholder" />
 
-<!-- 🟣 Top Categories -->
-<div class="categories-section" v-if="categories.length">
-  <h2 class="section-title">Top Categories</h2>
-  <div class="categories-grid">
-    <div
-      v-for="category in categories"
-      :key="category.id"
-      class="category-card"
-    >
-      <router-link :to="`/category/${category.slug}`">
-        <img
-          :src="category.image_url || placeholder"
-          :alt="category.title || category.slug"
-          class="category-image"
-        />
-        <!-- ⭐ title priority, slug fallback -->
-        <p>{{ category.title || category.slug }}</p>
-      </router-link>
-    </div>
-  </div>
-  <span class="section-link" @click="router.push('/categories')">
-    See All Categories
-  </span>
-</div>
-
 
 
       <!-- 🟣 Top Products -->
