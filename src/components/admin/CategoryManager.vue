@@ -30,7 +30,7 @@
         <label class="form-label">Category Title</label>
         <input
           v-model="newCategoryTitle"
-          placeholder="e.g. Electronics, Kids Toys..."
+          placeholder="e.g. Fashions, Beauty, Toys..."
           required
           class="text-input"
         />
@@ -41,7 +41,7 @@
         <label class="form-label">Category Slug</label>
         <input
           v-model="newCategorySlug"
-          placeholder="e.g. electronics, gadgets..."
+          placeholder="e.g. fashions, beauty, kids-toys..."
           required
           class="text-input"
         />
@@ -67,7 +67,6 @@
           <!-- Title + Slug show -->
           <p class="slug-text">
             {{ c.title || c.slug }}
-            <!-- চাইলে নিচেরটা comment করে dite paro -->
             <span class="slug-small">({{ c.slug }})</span>
           </p>
           <button @click="deleteCategory(c.id)" class="btn-delete">
@@ -124,7 +123,7 @@ const addCategory = async () => {
   const formData = new FormData();
   formData.append("image", newCategoryFile.value);
   formData.append("slug", newCategorySlug.value);
-  formData.append("title", newCategoryTitle.value); // ⭐ new
+  formData.append("title", newCategoryTitle.value); // ⭐ send title
 
   try {
     await axios.post(`${API_BASE}/categories`, formData, {
@@ -151,6 +150,7 @@ const deleteCategory = async (id) => {
 
 onMounted(fetchCategories);
 </script>
+
 <style scoped>
 .category-manager {
   max-width: 1100px;
