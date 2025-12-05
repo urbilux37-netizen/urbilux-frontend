@@ -421,7 +421,7 @@ onUnmounted(() => {
   margin: 0 auto;
 }
 
-/* Desktop grid */
+/* ===================== DESKTOP (>=1024px) ===================== */
 .banner-grid {
   display: grid;
   grid-template-columns: 2.1fr 1fr;
@@ -530,7 +530,7 @@ onUnmounted(() => {
   border-radius: 6px 0 0 6px;
 }
 
-/* SIDE */
+/* SIDE (desktop: 2 ta top/bottom) */
 .side-banners {
   display: flex;
   flex-direction: column;
@@ -545,7 +545,7 @@ onUnmounted(() => {
 .side-item::before {
   content: "";
   display: block;
-  padding-top: 48%; /* little more height for side banners */
+  padding-top: 48%;
 }
 .side-inner {
   position: absolute;
@@ -631,25 +631,41 @@ onUnmounted(() => {
   opacity: 0;
 }
 
-/* RESPONSIVE */
+/* ===================== MOBILE / TABLET (<1024px) ===================== */
 @media (max-width: 1023px) {
+  /* main + side ek column e niche niche */
   .banner-grid {
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 10px;
-  }
-  .side-banners {
-    flex-direction: row;
-    gap: 10px;
-  }
-  .side-item::before {
-    padding-top: 60%;
   }
 
+  /* main banner full width thakbe */
+  .main-banner {
+    border-radius: 12px;
+  }
+
+  /* side banners: 2 ta pasapasi Startech moto */
+  .side-banners {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  .side-item {
+    border-radius: 12px;
+  }
+
+  .side-item::before {
+    padding-top: 60%; /* choto square-ish size */
+  }
+
+  /* mobile-e arrow/dots off (swipe + auto slide) */
   .arrow,
   .side-arrow,
   .dots,
   .side-dots {
-    display: none; /* mobile e arrow/dot off, swipe on main only */
+    display: none;
   }
 }
 </style>
