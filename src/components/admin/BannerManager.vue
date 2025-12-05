@@ -1,339 +1,205 @@
 <template>
-  <div class="banner-manager">
-    <h1 class="page-title">🖼️ Banner Manager</h1>
+  <div class="category-manager">
+    <!-- Header -->
+    <h2 class="page-title">🗂 Manage Categories</h2>
 
-    <!-- ===== Add Banner Form ===== -->
-    <form @submit.prevent="addBanner" class="card form-card">
-      <h2 class="card-title">Add New Banner</h2>
+    <!-- Add Category Form -->
+    <form @submit.prevent="addCategory" class="category-form">
+      <!-- File Input + Preview -->
+      <div class="form-section">
+        <label class="form-label">Select Category Image</label>
 
-      <div class="grid">
-        <div class="field">
-          <label>Title (optional)</label>
-          <input v-model.trim="newBanner.title" placeholder="Summer Sale" />
-        </div>
-
-        <!-- 🔹 Slot select -->
-        <div class="field">
-          <label>Banner Slot</label>
-          <select v-model="newBanner.slot">
-            <option value="main">Main (big)</option>
-            <option value="side_top">Right Top (small)</option>
-            <option value="side_bottom">Right Bottom (small)</option>
-          </select>
-        </div>
-
-        <div class="field col-span-2">
-          <label>Banner Image <span class="req">*</span></label>
+        <div class="file-upload-wrapper">
           <input
             type="file"
-            @change="onBannerFileChange"
+            @change="onCategoryFileChange"
             accept="image/*"
             required
+            class="file-input"
+            id="file-upload"
           />
-          <p class="hint">
-            Use 1600×700 for main, ~800×500 for side banners. (Wide image recommended)
-          </p>
-
-          <div v-if="uploading" class="uploading">
-            Uploading... {{ uploadProgress }}%
-          </div>
-
-          <div v-if="newBannerFilePreview" class="image-preview">
-            <img :src="newBannerFilePreview" alt="Preview" />
-          </div>
+          <label for="file-upload" class="file-label">Choose Image</label>
         </div>
 
-        <div class="field">
-          <label>Button Text (optional)</label>
-          <input v-model.trim="newBanner.button_text" placeholder="Shop Now" />
+        <div v-if="uploading" class="uploading">
+          Uploading image... {{ uploadProgress }}%
         </div>
 
-        <div class="field">
-          <label>Button Link (optional)</label>
-          <input v-model.trim="newBanner.button_link" placeholder="/category/new" />
+        <div v-if="newCategoryFilePreview" class="image-preview">
+          <img :src="newCategoryFilePreview" alt="Preview" />
         </div>
       </div>
 
-      <div class="actions">
-        <button type="submit" class="btn-primary" :disabled="uploading">
-          {{ uploading ? "Uploading..." : "Add Banner" }}
+      <!-- Title Input -->
+      <div class="form-section">
+        <label class="form-label">Category Title</label>
+        <input
+          v-model="newCategoryTitle"
+          placeholder="e.g. Fashions, Beauty, Toys..."
+          required
+          class="text-input"
+        />
+      </div>
+
+      <!-- Slug Input -->
+      <div class="form-section">
+        <label class="form-label">Category Slug</label>
+        <input
+          v-model="newCategorySlug"
+          placeholder="e.g. fashions, beauty, kids-toys..."
+          required
+          class="text-input"
+        />
+      </div>
+
+      <!-- Add Button -->
+      <div class="form-section">
+        <button
+          type="submit"
+          class="btn-add"
+          :disabled="!newCategoryImageUrl || uploading"
+        >
+          + Add Category
         </button>
-        <button type="button" class="btn-ghost" @click="resetForm">Reset</button>
       </div>
     </form>
 
-    <!-- ===== Banner List ===== -->
-    <div class="card list-card">
-      <div class="list-header">
-        <h2 class="card-title">All Banners</h2>
-        <button class="btn-ghost" @click="fetchBanners" :disabled="loading">
-          {{ loading ? "Refreshing…" : "Refresh" }}
-        </button>
-      </div>
-
-      <div v-if="loading" class="skeleton-wrap">
-        <div class="skeleton" v-for="n in 3" :key="n"></div>
-      </div>
-
-      <div v-else-if="!banners.length" class="empty">No banners found.</div>
-
-      <div v-else class="items">
-        <div v-for="b in banners" :key="b.id" class="item">
-          <img :src="b.image_url" class="thumb" alt="Banner" />
-          <div class="meta">
-            <div class="title-row">
-              <p class="title">{{ b.title || "Untitled banner" }}</p>
-              <span class="slot-tag">{{ humanSlot(b.slot) }}</span>
-            </div>
-            <p class="sub">
-              <strong>Button:</strong>
-              <span v-if="b.button_text">{{ b.button_text }}</span>
-              <span v-else class="muted">—</span>
-              <span v-if="b.button_link" class="link">→ {{ b.button_link }}</span>
-            </p>
-          </div>
-
-          <div class="row-actions">
-            <button class="btn-small" @click="openEdit(b)">Edit</button>
-            <button class="btn-danger" @click="deleteBanner(b.id)">Delete</button>
-          </div>
+    <!-- Category List -->
+    <div v-if="categories.length" class="category-grid">
+      <div
+        v-for="c in categories"
+        :key="c.id"
+        class="category-card"
+      >
+        <div class="card-image">
+          <img :src="c.image_url" alt="Category" />
+        </div>
+        <div class="card-info">
+          <!-- Title + Slug show -->
+          <p class="slug-text">
+            {{ c.title || c.slug }}
+            <span class="slug-small">({{ c.slug }})</span>
+          </p>
+          <button @click="deleteCategory(c.id)" class="btn-delete">
+            Delete
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- ===== Edit Modal ===== -->
-    <div v-if="editing" class="modal-mask" @click.self="closeEdit">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Edit Banner #{{ editModel.id }}</h3>
-          <button class="x" @click="closeEdit">✕</button>
-        </div>
-
-        <form @submit.prevent="updateBanner" class="modal-body">
-          <div class="grid">
-            <div class="field">
-              <label>Title</label>
-              <input v-model.trim="editModel.title" />
-            </div>
-
-            <!-- 🔹 Slot select (edit) -->
-            <div class="field">
-              <label>Banner Slot</label>
-              <select v-model="editModel.slot">
-                <option value="main">Main (big)</option>
-                <option value="side_top">Right Top (small)</option>
-                <option value="side_bottom">Right Bottom (small)</option>
-              </select>
-            </div>
-
-            <div class="field col-span-2">
-              <label>Banner Image</label>
-              <input
-                type="file"
-                @change="onEditBannerFileChange"
-                accept="image/*"
-              />
-
-              <div v-if="editUploading" class="uploading">
-                Uploading... {{ editUploadProgress }}%
-              </div>
-
-              <div v-if="editFilePreview" class="image-preview">
-                <img :src="editFilePreview" alt="Preview" />
-              </div>
-              <img
-                v-else-if="editModel.image_url"
-                :src="editModel.image_url"
-                class="preview"
-                alt="Current"
-              />
-            </div>
-
-            <div class="field">
-              <label>Button Text</label>
-              <input v-model.trim="editModel.button_text" />
-            </div>
-
-            <div class="field">
-              <label>Button Link</label>
-              <input v-model.trim="editModel.button_link" />
-            </div>
-          </div>
-
-          <div class="actions">
-            <button type="submit" class="btn-primary" :disabled="editUploading">
-              {{ editUploading ? "Saving..." : "Save" }}
-            </button>
-            <button type="button" class="btn-ghost" @click="closeEdit">
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+    <!-- Empty State -->
+    <p v-else class="empty-text">No categories found. Add one above!</p>
   </div>
 </template>
 
 <script setup>
-import axios from "axios";
 import { ref, onMounted } from "vue";
+import axios from "axios";
 
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000"
     : "https://urbilux-backend.onrender.com";
 
-const banners = ref([]);
-const loading = ref(false);
+const categories = ref([]);
+const newCategoryFile = ref(null);
+const newCategoryFilePreview = ref(null);
+const newCategorySlug = ref("");
+const newCategoryTitle = ref("");
+const newCategoryImageUrl = ref(""); // ⭐ persistent url
 
-// ---------- Add ----------
-const newBanner = ref({
-  title: "",
-  button_text: "",
-  button_link: "",
-  slot: "main",
-});
-const newBannerFile = ref(null);
-const newBannerFilePreview = ref(null);
 const uploading = ref(false);
 const uploadProgress = ref(0);
 
-function humanSlot(slot) {
-  if (slot === "side_top") return "Right Top";
-  if (slot === "side_bottom") return "Right Bottom";
-  return "Main";
-}
-
-function onBannerFileChange(e) {
-  const file = e.target.files[0];
-  newBannerFile.value = file || null;
-  newBannerFilePreview.value = file ? URL.createObjectURL(file) : null;
-}
-
-function resetForm() {
-  newBanner.value = {
-    title: "",
-    button_text: "",
-    button_link: "",
-    slot: "main",
-  };
-  newBannerFile.value = null;
-  newBannerFilePreview.value = null;
-  uploadProgress.value = 0;
-}
-
-async function fetchBanners() {
-  loading.value = true;
-  try {
-    const res = await axios.get(`${API_BASE}/api/banners`);
-    banners.value = res.data || [];
-  } catch (err) {
-    console.error("❌ Fetch banners error:", err);
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function addBanner() {
-  if (!newBannerFile.value) return alert("Please select an image");
-
+const uploadCategoryImage = async (file) => {
+  if (!file) return;
   const formData = new FormData();
-  formData.append("image", newBannerFile.value);
-  formData.append("title", newBanner.value.title || "");
-  formData.append("button_text", newBanner.value.button_text || "");
-  formData.append("button_link", newBanner.value.button_link || "");
-  formData.append("slot", newBanner.value.slot || "main");
+  formData.append("image", file);
 
   try {
     uploading.value = true;
-    await axios.post(`${API_BASE}/api/banners`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: (e) => {
-        if (!e.total) return;
-        uploadProgress.value = Math.round((e.loaded * 100) / e.total);
-      },
+    uploadProgress.value = 0;
+
+    // ✅ Same upload logic / endpoint as ProductManager
+    const res = await fetch(`${API_BASE}/products/upload`, {
+      method: "POST",
+      body: formData,
     });
-    resetForm();
-    fetchBanners();
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Upload failed");
+
+    newCategoryImageUrl.value = data.image_url;
   } catch (err) {
-    console.error("❌ Add banner error:", err);
-    alert("Failed to add banner");
+    console.error("❌ Category image upload error:", err);
+    alert("Category image upload failed");
   } finally {
     uploading.value = false;
+    uploadProgress.value = 100;
   }
-}
+};
 
-async function deleteBanner(id) {
-  if (!confirm("Delete this banner?")) return;
+const onCategoryFileChange = (e) => {
+  newCategoryFile.value = e.target.files[0] || null;
+  newCategoryFilePreview.value = newCategoryFile.value
+    ? URL.createObjectURL(newCategoryFile.value)
+    : null;
+
+  if (newCategoryFile.value) {
+    uploadCategoryImage(newCategoryFile.value);
+  } else {
+    newCategoryImageUrl.value = "";
+  }
+};
+
+const fetchCategories = async () => {
   try {
-    await axios.delete(`${API_BASE}/api/banners/${id}`);
-    fetchBanners();
+    const res = await axios.get(`${API_BASE}/categories`);
+    categories.value = res.data;
   } catch (err) {
-    console.error("❌ Delete banner error:", err);
-    alert("Failed to delete banner");
+    console.error("❌ Fetch categories error:", err);
   }
-}
+};
 
-// ---------- Edit ----------
-const editing = ref(false);
-const editModel = ref({});
-const editFile = ref(null);
-const editFilePreview = ref(null);
-const editUploading = ref(false);
-const editUploadProgress = ref(0);
-
-function openEdit(b) {
-  editModel.value = { ...b }; // includes slot, button fields, etc.
-  editing.value = true;
-}
-
-function closeEdit() {
-  editing.value = false;
-  editFile.value = null;
-  editFilePreview.value = null;
-  editUploadProgress.value = 0;
-}
-
-function onEditBannerFileChange(e) {
-  const file = e.target.files[0];
-  editFile.value = file || null;
-  editFilePreview.value = file ? URL.createObjectURL(file) : null;
-}
-
-async function updateBanner() {
-  const formData = new FormData();
-  if (editFile.value) formData.append("image", editFile.value);
-  formData.append("title", editModel.value.title || "");
-  formData.append("button_text", editModel.value.button_text || "");
-  formData.append("button_link", editModel.value.button_link || "");
-  formData.append("slot", editModel.value.slot || "main");
+const addCategory = async () => {
+  if (
+    !newCategoryImageUrl.value ||
+    !newCategorySlug.value ||
+    !newCategoryTitle.value
+  )
+    return alert("Please fill all fields and wait for image upload");
 
   try {
-    editUploading.value = true;
-    await axios.put(
-      `${API_BASE}/api/banners/${editModel.value.id}`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-        onUploadProgress: (e) => {
-          if (!e.total) return;
-          editUploadProgress.value = Math.round(
-            (e.loaded * 100) / e.total
-          );
-        },
-      }
-    );
-    closeEdit();
-    fetchBanners();
-  } catch (err) {
-    console.error("❌ Update banner error:", err);
-    alert("Failed to update banner");
-  } finally {
-    editUploading.value = false;
-  }
-}
+    // 🔹 Now we only send JSON with image_url, no file
+    await axios.post(`${API_BASE}/categories`, {
+      slug: newCategorySlug.value,
+      title: newCategoryTitle.value,
+      image_url: newCategoryImageUrl.value,
+    });
 
-onMounted(fetchBanners);
+    newCategoryFile.value = null;
+    newCategoryFilePreview.value = null;
+    newCategorySlug.value = "";
+    newCategoryTitle.value = "";
+    newCategoryImageUrl.value = "";
+    uploadProgress.value = 0;
+
+    await fetchCategories();
+  } catch (err) {
+    console.error("❌ Add category error:", err);
+    alert("Failed to add category");
+  }
+};
+
+const deleteCategory = async (id) => {
+  try {
+    await axios.delete(`${API_BASE}/categories/${id}`);
+    await fetchCategories();
+  } catch (err) {
+    console.error("❌ Delete category error:", err);
+  }
+};
+
+onMounted(fetchCategories);
 </script>
 
 <style scoped>
