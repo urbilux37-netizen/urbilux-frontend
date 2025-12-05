@@ -18,12 +18,20 @@
         Banners
       </button>
 
-      <!-- 🟣 NEW TAB: Tickers -->
+      <!-- 🟣 TAB 1: Main Tickers -->
       <button
         @click="activeTab = 'tickers'"
         :class="activeTab === 'tickers' ? 'active-tab' : 'inactive-tab'"
       >
         Tickers
+      </button>
+
+      <!-- 🟣 TAB 2: Secondary Tickers -->
+      <button
+        @click="activeTab = 'secondary-tickers'"
+        :class="activeTab === 'secondary-tickers' ? 'active-tab' : 'inactive-tab'"
+      >
+        Secondary Tickers
       </button>
 
       <button
@@ -73,9 +81,14 @@
         <BannerManager />
       </div>
 
-      <!-- 🟣 NEW TAB CONTENT LOAD: Tickers -->
+      <!-- 🟣 CONTENT 1: Ticker Manager -->
       <div v-else-if="activeTab === 'tickers'">
         <TickerManager />
+      </div>
+
+      <!-- 🟣 CONTENT 2: Secondary Ticker Manager -->
+      <div v-else-if="activeTab === 'secondary-tickers'">
+        <SecondaryTickerManager />
       </div>
 
       <div v-else-if="activeTab === 'categories'">
@@ -111,11 +124,14 @@ import ProductsManager from "../components/admin/ProductManager.vue";
 import OrdersManager from "../components/admin/AdminOrders.vue";
 import FooterManagement from "../components/FooterManagement.vue";
 
-// 🟣 NEW IMPORT
+// 🟣 IMPORT: Traffic
 import Traffic from "../components/admin/Traffic.vue";
 
-// 🟣 NEW IMPORT: Ticker Manager
+// 🟣 IMPORT: Ticker Manager (Main)
 import TickerManager from "../components/admin/TickerManager.vue";
+
+// 🟣 IMPORT: Secondary Ticker Manager
+import SecondaryTickerManager from "../components/admin/SecondaryTickerManager.vue";
 
 const activeTab = ref("dashboard"); // Default tab
 </script>
