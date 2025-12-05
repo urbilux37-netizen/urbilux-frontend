@@ -118,7 +118,7 @@
 import FloatingIcon from "@/components/FloatingIcon.vue";
 import TopCategories from "../components/TopCategories.vue"; // ⭐ new
 import HeaderTickerBar from "@/components/HeaderTickerBar.vue";
-import SecondaryTickerBar from "@/components/SecondaryTickerBar.vue";
+import SecondaryTickerBar from "../views/SecondaryTickerBar.vue";
 
 import Navbar from "../components/NavBar.vue";
 import ProductCard from "../components/ProductCard.vue";
