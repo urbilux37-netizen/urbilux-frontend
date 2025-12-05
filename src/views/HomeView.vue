@@ -12,7 +12,8 @@
     <div class="home-content">
  <WelcomeBanner />
       <!-- 🟣 Service Features Section -->
-
+<br>
+<br>
        <SecondaryTickerBar />
       <section class="service-section">
         <div class="cards-container">
