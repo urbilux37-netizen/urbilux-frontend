@@ -539,7 +539,7 @@ onUnmounted(() => {
 .side-item {
   position: relative;
   border-radius: 14px;
-  overflow: hidden;
+
   background: #ffffff;
 }
 .side-item::before {
