@@ -15,48 +15,7 @@
 <br>
 <br>
        <SecondaryTickerBar />
-      <section class="service-section">
-        <div class="cards-container">
-          <!-- 🚚 Delivery -->
-          <div class="card">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/679/679720.png"
-              alt="Delivery Icon"
-              class="icon"
-            />
-            <h3 class="card-title">Delivery</h3>
-            <p class="card-text">
-              Enjoy fast home delivery all over Bangladesh.
-            </p>
-          </div>
 
-          <!-- 🔁 Easy Returns -->
-          <div class="card">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/10106/10106672.png"
-              alt="Return Icon"
-              class="icon"
-            />
-            <h3 class="card-title">Easy Returns</h3>
-            <p class="card-text">
-              Pay only after receiving and checking your product for peace of mind.
-            </p>
-          </div>
-
-          <!-- 💸 Cash on Delivery -->
-          <div class="card">
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png"
-              alt="Cash on Delivery Icon"
-              class="icon"
-            />
-            <h3 class="card-title">Cash on Delivery</h3>
-            <p class="card-text">
-              Pay conveniently when your order arrives at your doorstep.
-            </p>
-          </div>
-        </div>
-      </section>
 
 <HeaderTickerBar />
 
@@ -109,7 +68,48 @@
           View All Products
         </span>
       </div>
+   <section class="service-section">
+        <div class="cards-container">
+          <!-- 🚚 Delivery -->
+          <div class="card">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/679/679720.png"
+              alt="Delivery Icon"
+              class="icon"
+            />
+            <h3 class="card-title">Delivery</h3>
+            <p class="card-text">
+              Enjoy fast home delivery all over Bangladesh.
+            </p>
+          </div>
 
+          <!-- 🔁 Easy Returns -->
+          <div class="card">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/10106/10106672.png"
+              alt="Return Icon"
+              class="icon"
+            />
+            <h3 class="card-title">Easy Returns</h3>
+            <p class="card-text">
+              Pay only after receiving and checking your product for peace of mind.
+            </p>
+          </div>
+
+          <!-- 💸 Cash on Delivery -->
+          <div class="card">
+            <img
+              src="https://cdn-icons-png.flaticon.com/512/3135/3135706.png"
+              alt="Cash on Delivery Icon"
+              class="icon"
+            />
+            <h3 class="card-title">Cash on Delivery</h3>
+            <p class="card-text">
+              Pay conveniently when your order arrives at your doorstep.
+            </p>
+          </div>
+        </div>
+      </section>
     </div> <!-- ✅ end .home-content -->
 
   </div>

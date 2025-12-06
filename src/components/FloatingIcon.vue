@@ -25,13 +25,29 @@
         alt="WhatsApp"
       />
     </a>
+
+    <!-- Messenger Button (NEW) -->
+    <a
+      :href="messengerLink"
+      target="_blank"
+      rel="noopener"
+      class="floating-btn messenger-btn"
+    >
+      <img
+        src="https://upload.wikimedia.org/wikipedia/commons/8/83/Facebook_Messenger_4_Logo.svg"
+        alt="Messenger"
+      />
+    </a>
   </div>
 </template>
 
 <script setup>
-// 👉 এখানেই তোমার লিঙ্কগুলো বসাবে
-const whatsAppLink = "https://wa.me/8801631822765"; // তোমার WhatsApp নম্বর
-const mapLink = "https://maps.app.goo.gl/DTC6xUpMtKwHC4QC7?g_st=ac"; // Google Map Link
+// 👉 তোমার লিঙ্কগুলো বসাবে এখানে
+const whatsAppLink = "https://wa.me/8801631822765";
+const mapLink = "https://maps.app.goo.gl/DTC6xUpMtKwHC4QC7?g_st=ac";
+
+// ⬇⬇⬇ Messenger link placeholder (তুমি নিজে বসাবে)
+const messengerLink = "";
 </script>
 
 <style scoped>
@@ -68,6 +84,11 @@ const mapLink = "https://maps.app.goo.gl/DTC6xUpMtKwHC4QC7?g_st=ac"; // Google M
 /* WhatsApp color */
 .whatsapp-btn {
   background: #25d366;
+}
+
+/* Messenger color */
+.messenger-btn {
+  background: #0084ff;
 }
 
 /* Hover effect */
