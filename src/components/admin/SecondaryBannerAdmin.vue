@@ -21,7 +21,8 @@
     <!-- Banner List -->
     <div class="banner-list" v-if="banners.length">
       <div v-for="b in banners" :key="b.id" class="banner-card">
-        <img :src="BACKEND + b.image_url" alt="Banner" />
+   <img :src="b.image_url" alt="Banner" />
+
         <button class="btn-delete" @click="deleteBanner(b.id)">Delete</button>
       </div>
     </div>
