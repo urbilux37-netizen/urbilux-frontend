@@ -16,6 +16,7 @@
 <br>
        <SecondaryTickerBar />
 
+       <SecondaryBanner />
 
 <HeaderTickerBar />
 
@@ -120,7 +121,7 @@ import FloatingIcon from "@/components/FloatingIcon.vue";
 import TopCategories from "../components/TopCategories.vue"; // ⭐ new
 import HeaderTickerBar from "@/components/HeaderTickerBar.vue";
 import SecondaryTickerBar from "../views/SecondaryTickerBar.vue";
-
+import SecondaryBanner from "@/components/SecondaryBanner.vue";
 import Navbar from "../components/NavBar.vue";
 import ProductCard from "../components/ProductCard.vue";
 import Footer from "../components/Footer.vue";

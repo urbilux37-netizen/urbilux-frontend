@@ -34,6 +34,14 @@
         Secondary Tickers
       </button>
 
+      <!-- 🟣 NEW TAB: Secondary Banners -->
+      <button
+        @click="activeTab = 'secondary-banners'"
+        :class="activeTab === 'secondary-banners' ? 'active-tab' : 'inactive-tab'"
+      >
+        Secondary Banners
+      </button>
+
       <button
         @click="activeTab = 'categories'"
         :class="activeTab === 'categories' ? 'active-tab' : 'inactive-tab'"
@@ -91,6 +99,11 @@
         <SecondaryTickerManager />
       </div>
 
+      <!-- 🟣 CONTENT 3: Secondary Banner Manager -->
+      <div v-else-if="activeTab === 'secondary-banners'">
+        <SecondaryBannerAdmin />
+      </div>
+
       <div v-else-if="activeTab === 'categories'">
         <CategoryManager />
       </div>
@@ -117,6 +130,7 @@
 
 <script setup>
 import { ref } from "vue";
+
 import Dashboard from "../components/admin/AdminDashboard.vue";
 import BannerManager from "../components/admin/BannerManager.vue";
 import CategoryManager from "../components/admin/CategoryManager.vue";
@@ -133,8 +147,12 @@ import TickerManager from "../components/admin/TickerManager.vue";
 // 🟣 IMPORT: Secondary Ticker Manager
 import SecondaryTickerManager from "../components/admin/SecondaryTickerManager.vue";
 
+// 🟣 IMPORT: Secondary Banner Admin (NEW)
+import SecondaryBannerAdmin from "../components/admin/SecondaryBannerAdmin.vue";
+
 const activeTab = ref("dashboard"); // Default tab
 </script>
+
 
 <style scoped>
 .admin-page {
