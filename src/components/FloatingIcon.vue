@@ -34,7 +34,7 @@
       class="floating-btn messenger-btn"
     >
       <img
-        src="https://upload.wikimedia.org/wikipedia/commons/8/83/Facebook_Messenger_4_Logo.svg"
+        src="https://img.icons8.com/?size=100&id=20419&format=png&color=000000"
         alt="Messenger"
       />
     </a>
@@ -47,7 +47,7 @@ const whatsAppLink = "https://wa.me/8801631822765";
 const mapLink = "https://maps.app.goo.gl/DTC6xUpMtKwHC4QC7?g_st=ac";
 
 // ⬇⬇⬇ Messenger link placeholder (তুমি নিজে বসাবে)
-const messengerLink = "";
+const messengerLink = "https://www.facebook.com/share/14YjLSpT8jd/";
 </script>
 
 <style scoped>
