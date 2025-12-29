@@ -108,7 +108,7 @@ const categoriesToShow = computed(() =>
 .category-image {
   width: 100%;
   height: 120px;
-  object-fit: cover;
+  object-fit: contain;
   display: block;
 }
 
