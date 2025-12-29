@@ -3,8 +3,9 @@
     <transition name="fade">
       <img
         v-if="current"
-        :src="API + current.image_url"
+        :src="current.image_url"
         :key="current.id"
+        alt="Secondary Banner"
       />
     </transition>
   </div>
@@ -14,19 +15,22 @@
 import { ref, onMounted } from "vue";
 import axios from "axios";
 
-const API =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://urbilux-backend.onrender.com";
-
 const banners = ref([]);
 const current = ref(null);
 let index = 0;
 
 const load = async () => {
-  const res = await axios.get(`${API}/secondary-banners`);
-  banners.value = res.data;
-  current.value = banners.value[0];
+  try {
+    const res = await axios.get(
+      window.location.hostname === "localhost"
+        ? "http://localhost:5000/api/secondary-banners"
+        : "https://urbilux-backend.onrender.com/api/secondary-banners"
+    );
+    banners.value = res.data;
+    current.value = banners.value[0] || null;
+  } catch (err) {
+    console.error("Failed to load banners:", err);
+  }
 };
 
 onMounted(async () => {
@@ -45,21 +49,21 @@ onMounted(async () => {
 .secondary-banner {
   width: 100%;
   height: 400px;
-  position: relative;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
+
 .secondary-banner img {
   width: 100%;
   height: 400px;
   object-fit: cover;
-  position: absolute;
 }
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 1s ease;
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
 }
-.fade-enter-from,
-.fade-leave-to {
+.fade-enter-from, .fade-leave-to {
   opacity: 0;
 }
 </style>
