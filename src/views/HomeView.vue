@@ -16,13 +16,12 @@
 <br>
        <SecondaryTickerBar />
 <br>
-<br>
-<br>
+
+
 
        <SecondaryBanner />
 <br>
-<br>
-<br>
+
 
 <HeaderTickerBar />
 
