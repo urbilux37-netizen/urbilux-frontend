@@ -57,7 +57,7 @@ onMounted(async () => {
 .secondary-banner img {
   width: 100%;
   height: 400px;
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .fade-enter-active, .fade-leave-active {
