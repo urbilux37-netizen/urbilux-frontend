@@ -96,6 +96,7 @@ onMounted(fetchBlogs);
 .header {
   text-align: center;
   margin-bottom: 40px;
+  margin-top: 50px;
 }
 .title {
   font-size: 2.2rem;
