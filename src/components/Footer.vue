@@ -1,6 +1,14 @@
 <template>
   <footer class="footer">
     <div class="footer-top">
+      <!-- 🔹 Complaint Button at the top of Support Column -->
+      <div class="complaint-button-wrapper">
+        <p class="complaint-label font-bold">অভিযোগ / পরামর্শ</p>
+        <button class="complaint-btn" @click="goToComplaint">
+          অভিযোগ / পরামর্শ দিন
+        </button>
+      </div>
+
       <!-- Support Column -->
       <div class="footer-column">
         <h4>SUPPORT</h4>
@@ -76,13 +84,17 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import axios from "axios";
+
+// Router instance
+const router = useRouter();
 
 // ✅ Backend Base URL detect automatically (Render or Localhost)
 const backendURL =
   window.location.hostname.includes("localhost")
     ? "http://localhost:5000"
-    : "https://urbilux-backend.onrender.com"; // 🔹 তোমার Render API লিংক বসাও
+    : "https://urbilux-backend.onrender.com";
 
 // Footer state variables
 const supportItems = ref([]);
@@ -94,7 +106,12 @@ const appText = ref("");
 const copyright = ref("");
 const poweredBy = ref("");
 
-// ✅ Fetch Footer Data from Node.js Backend
+// Navigate to Complaint Page
+const goToComplaint = () => {
+  router.push("/complaint");
+};
+
+// Fetch Footer Data from Node.js Backend
 const fetchFooterData = async () => {
   try {
     const [support, about, stay, app, social, text] = await Promise.all([
@@ -129,7 +146,37 @@ const fetchFooterData = async () => {
 
 onMounted(fetchFooterData);
 </script>
+
+
 <style scoped>
+  /* 🔹 Complaint Button Styles */
+.complaint-button-wrapper {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.complaint-label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.complaint-btn {
+  background-color: #ff4d4f;
+  color: white;
+  font-weight: bold;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.complaint-btn:hover {
+  background-color: #e04344;
+  transform: translateY(-2px);
+}
+
 .footer {
   background: linear-gradient(135deg, #a070ff, #b682ff, #c394ff) ;
   background-color: linear-gradient(135deg, #a070ff, #b682ff, #c394ff);
