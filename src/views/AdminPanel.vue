@@ -85,6 +85,15 @@
       >
         Traffic
       </button>
+
+<button
+  @click="activeTab = 'complaints'"
+  :class="activeTab === 'complaints' ? 'active-tab' : 'inactive-tab'"
+>
+  Complaints
+</button>
+
+
     </nav>
 
     <!-- ===== Tab Content ===== -->
@@ -133,12 +142,16 @@
       <div v-else-if="activeTab === 'traffic'">
         <Traffic />
       </div>
+      <div v-else-if="activeTab === 'complaints'">
+  <ComplaintManager />
+</div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import ComplaintManager from "../components/admin/ComplaintManager.vue";
 
 import Dashboard from "../components/admin/AdminDashboard.vue";
 import BannerManager from "../components/admin/BannerManager.vue";
