@@ -34,12 +34,20 @@
         Secondary Tickers
       </button>
 
-      <!-- 🟣 NEW TAB: Secondary Banners -->
+      <!-- 🟣 TAB 3: Secondary Banners -->
       <button
         @click="activeTab = 'secondary-banners'"
         :class="activeTab === 'secondary-banners' ? 'active-tab' : 'inactive-tab'"
       >
         Secondary Banners
+      </button>
+
+      <!-- 🟢 NEW TAB: BLOGS -->
+      <button
+        @click="activeTab = 'blogs'"
+        :class="activeTab === 'blogs' ? 'active-tab' : 'inactive-tab'"
+      >
+        Blogs
       </button>
 
       <button
@@ -70,7 +78,7 @@
         Footer
       </button>
 
-      <!-- 🟣 NEW TAB: Traffic -->
+      <!-- 🟣 TAB: Traffic -->
       <button
         @click="activeTab = 'traffic'"
         :class="activeTab === 'traffic' ? 'active-tab' : 'inactive-tab'"
@@ -89,19 +97,21 @@
         <BannerManager />
       </div>
 
-      <!-- 🟣 CONTENT 1: Ticker Manager -->
       <div v-else-if="activeTab === 'tickers'">
         <TickerManager />
       </div>
 
-      <!-- 🟣 CONTENT 2: Secondary Ticker Manager -->
       <div v-else-if="activeTab === 'secondary-tickers'">
         <SecondaryTickerManager />
       </div>
 
-      <!-- 🟣 CONTENT 3: Secondary Banner Manager -->
       <div v-else-if="activeTab === 'secondary-banners'">
         <SecondaryBannerAdmin />
+      </div>
+
+      <!-- 🟢 BLOG MANAGER CONTENT -->
+      <div v-else-if="activeTab === 'blogs'">
+        <BlogManager />
       </div>
 
       <div v-else-if="activeTab === 'categories'">
@@ -120,7 +130,6 @@
         <FooterManagement />
       </div>
 
-      <!-- 🟣 NEW TAB CONTENT LOAD -->
       <div v-else-if="activeTab === 'traffic'">
         <Traffic />
       </div>
@@ -147,12 +156,14 @@ import TickerManager from "../components/admin/TickerManager.vue";
 // 🟣 IMPORT: Secondary Ticker Manager
 import SecondaryTickerManager from "../components/admin/SecondaryTickerManager.vue";
 
-// 🟣 IMPORT: Secondary Banner Admin (NEW)
+// 🟣 IMPORT: Secondary Banner Admin
 import SecondaryBannerAdmin from "../components/admin/SecondaryBannerAdmin.vue";
 
-const activeTab = ref("dashboard"); // Default tab
-</script>
+// 🟢 IMPORT: BLOG MANAGER
+import BlogManager from "../components/admin/BlogManager.vue";
 
+const activeTab = ref("dashboard");
+</script>
 
 <style scoped>
 .admin-page {
@@ -166,17 +177,14 @@ const activeTab = ref("dashboard"); // Default tab
   transition: all 0.3s ease;
 }
 
-/* Heading */
 h1 {
   text-align: center;
   background: linear-gradient(90deg, #4a00e0, #8e2de2);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   font-weight: 800;
-  letter-spacing: 0.5px;
 }
 
-/* ===== Tabs ===== */
 nav button {
   padding: 10px 22px;
   border-radius: 10px;
@@ -187,15 +195,12 @@ nav button {
   border: none;
 }
 
-/* Active tab */
 .active-tab {
   background: linear-gradient(90deg, #4a00e0, #8e2de2);
   color: #fff;
   box-shadow: 0 4px 12px rgba(142, 45, 226, 0.3);
-  transform: translateY(-1px);
 }
 
-/* Inactive tab */
 .inactive-tab {
   background: #e0e0e0;
   color: #444;
@@ -203,35 +208,19 @@ nav button {
 .inactive-tab:hover {
   background: #e8defc;
   color: #4a00e0;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
-/* ===== Tab Content ===== */
 .tab-content {
   background: #fff;
   padding: 24px;
   border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
   min-height: 500px;
 }
 
-/* Responsive */
 @media (max-width: 768px) {
   .admin-page {
     width: 95%;
     padding: 20px;
-  }
-  nav {
-    justify-content: center;
-  }
-  nav button {
-    font-size: 14px;
-    padding: 8px 16px;
-  }
-  .tab-content {
-    padding: 16px;
   }
 }
 </style>
