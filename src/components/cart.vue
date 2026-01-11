@@ -9,26 +9,29 @@
       <section v-if="cart.length && !loading" class="cart-list">
         <div v-for="item in cart" :key="item.id" class="cart-item">
 
-          <!-- Correct image -->
-          <img :src="item.final_image" alt="Product Image" class="product-image" />
+          <!-- ✅ Correct image logic -->
+          <img
+            :src="item.final_image || '/images/no-image.png'"
+            alt="Product Image"
+            class="product-image"
+          />
 
           <div class="details">
             <h3>{{ item.name }}</h3>
 
-            <!-- Correct price logic -->
+            <!-- ✅ Correct price logic with discount -->
             <p class="price">
-              <template v-if="item.discount_percent">
+              <template v-if="item.discount_percent && Number(item.discount_percent)">
                 <span class="discounted">
-                  ৳ {{ discounted(item).toFixed(2) }}
+                  ৳ {{ calculateDiscount(item).toFixed(2) }}
                 </span>
-
                 <span class="original">
-                  ৳ {{ item.final_price }}
+                  ৳ {{ Number(item.final_price).toFixed(2) }}
                 </span>
               </template>
 
               <template v-else>
-                ৳ {{ item.final_price }}
+                ৳ {{ Number(item.final_price).toFixed(2) }}
               </template>
             </p>
 
@@ -44,9 +47,7 @@
 
         <div class="cart-summary">
           <p class="total-text">Subtotal:</p>
-          <p class="total-amount">
-            ৳ {{ totalPrice }}
-          </p>
+          <p class="total-amount">৳ {{ totalPrice }}</p>
         </div>
 
         <button class="checkout-btn" @click="goCheckout">
@@ -59,7 +60,10 @@
       </section>
 
       <section v-else class="empty-box">
-        <img src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png" alt="Empty" />
+        <img
+          src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
+          alt="Empty"
+        />
         <p>Your cart is empty 🛍️</p>
       </section>
     </div>
@@ -72,50 +76,45 @@ import { useRouter } from "vue-router";
 import { useCart } from "@/composables/useCart";
 
 const emit = defineEmits(["close"]);
-const { cart, loading, fetchCart, addToCart, updateQty, removeItem } = useCart();
+const { cart, loading, fetchCart, updateQty, removeItem } = useCart();
 const router = useRouter();
 
+// ✅ Fetch latest cart items on mount
 onMounted(fetchCart);
 
-// Discounted price calculator
-const discounted = (item) => {
+// ---------- Discounted Price Calculation ----------
+const calculateDiscount = (item) => {
   if (!item.discount_percent) return Number(item.final_price);
-  const p = Number(item.final_price);
-  const d = Number(item.discount_percent);
-  return p - (p * d) / 100;
+  const base = Number(item.final_price);
+  const discount = Number(item.discount_percent);
+  return base - (base * discount) / 100;
 };
 
-// Total cart amount
+// ---------- Total Price ----------
 const totalPrice = computed(() =>
-  cart.value.reduce(
-    (sum, item) => sum + discounted(item) * item.quantity,
-    0
-  )
+  cart.value.reduce((sum, item) => sum + calculateDiscount(item) * item.quantity, 0)
 );
 
-// Increase quantity
+// ---------- Quantity Handlers ----------
 const increase = async (item) => {
   await updateQty(item.id, item.quantity + 1);
 };
 
-// Decrease quantity
 const decrease = async (item) => {
-  if (item.quantity > 1) {
-    await updateQty(item.id, item.quantity - 1);
-  }
+  if (item.quantity > 1) await updateQty(item.id, item.quantity - 1);
 };
 
-// Remove item
-const remove = async (id) => {
-  await removeItem(id);
-};
+// ---------- Remove Item ----------
+const remove = async (id) => await removeItem(id);
 
+// ---------- Drawer & Checkout ----------
 const closeDrawer = () => emit("close");
 const goCheckout = () => {
   emit("close");
   router.push("/checkout");
 };
 </script>
+
 
 
 <style scoped>
