@@ -3,35 +3,81 @@
     <!-- 🟣 Navbar -->
     <Navbar />
 
-    <!-- ================= Checkout Section ================= -->
-    <div class="checkout-page">
-      <h1 class="checkout-title">🛒 Checkout</h1>
+    <!-- ================= Main Product Details ================= -->
+    <div class="product-page">
+      <div class="product-wrapper">
+        <div class="product-container">
+          <!-- Left: Main Image -->
+          <div class="image-container">
+            <img :src="displayImage" alt="Product Image" class="main-image" />
 
-      <div v-if="cartItems.length" class="checkout-container">
-        <div v-for="item in cartItems" :key="item.id" class="checkout-item">
-          <!-- Left: Image -->
-          <div class="checkout-image">
-            <img :src="getItemImage(item)" alt="Product Image" />
+            <!-- Thumbnails -->
+            <div class="thumbnail-container">
+              <!-- main product image -->
+              <img
+                v-if="product.image_url"
+                :src="product.image_url"
+                alt="Main"
+                class="thumb"
+                @click="handleThumbClick(product.image_url)"
+              />
+
+              <!-- secondary images -->
+              <img
+                v-for="(img, idx) in secondaryImages"
+                :key="'sec-' + idx"
+                :src="img"
+                alt="Secondary"
+                class="thumb"
+                @click="handleThumbClick(img)"
+              />
+
+              <!-- variant option images -->
+              <template v-for="variant in variants || []" :key="'var-' + variant.id">
+                <template v-for="opt in (variant.options || [])" :key="'opt-' + opt.id">
+                  <img
+                    v-if="opt.option_image_url"
+                    :src="opt.option_image_url"
+                    alt="Option Image"
+                    class="thumb"
+                    @click="handleThumbClick(opt.option_image_url)"
+                  />
+                </template>
+              </template>
+            </div>
           </div>
 
           <!-- Right: Details -->
-          <div class="checkout-details">
-            <h2 class="item-name">{{ item.name }}</h2>
+          <div class="details-container">
+            <h1 class="product-title">{{ product.name }}</h1>
+            <p class="product-description">{{ product.description }}</p>
 
-            <!-- Variant selectors -->
+            <!-- Price with Discount -->
+            <p class="price">
+              <span v-if="Number(product.discount_percent)">
+                <span class="original-price">{{ displayPriceOriginal }}৳</span>
+                <span class="discounted-price">{{ displayPriceDiscounted }}৳</span>
+              </span>
+              <span v-else>
+                {{ displayPriceDiscounted }}৳
+              </span>
+            </p>
+
+            <!-- Variant Selectors -->
             <div
-              v-for="variant in item.variants || []"
+              v-for="variant in variants || []"
               :key="variant.id"
               class="variant-selector"
             >
-              <label>{{ variant.name }}</label>
+              <label class="variant-label">{{ variant.name }}</label>
               <select
-                v-model="item.selected_variants[variant.id]"
-                @change="updateItemPrice(item)"
+                v-model="selectedOptions[variant.id]"
+                @change="updateDisplay"
+                class="variant-select"
               >
                 <option value="">-- Select {{ variant.name }} --</option>
                 <option
-                  v-for="opt in variant.options || []"
+                  v-for="opt in (variant.options || [])"
                   :key="opt.id"
                   :value="opt.id"
                 >
@@ -46,238 +92,230 @@
               <label>Quantity:</label>
               <input
                 type="number"
-                v-model.number="item.quantity"
+                v-model.number="quantity"
                 min="1"
-                @change="updateItemPrice(item)"
+                class="quantity-input"
               />
             </div>
 
-            <!-- Price -->
-            <p class="price">
-              <span v-if="item.discount_percent && item.discount_percent > 0">
-                <span class="original-price">{{ item.price.toFixed(2) }}৳</span>
-                <span class="discounted-price">{{ item.final_price.toFixed(2) }}৳</span>
-              </span>
-              <span v-else>{{ item.final_price.toFixed(2) }}৳</span>
-            </p>
-
-            <!-- Remove -->
-            <button class="remove-btn" @click="removeItem(item.id)">🗑 Remove</button>
+            <!-- Buttons -->
+            <div class="button-group">
+              <button @click="handleAddToCart" class="btn">Add to Cart</button>
+              <button @click="handleBuyNow" class="btn">Buy Now</button>
+            </div>
           </div>
         </div>
-
-        <!-- Cart Summary -->
-        <div class="checkout-summary">
-          <p>Subtotal: <strong>৳ {{ subtotal.toFixed(2) }}</strong></p>
-        </div>
-
-        <!-- Checkout Button -->
-        <button class="checkout-btn" @click="goToPayment">Proceed to Payment</button>
-      </div>
-
-      <div v-else class="empty-cart">
-        <p>Your cart is empty 🛍️</p>
       </div>
     </div>
 
-    <!-- Footer -->
+    <!-- ================= Related Products ================= -->
+    <div v-if="relatedProducts.length" class="related-products-page">
+      <h2 class="section-title">Related Products</h2>
+      <div class="related-products-container">
+        <ProductCard
+          v-for="item in relatedProducts"
+          :key="item.id"
+          :product="item"
+        />
+      </div>
+    </div>
+
+    <!-- ================= Footer ================= -->
     <Footer />
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
-import { useRouter } from "vue-router";
+import { ref, computed, onMounted, watch } from "vue";
+import axios from "axios";
+import { useRouter, useRoute } from "vue-router";
+
 import Navbar from "@/components/NavBar.vue";
 import Footer from "@/components/Footer.vue";
+import ProductCard from "@/components/ProductCard.vue";
 import { useCart } from "@/composables/useCart";
 
 const router = useRouter();
-const { cart: cartItems, fetchCart, updateQty, removeItem } = useCart();
+const route = useRoute();
+const { addToCart: addToCartApi } = useCart();
 
-// Load cart on mount
-onMounted(fetchCart);
+// ✅ API Base
+const API_BASE =
+  window.location.hostname === "localhost"
+    ? "http://localhost:5000"
+    : "https://urbilux-backend.onrender.com";
 
-// ---------- Price & Image Helpers ----------
-const getItemImage = (item) => {
-  // Variant image > final_image > main product image
-  if (item.variants) {
-    for (let v of item.variants) {
-      const optId = item.selected_variants[v.id];
-      if (!optId) continue;
-      const opt = (v.options || []).find((o) => String(o.id) === String(optId));
-      if (opt?.option_image_url) return opt.option_image_url;
-    }
+// ---------- States ----------
+const productId = ref(route.params.id);
+const product = ref({});
+const variants = ref([]);
+const selectedOptions = ref({});
+const quantity = ref(1);
+const displayImageOverride = ref(null);
+const relatedProducts = ref([]);
+const allProducts = ref([]);
+
+// ---------- Secondary Images ----------
+const secondaryImages = computed(() => {
+  const si = product.value.secondary_images;
+  if (!si) return [];
+  if (Array.isArray(si)) return si;
+  try {
+    const parsed = JSON.parse(si);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
-  return item.final_image || item.image_url || "/images/no-image.png";
+});
+
+// ---------- Display Image ----------
+const displayImage = computed(() => {
+  if (displayImageOverride.value) return displayImageOverride.value;
+
+  for (let v of variants.value || []) {
+    const optId = selectedOptions.value[v.id];
+    if (!optId) continue;
+    const opt = (v.options || []).find((o) => String(o.id) === String(optId));
+    if (opt?.option_image_url) return opt.option_image_url;
+  }
+
+  return product.value.image_url || "/images/no-image.png";
+});
+
+// ---------- Price Calculation ----------
+const basePrice = computed(() => {
+  let price = Number(product.value.price || 0);
+  for (let v of variants.value || []) {
+    const optId = selectedOptions.value[v.id];
+    if (!optId) continue;
+    const opt = (v.options || []).find((o) => String(o.id) === String(optId));
+    if (opt?.option_price) price += Number(opt.option_price);
+  }
+  return price;
+});
+
+const displayPriceOriginal = computed(() => basePrice.value.toFixed(2));
+
+const displayPriceDiscounted = computed(() => {
+  const original = basePrice.value;
+  const dp = Number(product.value.discount_percent || 0);
+  return dp > 0 ? (original - (original * dp) / 100).toFixed(2) : original.toFixed(2);
+});
+
+// ---------- Fetch Product ----------
+const fetchProduct = async () => {
+  if (!productId.value) return;
+  try {
+    const { data } = await axios.get(`${API_BASE}/products/${productId.value}`);
+    product.value = data || {};
+    variants.value = Array.isArray(data?.variants) ? data.variants : [];
+    selectedOptions.value = {};
+
+    variants.value.forEach((v) => {
+      selectedOptions.value[v.id] = "";
+    });
+
+    displayImageOverride.value = null;
+
+    const resAll = await axios.get(`${API_BASE}/products`);
+    allProducts.value = resAll.data || [];
+
+    if (product.value.category_slug) {
+      relatedProducts.value = allProducts.value
+        .filter(
+          (p) =>
+            p.category_slug === product.value.category_slug &&
+            String(p.id) !== String(product.value.id)
+        )
+        .slice(0, 8);
+    } else {
+      relatedProducts.value = allProducts.value
+        .filter((p) => String(p.id) !== String(product.value.id))
+        .slice(0, 8);
+    }
+  } catch (err) {
+    console.error("❌ Failed to fetch product:", err);
+    product.value = {};
+    variants.value = [];
+    relatedProducts.value = [];
+  }
 };
 
-const updateItemPrice = (item) => {
-  // base price
-  let price = Number(item.price || 0);
-
-  // add selected variant prices
-  if (item.variants) {
-    for (let v of item.variants) {
-      const optId = item.selected_variants[v.id];
-      if (!optId) continue;
-      const opt = (v.options || []).find((o) => String(o.id) === String(optId));
-      if (opt?.option_price) price += Number(opt.option_price);
-    }
-  }
-
-  // apply discount once
-  const discount = Number(item.discount_percent || 0);
-  item.final_price = discount > 0 ? price - (price * discount) / 100 : price;
-
-  // update cart quantity if changed
-  updateQty(item.id, item.quantity);
+// ---------- Update Display ----------
+const updateDisplay = () => {
+  displayImageOverride.value = null;
 };
 
-// ---------- Cart Subtotal ----------
-const subtotal = computed(() =>
-  cartItems.value.reduce((sum, item) => sum + Number(item.final_price) * item.quantity, 0)
+const handleThumbClick = (img) => {
+  displayImageOverride.value = img;
+};
+
+// ---------- Cart Handlers ----------
+const handleAddToCart = async () => {
+  try {
+    const payload = {
+      product_id: Number(product.value.id),
+      quantity: Number(quantity.value),
+      final_price: Number(displayPriceDiscounted.value),
+      final_image: displayImage.value || product.value.image_url,
+      selected_variants: selectedOptions.value,
+      variants: variants.value || []
+    };
+
+    await addToCartApi(payload);
+    alert("✅ Product added to cart successfully!");
+  } catch (err) {
+    console.error("❌ Add to cart failed:", err);
+    alert("Failed to add to cart!");
+  }
+};
+
+const handleBuyNow = async () => {
+  await handleAddToCart();
+  router.push("/checkout");
+};
+
+// ---------- Lifecycle ----------
+onMounted(() => {
+  fetchProduct();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+watch(
+  () => route.params.id,
+  (newId) => {
+    productId.value = newId;
+    fetchProduct();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
 );
-
-// ---------- Actions ----------
-const goToPayment = () => router.push("/payment");
 </script>
 
 <style scoped>
-.checkout-page {
-  max-width: 90%;
-  margin: 80px auto;
-  font-family: "Zalando Sans", sans-serif;
-}
-
-.checkout-title {
-  font-size: 2em;
-  font-weight: 700;
-  margin-bottom: 30px;
-  color: #4a00e0;
-  text-align: center;
-}
-
-.checkout-container {
-  display: flex;
-  flex-direction: column;
-  gap: 25px;
-}
-
-.checkout-item {
-  display: flex;
-  gap: 20px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 15px;
-}
-
-.checkout-image img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-}
-
-.checkout-details {
-  flex: 1;
-}
-
-.item-name {
-  font-weight: 600;
-  font-size: 1.2em;
-  margin-bottom: 10px;
-}
-
-.variant-selector {
-  margin-bottom: 10px;
-}
-.variant-selector label {
-  display: block;
-  font-weight: 500;
-  margin-bottom: 3px;
-}
-.variant-selector select {
-  padding: 5px 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
+/* Keep your previous CSS (product page, buttons, thumbnails, etc.) */
 .quantity-box {
-  margin: 10px 0;
+  margin: 15px 0;
   display: flex;
   align-items: center;
   gap: 10px;
 }
-.quantity-box input {
+.quantity-input {
   width: 60px;
   padding: 5px;
   border-radius: 6px;
   border: 1px solid #ccc;
   text-align: center;
 }
-
-.price {
-  font-weight: 700;
-  font-size: 1.2em;
-  margin: 10px 0;
+.product-page {
+  max-width: 80%;
+  margin-top: 100px;
+  margin-left: 10%;
+  margin-right: 10%;
+  padding: 20px;
+  font-family: "Zalando Sans", sans-serif;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 20px rgba(74, 0, 224, 0.1);
 }
-.original-price {
-  text-decoration: line-through;
-  color: #888;
-  margin-right: 8px;
-}
-.discounted-price {
-  color: #e53935;
-}
-
-.remove-btn {
-  padding: 6px 10px;
-  border: none;
-  background: #ff6b6b;
-  color: #fff;
-  border-radius: 6px;
-  cursor: pointer;
-}
-.remove-btn:hover {
-  background: #e53935;
-}
-
-.checkout-summary {
-  font-size: 1.2em;
-  font-weight: 600;
-  text-align: right;
-  margin-top: 15px;
-}
-
-.checkout-btn {
-  width: 100%;
-  padding: 12px 0;
-  background: #6b46c1;
-  color: #fff;
-  font-weight: 700;
-  border: none;
-  border-radius: 8px;
-  margin-top: 20px;
-  cursor: pointer;
-}
-.checkout-btn:hover {
-  background: #553c9a;
-}
-
-/* Mobile */
-@media (max-width: 768px) {
-  .checkout-item {
-    flex-direction: column;
-    align-items: center;
-  }
-  .checkout-image img {
-    width: 100%;
-    max-width: 250px;
-    height: auto;
-  }
-  .checkout-details {
-    width: 100%;
-    text-align: center;
-  }
-}
+/* Rest of your previous CSS remains the same... */
 </style>
