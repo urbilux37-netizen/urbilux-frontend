@@ -1,523 +1,283 @@
 <template>
   <div>
+    <!-- 🟣 Navbar -->
     <Navbar />
 
+    <!-- ================= Checkout Section ================= -->
     <div class="checkout-page">
-      <h1 class="checkout-title">Checkout</h1>
+      <h1 class="checkout-title">🛒 Checkout</h1>
 
-      <div class="checkout-container">
-        <!-- 🟣 Left: Order Summary -->
-        <div class="order-summary">
-          <h2>Your Cart</h2>
-
-          <div v-if="cart.length">
-            <div v-for="item in cart" :key="item.id" class="summary-item">
-
-              <!-- 🟣 FIXED IMAGE -->
-              <img :src="item.final_image" alt="Product Image" class="summary-img" />
-
-              <div class="summary-details">
-                <p class="summary-name">{{ item.name }}</p>
-
-                <!-- 🟣 FIXED PRICE -->
-                <p class="summary-price">
-                  <template v-if="item.discount_percent">
-                    <span class="discounted">
-                      ৳{{ discountedPrice(item).toFixed(2) }}
-                    </span>
-
-                    <span class="original">
-                      ৳{{ item.final_price }}
-                    </span>
-                  </template>
-
-                  <template v-else>
-                    ৳{{ item.final_price }}
-                  </template>
-
-                  × {{ item.quantity }}
-                </p>
-              </div>
-            </div>
-
-            <!-- 🟣 FIXED TOTAL PRICE -->
-            <div class="total-section">
-              <h3>
-                Total:
-                ৳{{ (Number(totalPrice) - Number(onlinePayment.amount || 0)).toFixed(2) }}
-              </h3>
-
-              <p v-if="onlinePayment.amount">
-                (Paid ৳{{ onlinePayment.amount }} by {{ onlinePayment.method }})
-              </p>
-            </div>
+      <div v-if="cartItems.length" class="checkout-container">
+        <div v-for="item in cartItems" :key="item.id" class="checkout-item">
+          <!-- Left: Image -->
+          <div class="checkout-image">
+            <img :src="getItemImage(item)" alt="Product Image" />
           </div>
 
-          <div v-else>
-            <p>Your cart is empty.</p>
-          </div>
-        </div>
+          <!-- Right: Details -->
+          <div class="checkout-details">
+            <h2 class="item-name">{{ item.name }}</h2>
 
-        <!-- 🟣 Right: Customer Details -->
-        <div class="checkout-form">
-          <h2>Customer Details</h2>
+            <!-- Variant selectors -->
+            <div
+              v-for="variant in item.variants || []"
+              :key="variant.id"
+              class="variant-selector"
+            >
+              <label>{{ variant.name }}</label>
+              <select
+                v-model="item.selected_variants[variant.id]"
+                @change="updateItemPrice(item)"
+              >
+                <option value="">-- Select {{ variant.name }} --</option>
+                <option
+                  v-for="opt in variant.options || []"
+                  :key="opt.id"
+                  :value="opt.id"
+                >
+                  {{ opt.option_name }}
+                  {{ opt.option_price ? `( +${opt.option_price}৳ )` : "" }}
+                </option>
+              </select>
+            </div>
 
-          <form @submit.prevent="placeOrder">
-            <input v-model="customer.name" type="text" placeholder="Full Name" required />
-            <input v-model="customer.phone" type="text" placeholder="Phone Number" required />
-            <input v-model="customer.address" type="text" placeholder="Full Address" required />
-
-            <label>Payment Method</label>
-            <select v-model="paymentMethod">
-              <option>Cash on Delivery</option>
-              <option>Online Payment</option>
-            </select>
-
-            <!-- 🟣 Online Payment Section -->
-            <div v-if="paymentMethod === 'Online Payment'" class="payment-box">
-              <label>Choose Payment App:</label>
-              <div class="radio-group">
-                <label>
-                  <input type="radio" value="Bkash" v-model="onlinePayment.method" />
-                  Bkash
-                </label>
-                <label>
-                  <input type="radio" value="Nagad" v-model="onlinePayment.method" />
-                  Nagad
-                </label>
-              </div>
-
-              <div class="instructions">
-                <p>
-                  <strong>{{ onlinePayment.method }} Personal Number:</strong>
-                  {{ onlinePayment.method === "Bkash" ? "01631822765" : "01631822765" }}
-                </p>
-                <p>অনুগ্রহ করে Send Money করুন উপরের নম্বরে।</p>
-              </div>
-
+            <!-- Quantity -->
+            <div class="quantity-box">
+              <label>Quantity:</label>
               <input
-                v-model="onlinePayment.amount"
                 type="number"
-                placeholder="কতো টাকা পাঠিয়েছেন (৳)"
-                required
-              />
-              <input
-                v-model="onlinePayment.last2"
-                type="text"
-                maxlength="2"
-                placeholder="যে নাম্বার থেকে পাঠিয়েছেন তার শেষ ২ সংখ্যা দিন"
-                required
+                v-model.number="item.quantity"
+                min="1"
+                @change="updateItemPrice(item)"
               />
             </div>
 
-            <button type="submit" class="checkout-btn">Confirm Order</button>
-          </form>
+            <!-- Price -->
+            <p class="price">
+              <span v-if="item.discount_percent && item.discount_percent > 0">
+                <span class="original-price">{{ item.price.toFixed(2) }}৳</span>
+                <span class="discounted-price">{{ item.final_price.toFixed(2) }}৳</span>
+              </span>
+              <span v-else>{{ item.final_price.toFixed(2) }}৳</span>
+            </p>
+
+            <!-- Remove -->
+            <button class="remove-btn" @click="removeItem(item.id)">🗑 Remove</button>
+          </div>
         </div>
+
+        <!-- Cart Summary -->
+        <div class="checkout-summary">
+          <p>Subtotal: <strong>৳ {{ subtotal.toFixed(2) }}</strong></p>
+        </div>
+
+        <!-- Checkout Button -->
+        <button class="checkout-btn" @click="goToPayment">Proceed to Payment</button>
+      </div>
+
+      <div v-else class="empty-cart">
+        <p>Your cart is empty 🛍️</p>
       </div>
     </div>
+
+    <!-- Footer -->
+    <Footer />
   </div>
 </template>
 
 <script setup>
-import Navbar from "@/components/NavBar.vue";
-import axios from "axios";
 import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import Navbar from "@/components/NavBar.vue";
+import Footer from "@/components/Footer.vue";
 import { useCart } from "@/composables/useCart";
 
-// API
-const API_BASE =
-  window.location.hostname === "localhost"
-    ? "http://localhost:5000/api"
-    : "https://urbilux-backend.onrender.com/api";
+const router = useRouter();
+const { cart: cartItems, fetchCart, updateQty, removeItem } = useCart();
 
-axios.defaults.withCredentials = true;
-axios.defaults.baseURL = API_BASE;
+// Load cart on mount
+onMounted(fetchCart);
 
-// Cart
-const { cart, fetchCart } = useCart();
-
-// Customer Info
-const customer = ref({
-  name: "",
-  phone: "",
-  address: "",
-});
-
-const paymentMethod = ref("Cash on Delivery");
-const onlinePayment = ref({
-  method: "Bkash",
-  amount: "",
-  last2: "",
-});
-
-// 🟣 FIXED — Use final_price
-const discountedPrice = (item) => {
-  const price = Number(item.final_price);
-  const discount = Number(item.discount_percent || 0);
-  return discount ? price - (price * discount) / 100 : price;
+// ---------- Price & Image Helpers ----------
+const getItemImage = (item) => {
+  // Variant image > final_image > main product image
+  if (item.variants) {
+    for (let v of item.variants) {
+      const optId = item.selected_variants[v.id];
+      if (!optId) continue;
+      const opt = (v.options || []).find((o) => String(o.id) === String(optId));
+      if (opt?.option_image_url) return opt.option_image_url;
+    }
+  }
+  return item.final_image || item.image_url || "/images/no-image.png";
 };
 
-// 🟣 FIXED — total price calculation
-const totalPrice = computed(() =>
-  cart.value.reduce(
-    (sum, item) => sum + discountedPrice(item) * (item.quantity || 1),
-    0
-  )
+const updateItemPrice = (item) => {
+  // base price
+  let price = Number(item.price || 0);
+
+  // add selected variant prices
+  if (item.variants) {
+    for (let v of item.variants) {
+      const optId = item.selected_variants[v.id];
+      if (!optId) continue;
+      const opt = (v.options || []).find((o) => String(o.id) === String(optId));
+      if (opt?.option_price) price += Number(opt.option_price);
+    }
+  }
+
+  // apply discount once
+  const discount = Number(item.discount_percent || 0);
+  item.final_price = discount > 0 ? price - (price * discount) / 100 : price;
+
+  // update cart quantity if changed
+  updateQty(item.id, item.quantity);
+};
+
+// ---------- Cart Subtotal ----------
+const subtotal = computed(() =>
+  cartItems.value.reduce((sum, item) => sum + Number(item.final_price) * item.quantity, 0)
 );
 
-// Place Order
-const placeOrder = async () => {
-  try {
-    await fetchCart();
-
-    if (!cart.value.length) {
-      alert("Your cart is empty!");
-      return;
-    }
-
-    const payload = {
-      items: cart.value.map((i) => ({
-        product_id: i.product_id,
-        name: i.name,
-        quantity: i.quantity,
-
-        // 🟣 FIXED
-        price: discountedPrice(i).toFixed(2),
-        image_url: i.final_image,
-
-        discount_percent: i.discount_percent,
-        variants: i.variants,
-      })),
-
-      total: totalPrice.value,
-      customer: customer.value,
-      payment_method: paymentMethod.value,
-    };
-
-    if (paymentMethod.value === "Online Payment") {
-      payload.online_payment = {
-        method: onlinePayment.value.method,
-        amount: Number(onlinePayment.value.amount || 0),
-        last2: onlinePayment.value.last2,
-        note: `Manual ${onlinePayment.value.method} payment verification pending`,
-      };
-    }
-
-    const res = await axios.post(`${API_BASE}/checkout`, payload);
-
-    if (res.data.success) {
-      alert("Order placed successfully!");
-      customer.value = { name: "", phone: "", address: "" };
-      onlinePayment.value = { method: "Bkash", amount: "", last2: "" };
-      paymentMethod.value = "Cash on Delivery";
-      await fetchCart();
-    } else {
-      alert("Checkout failed!");
-    }
-  } catch (err) {
-    console.error("Checkout Error:", err);
-    alert("Error: " + err.message);
-  }
-};
-
-// Load cart
-onMounted(fetchCart);
+// ---------- Actions ----------
+const goToPayment = () => router.push("/payment");
 </script>
-
 
 <style scoped>
 .checkout-page {
-  margin: 100px auto;
-  width: 85%;
-  max-width: 1200px;
+  max-width: 90%;
+  margin: 80px auto;
   font-family: "Zalando Sans", sans-serif;
 }
 
 .checkout-title {
-  text-align: center;
-  font-size: 32px;
+  font-size: 2em;
   font-weight: 700;
-  background: linear-gradient(90deg, #4a00e0, #8e2de2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
+  color: #4a00e0;
+  text-align: center;
 }
 
 .checkout-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 40px;
+  flex-direction: column;
+  gap: 25px;
 }
 
-/* 🟣 Order Summary */
-.order-summary {
-  flex: 1;
-  min-width: 350px;
-  background: #fff;
-  padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(142, 45, 226, 0.08);
-}
-
-.order-summary h2 {
-  font-size: 20px;
-  color: #4a00e0;
-  font-weight: 700;
-  margin-bottom: 15px;
-}
-
-.summary-item {
+.checkout-item {
   display: flex;
-  align-items: center;
-  border-bottom: 1px solid #eee;
-  padding: 10px 0;
+  gap: 20px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 15px;
 }
 
-.summary-img {
-  width: 70px;
-  height: 70px;
-  border-radius: 8px;
+.checkout-image img {
+  width: 120px;
+  height: 120px;
   object-fit: cover;
-  margin-right: 15px;
+  border-radius: 8px;
 }
 
-.summary-details {
+.checkout-details {
   flex: 1;
 }
 
-.summary-name {
+.item-name {
   font-weight: 600;
-  color: #333;
-  font-size: 15px;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
+
+.variant-selector {
+  margin-bottom: 10px;
+}
+.variant-selector label {
+  display: block;
+  font-weight: 500;
   margin-bottom: 3px;
 }
-
-.summary-price {
-  font-size: 14px;
-  color: #555;
-}
-
-.discounted {
-  color: #e67e22;
-  font-weight: 600;
-}
-
-.original {
-  text-decoration: line-through;
-  color: #999;
-  font-size: 12px;
-  margin-left: 6px;
-}
-
-.total-section {
-  margin-top: 15px;
-  text-align: right;
-}
-
-.total-section h3 {
-  color: #4a00e0;
-  font-size: 19px;
-  font-weight: 700;
-}
-
-/* 🟣 Checkout Form */
-.checkout-form {
-  flex: 1;
-  min-width: 350px;
-  background: #fff;
-  padding: 25px;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(142, 45, 226, 0.08);
-}
-
-.checkout-form h2 {
-  font-size: 20px;
-  color: #4a00e0;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
-.checkout-form input,
-.checkout-form select {
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  border-radius: 8px;
+.variant-selector select {
+  padding: 5px 8px;
+  border-radius: 6px;
   border: 1px solid #ccc;
-  font-size: 14px;
-  background: #fafafa;
-  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.checkout-form input:focus,
-.checkout-form select:focus {
-  border-color: #8e2de2;
-  box-shadow: 0 0 0 2px rgba(142, 45, 226, 0.15);
-  outline: none;
+.quantity-box {
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.quantity-box input {
+  width: 60px;
+  padding: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  text-align: center;
 }
 
-/* 🟣 Confirm Button */
-.checkout-btn {
-  background: linear-gradient(90deg, #4a00e0, #8e2de2);
-  color: #fff;
-  padding: 12px 0;
+.price {
+  font-weight: 700;
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+.original-price {
+  text-decoration: line-through;
+  color: #888;
+  margin-right: 8px;
+}
+.discounted-price {
+  color: #e53935;
+}
+
+.remove-btn {
+  padding: 6px 10px;
   border: none;
-  border-radius: 10px;
+  background: #ff6b6b;
+  color: #fff;
+  border-radius: 6px;
   cursor: pointer;
+}
+.remove-btn:hover {
+  background: #e53935;
+}
+
+.checkout-summary {
+  font-size: 1.2em;
   font-weight: 600;
-  font-size: 16px;
-  transition: all 0.3s ease;
+  text-align: right;
+  margin-top: 15px;
 }
 
+.checkout-btn {
+  width: 100%;
+  padding: 12px 0;
+  background: #6b46c1;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+}
 .checkout-btn:hover {
-  opacity: 0.9;
-  transform: scale(1.02);
+  background: #553c9a;
 }
 
-/* ✅ Tablet */
-@media (max-width: 992px) {
-  .checkout-page {
-    width: 95%;
-    margin: 70px auto;
-  }
-
-  .checkout-title {
-    font-size: 26px;
-    margin-bottom: 30px;
-  }
-
-  .checkout-container {
+/* Mobile */
+@media (max-width: 768px) {
+  .checkout-item {
     flex-direction: column;
-    gap: 25px;
+    align-items: center;
   }
-
-  .order-summary,
-  .checkout-form {
-    padding: 20px;
-    border-radius: 14px;
+  .checkout-image img {
+    width: 100%;
+    max-width: 250px;
+    height: auto;
   }
-
-  .summary-img {
-    width: 65px;
-    height: 65px;
-  }
-
-  .summary-name {
-    font-size: 14px;
-  }
-
-  .summary-price {
-    font-size: 13px;
-  }
-
-  .total-section h3 {
-    font-size: 17px;
-  }
-
-  .checkout-form input,
-  .checkout-form select {
-    font-size: 13px;
-    padding: 9px 10px;
-  }
-
-  .checkout-btn {
-    font-size: 15px;
-    padding: 10px 0;
-  }
-}
-
-/* ✅ Mobile */
-@media (max-width: 600px) {
-  .checkout-page {
-    width: 94%;
-    margin: 40px auto;
-  }
-
-  .checkout-title {
-    font-size: 22px;
-    margin-bottom: 25px;
-  }
-
-  .order-summary,
-  .checkout-form {
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0 3px 10px rgba(142, 45, 226, 0.08);
-  }
-
-  .order-summary h2,
-  .checkout-form h2 {
-    font-size: 18px;
-    margin-bottom: 15px;
-  }
-
-  .summary-img {
-    width: 55px;
-    height: 55px;
-  }
-
-  .summary-name {
-    font-size: 13.5px;
-  }
-
-  .summary-price {
-    font-size: 12.5px;
-  }
-
-  /* 🔹 Compact Inputs */
-  .checkout-form input,
-  .checkout-form select {
-    padding: 8px 9px;
-    font-size: 13px;
-    border-radius: 7px;
-    margin-bottom: 10px;
-  }
-
-  .checkout-btn {
-    font-size: 14px;
-    padding: 9px 0;
-    border-radius: 8px;
-  }
-
-  .total-section h3 {
-    font-size: 16px;
-  }
-}
-
-/* ✅ Extra Small Devices */
-@media (max-width: 400px) {
-  .checkout-page {
-    width: 98%;
-    margin: 25px auto;
-  }
-
-  .checkout-title {
-    font-size: 20px;
-    margin-bottom: 20px;
-  }
-
-  .summary-img {
-    width: 50px;
-    height: 50px;
-  }
-
-  .summary-name {
-    font-size: 13px;
-  }
-
-  .summary-price {
-    font-size: 12px;
-  }
-
-  .checkout-form input,
-  .checkout-form select {
-    padding: 7px 8px;
-    font-size: 12px;
-  }
-
-  .checkout-btn {
-    font-size: 13px;
-    padding: 8px 0;
+  .checkout-details {
+    width: 100%;
+    text-align: center;
   }
 }
 </style>
