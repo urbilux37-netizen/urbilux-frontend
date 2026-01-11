@@ -20,10 +20,10 @@
             <p class="price">
               <template v-if="item.discount_percent && item.discount_percent > 0">
                 <span class="discounted">
-                  ৳ {{ discounted(item).toFixed(2) }}
+                  ৳ {{ Number(item.final_price).toFixed(2) }}
                 </span>
                 <span class="original">
-                  ৳ {{ Number(item.final_price).toFixed(2) }}
+                  ৳ {{ Number(item.price).toFixed(2) }}
                 </span>
               </template>
               <template v-else>
@@ -79,16 +79,9 @@ const router = useRouter();
 
 onMounted(fetchCart);
 
-// 🔹 Discounted price calculator
-const discounted = (item) => {
-  const price = Number(item.final_price || 0);
-  const discount = Number(item.discount_percent || 0);
-  return discount > 0 ? price - (price * discount) / 100 : price;
-};
-
-// 🔹 Total cart amount
+// 🔹 Total cart amount (final_price already discounted)
 const totalPrice = computed(() =>
-  cart.value.reduce((sum, item) => sum + discounted(item) * item.quantity, 0)
+  cart.value.reduce((sum, item) => sum + Number(item.final_price) * item.quantity, 0)
 );
 
 // 🔹 Increase quantity
