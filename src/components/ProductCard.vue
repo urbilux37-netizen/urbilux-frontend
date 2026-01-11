@@ -34,52 +34,39 @@ import { useCart } from "@/composables/useCart";
 const placeholder = new URL("@/assets/no-image.png", import.meta.url).href;
 const props = defineProps({ product: Object });
 const router = useRouter();
-const { fetchCart } = useCart();
+const { fetchCart, addToCart } = useCart();
 
-// ✅ Dynamic API base
+// Dynamic API
 const API_BASE =
   window.location.hostname === "localhost"
     ? "http://localhost:5000/api"
     : "https://urbilux-backend.onrender.com/api";
 
-// ✅ Navigate to product page
+// Navigate to product page
 const goToProductPage = () => {
   if (props.product.id) router.push(`/product/${props.product.id}`);
 };
 
-// ✅ Discounted price
+// Discounted price
 const finalPrice = computed(() => {
   const price = Number(props.product.price) || 0;
   const discount = Number(props.product.discount_percent) || 0;
   return discount ? (price - (price * discount) / 100).toFixed(2) : price.toFixed(2);
 });
 
-// ✅ Add to cart (fetch full product details first)
+// Add to cart using composable (works same as product page)
 const handleAddToCart = async () => {
   try {
-    // Fetch full product details
-    const res = await fetch(`${API_BASE}/products/${props.product.id}`);
-    const fullProduct = await res.json();
-
     const payload = {
-      product_id: fullProduct.id,
+      product_id: Number(props.product.id),
       quantity: 1,
-      final_price: Number(fullProduct.price || 0),
-      final_image: fullProduct.image_url || placeholder,
-      selected_variants: {}, // empty for product card add-to-cart
-      discount_percent: Number(fullProduct.discount_percent || 0),
-      name: fullProduct.name,
+      final_price: Number(finalPrice.value),
+      final_image: props.product.image_url || placeholder,
+      selected_variants: {},
+      discount_percent: Number(props.product.discount_percent || 0),
+      name: props.product.name,
     };
-
-    // Add to cart
-    await fetch(`${API_BASE}/cart/add`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
-
-    // Refresh cart
+    await addToCart(payload);
     await fetchCart();
     alert("✅ Product added to cart!");
   } catch (err) {
@@ -88,7 +75,7 @@ const handleAddToCart = async () => {
   }
 };
 
-// ✅ Buy now
+// Buy now
 const handleBuyNow = async () => {
   try {
     await handleAddToCart();
