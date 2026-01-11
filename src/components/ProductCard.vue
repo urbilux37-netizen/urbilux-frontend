@@ -29,18 +29,18 @@
 <script setup>
 import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { useCartStore } from "@/stores/cart";
+import { useCart } from "@/composables/useCart";
 
 const placeholder = new URL("@/assets/no-image.png", import.meta.url).href;
 const props = defineProps({ product: Object });
 const router = useRouter();
-const cartStore = useCartStore();
+const { fetchCart } = useCart();
 
-// ✅ Dynamic API
+// ✅ Dynamic API base
 const API_BASE =
   window.location.hostname === "localhost"
-    ? "http://localhost:5000"
-    : "https://urbilux-backend.onrender.com";
+    ? "http://localhost:5000/api"
+    : "https://urbilux-backend.onrender.com/api";
 
 // ✅ Navigate to product page
 const goToProductPage = () => {
@@ -54,18 +54,37 @@ const finalPrice = computed(() => {
   return discount ? (price - (price * discount) / 100).toFixed(2) : price.toFixed(2);
 });
 
-// ✅ Add to cart
+// ✅ Add to cart (fetch full product details first)
 const handleAddToCart = async () => {
   try {
-    await fetch(`${API_BASE}/api/cart/add`, {
+    // Fetch full product details
+    const res = await fetch(`${API_BASE}/products/${props.product.id}`);
+    const fullProduct = await res.json();
+
+    const payload = {
+      product_id: fullProduct.id,
+      quantity: 1,
+      final_price: Number(fullProduct.price || 0),
+      final_image: fullProduct.image_url || placeholder,
+      selected_variants: {}, // empty for product card add-to-cart
+      discount_percent: Number(fullProduct.discount_percent || 0),
+      name: fullProduct.name,
+    };
+
+    // Add to cart
+    await fetch(`${API_BASE}/cart/add`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
-      body: JSON.stringify({ product_id: props.product.id, quantity: 1 }),
+      body: JSON.stringify(payload),
     });
-    await cartStore.fetchCart();
+
+    // Refresh cart
+    await fetchCart();
+    alert("✅ Product added to cart!");
   } catch (err) {
     console.error("❌ Add to cart failed:", err);
+    alert("Failed to add to cart!");
   }
 };
 
@@ -79,6 +98,7 @@ const handleBuyNow = async () => {
   }
 };
 </script>
+
 
 <style scoped>
 .product-card {
