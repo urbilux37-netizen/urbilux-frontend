@@ -6,35 +6,32 @@
         <button class="close" @click="closeDrawer">✖</button>
       </header>
 
+      <!-- ================= Cart Items ================= -->
       <section v-if="cart.length && !loading" class="cart-list">
         <div v-for="item in cart" :key="item.id" class="cart-item">
-
-          <!-- ✅ Correct image logic -->
-          <img
-            :src="item.final_image || '/images/no-image.png'"
-            alt="Product Image"
-            class="product-image"
-          />
+          <!-- Product Image -->
+          <img :src="item.final_image" alt="Product Image" class="product-image" />
 
           <div class="details">
+            <!-- Product Name -->
             <h3>{{ item.name }}</h3>
 
-            <!-- ✅ Correct price logic with discount -->
+            <!-- Price with discount -->
             <p class="price">
-              <template v-if="item.discount_percent && Number(item.discount_percent)">
+              <template v-if="item.discount_percent && item.discount_percent > 0">
                 <span class="discounted">
-                  ৳ {{ calculateDiscount(item).toFixed(2) }}
+                  ৳ {{ discounted(item).toFixed(2) }}
                 </span>
                 <span class="original">
                   ৳ {{ Number(item.final_price).toFixed(2) }}
                 </span>
               </template>
-
               <template v-else>
                 ৳ {{ Number(item.final_price).toFixed(2) }}
               </template>
             </p>
 
+            <!-- Quantity controls -->
             <div class="quantity">
               <button @click="decrease(item)">-</button>
               <span>{{ item.quantity }}</span>
@@ -42,12 +39,14 @@
             </div>
           </div>
 
+          <!-- Remove Button -->
           <button class="remove" @click="remove(item.id)">🗑</button>
         </div>
 
+        <!-- Cart Summary -->
         <div class="cart-summary">
           <p class="total-text">Subtotal:</p>
-          <p class="total-amount">৳ {{ totalPrice }}</p>
+          <p class="total-amount">৳ {{ totalPrice.toFixed(2) }}</p>
         </div>
 
         <button class="checkout-btn" @click="goCheckout">
@@ -55,15 +54,14 @@
         </button>
       </section>
 
+      <!-- Loading -->
       <section v-else-if="loading" class="empty-box">
         <p>Loading your cart...</p>
       </section>
 
+      <!-- Empty Cart -->
       <section v-else class="empty-box">
-        <img
-          src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png"
-          alt="Empty"
-        />
+        <img src="https://cdn-icons-png.flaticon.com/512/2038/2038854.png" alt="Empty" />
         <p>Your cart is empty 🛍️</p>
       </section>
     </div>
@@ -79,35 +77,36 @@ const emit = defineEmits(["close"]);
 const { cart, loading, fetchCart, updateQty, removeItem } = useCart();
 const router = useRouter();
 
-// ✅ Fetch latest cart items on mount
 onMounted(fetchCart);
 
-// ---------- Discounted Price Calculation ----------
-const calculateDiscount = (item) => {
-  if (!item.discount_percent) return Number(item.final_price);
-  const base = Number(item.final_price);
-  const discount = Number(item.discount_percent);
-  return base - (base * discount) / 100;
+// 🔹 Discounted price calculator
+const discounted = (item) => {
+  const price = Number(item.final_price || 0);
+  const discount = Number(item.discount_percent || 0);
+  return discount > 0 ? price - (price * discount) / 100 : price;
 };
 
-// ---------- Total Price ----------
+// 🔹 Total cart amount
 const totalPrice = computed(() =>
-  cart.value.reduce((sum, item) => sum + calculateDiscount(item) * item.quantity, 0)
+  cart.value.reduce((sum, item) => sum + discounted(item) * item.quantity, 0)
 );
 
-// ---------- Quantity Handlers ----------
+// 🔹 Increase quantity
 const increase = async (item) => {
   await updateQty(item.id, item.quantity + 1);
 };
 
+// 🔹 Decrease quantity
 const decrease = async (item) => {
   if (item.quantity > 1) await updateQty(item.id, item.quantity - 1);
 };
 
-// ---------- Remove Item ----------
-const remove = async (id) => await removeItem(id);
+// 🔹 Remove item
+const remove = async (id) => {
+  await removeItem(id);
+};
 
-// ---------- Drawer & Checkout ----------
+// 🔹 Drawer actions
 const closeDrawer = () => emit("close");
 const goCheckout = () => {
   emit("close");
@@ -115,230 +114,125 @@ const goCheckout = () => {
 };
 </script>
 
-
-
 <style scoped>
-/* 🔹 Overlay */
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(0,0,0,0.5);
   display: flex;
   justify-content: flex-end;
   z-index: 1000;
-  backdrop-filter: blur(2px);
 }
 
-/* 🔹 Drawer */
 .drawer {
-  background: #fff;
   width: 400px;
-  height: 100vh;
-  box-shadow: -3px 0 15px rgba(0, 0, 0, 0.25);
-  padding: 20px;
+  max-width: 100%;
+  background: #fff;
+  padding: 1.5rem;
   display: flex;
   flex-direction: column;
-  animation: slideIn 0.3s ease forwards;
+  height: 100%;
   overflow-y: auto;
 }
 
-/* 🔹 Header */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 2px solid rgba(142, 45, 226, 0.2);
-  padding-bottom: 10px;
-  margin-bottom: 15px;
-}
-header h2 {
-  color: #4a00e0;
-  font-size: 20px;
-  font-weight: 700;
-}
-.close {
-  background: none;
-  border: none;
-  font-size: 22px;
-  cursor: pointer;
-  color: #8e2de2;
-  transition: 0.2s;
-}
-.close:hover {
-  transform: rotate(90deg);
 }
 
-/* 🔹 Cart Items */
-.cart-list {
-  flex-grow: 1;
+header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
 }
+
+header .close {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.cart-list {
+  margin-top: 1rem;
+}
+
 .cart-item {
   display: flex;
   align-items: center;
-  border-bottom: 1px dashed #ddd;
-  padding: 10px 0;
-  position: relative;
+  margin-bottom: 1rem;
 }
+
 .product-image {
-  width: 65px;
-  height: 65px;
-  border-radius: 8px;
+  width: 80px;
+  height: 80px;
   object-fit: cover;
-  margin-right: 10px;
+  margin-right: 1rem;
+  border-radius: 8px;
 }
+
 .details {
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
 }
+
 .details h3 {
-  font-size: 15px;
-  color: #333;
+  font-size: 1rem;
   font-weight: 600;
+  margin-bottom: 0.25rem;
 }
+
 .price {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
 }
-.price .discounted {
-  color: #e67e22;
-  font-weight: 700;
-}
+
 .price .original {
-  color: #999;
   text-decoration: line-through;
-  font-size: 13px;
+  color: #888;
+  margin-left: 0.5rem;
 }
+
 .quantity {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.5rem;
 }
+
 .quantity button {
-  background: #8e2de2;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  width: 26px;
-  height: 26px;
-  font-weight: bold;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #ccc;
+  background: #f9f9f9;
   cursor: pointer;
-  transition: 0.2s;
-}
-.quantity button:hover {
-  background: #4a00e0;
 }
 
-/* ✅ Remove Button Visible */
 .remove {
-  position: absolute;
-  right: 5px;
-  top: 35%;
-  background: transparent;
+  background: none;
   border: none;
-  color: #e74c3c;
-  font-size: 18px;
+  font-size: 1.2rem;
   cursor: pointer;
-  transition: 0.2s;
-}
-.remove:hover {
-  transform: scale(1.2);
+  margin-left: 0.5rem;
 }
 
-/* 🔹 Subtotal */
 .cart-summary {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-  padding-top: 15px;
-  border-top: 2px solid rgba(142, 45, 226, 0.1);
-}
-.total-text {
-  font-size: 17px;
   font-weight: 600;
-  color: #333;
-}
-.total-amount {
-  font-size: 18px;
-  font-weight: 700;
-  color: #4a00e0;
+  margin-top: 1rem;
 }
 
-/* 🔹 Checkout */
 .checkout-btn {
-  background: linear-gradient(90deg, #4a00e0, #8e2de2);
-  border: none;
-  color: white;
+  margin-top: 1rem;
   width: 100%;
-  padding: 12px 0;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  margin-top: 15px;
+  padding: 0.75rem;
+  background: #6b46c1;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  transition: all 0.3s ease;
 }
+
 .checkout-btn:hover {
-  background: linear-gradient(90deg, #8e2de2, #4a00e0);
-  transform: scale(1.02);
-}
-/* 🔹 Empty State (Fixed for mobile + desktop) */
-.empty-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: calc(100vh - 150px); /* পুরো drawer এর মধ্যে vertically center */
-  text-align: center;
-  color: #666;
-  gap: 12px;
-}
-
-.empty-box img {
-  width: 120px;
-  height: auto;
-  opacity: 0.85;
-  margin-bottom: 6px;
-  transition: all 0.3s ease;
-}
-
-.empty-box p {
-  font-size: 16px;
-  font-weight: 500;
-}
-/* 🔹 Animation */
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-  }
-  to {
-    transform: translateX(0);
-  }
-}
-
-/* 🔹 Scrollbar */
-.drawer::-webkit-scrollbar {
-  width: 6px;
-}
-.drawer::-webkit-scrollbar-thumb {
-  background-color: rgba(142, 45, 226, 0.3);
-  border-radius: 5px;
-}
-/* ✅ Mobile responsive adjustment */
-@media (max-width: 768px) {
-  .empty-box {
-    height: calc(100vh - 120px);
-    gap: 8px;
-  }
-  .empty-box img {
-    width: 80px; /* 🔹 ছোট করা হলো */
-    opacity: 0.9;
-  }
-  .empty-box p {
-    font-size: 14px;
-  }
+  background: #553c9a;
 }
 </style>
